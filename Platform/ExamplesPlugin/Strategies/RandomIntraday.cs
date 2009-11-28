@@ -50,7 +50,7 @@ namespace TickZoom
 			    tickTime > randomEntries[randomIndex])
 			{
 				int randSignal = randomEntries[randomIndex].Second % 2;
-				Position.Signal = randSignal == 1 ? 1 : -1;
+				Position.Change( randSignal == 1 ? 1 : -1);
 				
 				randomIndex ++;
 			}

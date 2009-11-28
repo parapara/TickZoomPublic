@@ -79,8 +79,8 @@ namespace TickZoom.Common
 		
 		public override bool OnProcessTick(Tick tick)
 		{
-			if( IsTrace) Log.Trace("ProcessTick() Previous="+next+" Signal="+next.Position.Signal);
-			if( next.Position.Signal != Position.Signal) {
+			if( IsTrace) Log.Trace("ProcessTick() Previous="+next+" Signal="+next.Position.Current);
+			if( next.Position.Current != Position.Current) {
 				if( IsTrace) Log.Trace("ProcessTick() Signal Changed.");
 				if( IsTrace) Log.Indent();
 				if( Position.IsFlat) {
@@ -109,7 +109,7 @@ namespace TickZoom.Common
 				}
 				if( IsTrace) Log.Outdent();
 			} 
-			Position.Signal = next.Position.Signal;
+			Position.Change(next.Position.Current);
 			if( Position.HasPosition) {
 				transactionPairsBinary.Current.UpdatePrice(tick);
 				comboTradesBinary.Current.UpdatePrice(tick);
@@ -124,8 +124,8 @@ namespace TickZoom.Common
 		private void EnterTransactionInternal() {
 			if( IsTrace) Log.Trace("EnterTradeInternal()");
 			TransactionPairBinary pair = TransactionPairBinary.Create();
-			pair.Direction = next.Position.Signal;
-			if( next.Position.Signal > 0) {
+			pair.Direction = next.Position.Current;
+			if( next.Position.Current > 0) {
 				pair.EntryPrice = Ticks[0].Ask;
 			} else {
 				pair.EntryPrice = Ticks[0].Bid;
@@ -136,9 +136,9 @@ namespace TickZoom.Common
 		}
 		
 		private void EnterComboTradeInternal() {
-			if( next.Position.Signal > 0) {
+			if( next.Position.Current > 0) {
 				EnterComboTrade(Ticks[0].Ask);
-			} else if( next.Position.Signal < 0) {
+			} else if( next.Position.Current < 0) {
 				EnterComboTrade(Ticks[0].Bid);
 			} else {
 				throw new ApplicationException( "Direction was unset.");
@@ -148,7 +148,7 @@ namespace TickZoom.Common
 		public void EnterComboTrade(double fillPrice) {
 			if( IsTrace) Log.Trace("EnterComboTradeInternal()");
 			TransactionPairBinary pair = TransactionPairBinary.Create();
-			pair.Direction = next.Position.Signal;
+			pair.Direction = next.Position.Current;
 			pair.EntryPrice = fillPrice;
 			pair.EntryTime = Ticks[0].Time;
 			pair.EntryBar = Chart.ChartBars.BarCount;
@@ -159,10 +159,10 @@ namespace TickZoom.Common
 		private void ChangeComboSizeInternal() {
 			if( IsTrace) Log.Trace("ChangeComboSizeInternal()");
 			TransactionPairBinary combo = comboTradesBinary.Current;
-			if( next.Position.Signal > 0) {
-				combo.ChangeSize(next.Position.Signal,Ticks[0].Ask);
+			if( next.Position.Current > 0) {
+				combo.ChangeSize(next.Position.Current,Ticks[0].Ask);
 			} else {
-				combo.ChangeSize(next.Position.Signal,Ticks[0].Bid);
+				combo.ChangeSize(next.Position.Current,Ticks[0].Bid);
 			}
 			comboTradesBinary.Current = combo;
 		}

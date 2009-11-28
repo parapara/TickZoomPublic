@@ -37,9 +37,9 @@ namespace TickZoom.Common
 	public class PositionCommon : PositionInterface
 	{
 		protected Color signalColor = Color.Blue;
-		protected double signal = 0;
-		protected TimeStamp signalTime;
-		protected double signalPrice = 0;
+		protected double current = 0;
+		protected TimeStamp time;
+		protected double price = 0;
 		protected ModelInterface model;
 		protected string symbol = "default";
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -49,22 +49,42 @@ namespace TickZoom.Common
 			this.model = model;
 		}
 		
+		[Obsolete("Please use Current instead.",true)]
 		public virtual double Signal {
-			get { return signal; }
-			set { 
-				#if TRACE
-				if( value != signal) {
-					if( trace) log.Trace(model.Name+".Signal("+value+")");
-					if( trace) log.TickOn();
-				} else {
-					if( trace) log.TickOff();
-				}
-				#endif
-				if( signal != value) {
-					signalTime = model.Data.Ticks[0].Time;
-					signalPrice = model.Data.Ticks[0].Bid;
-					signal = value;
-				}
+			get { return current; }
+			set { }
+		}
+		
+		public virtual double Current {
+			get { return current; }
+		}
+		
+		public void Change( double position) {
+			double price;
+			if( position > current) {
+				price = model.Data.Ticks[0].Ask;
+			} else if( position < current) {
+				price = model.Data.Ticks[0].Bid;
+			} else {
+				price = 0;
+			}
+			price = model.Data.Ticks[0].Bid;
+			Change( position, price, model.Data.Ticks[0].Time);
+		}
+		
+		public virtual void Change( double position, double price, TimeStamp time) {
+			#if TRACE
+			if( value != current) {
+				if( trace) log.Trace(model.Name+".Signal("+value+")");
+				if( trace) log.TickOn();
+			} else {
+				if( trace) log.TickOff();
+			}
+			#endif
+			if( current != position) {
+				this.time = time;
+				this.price = price;
+				this.current = position;
 			}
 		}
 		
@@ -77,32 +97,42 @@ namespace TickZoom.Common
 			set { signalColor = value; }
 		}
 
+		[Obsolete("Please use Price instead.",true)]
 		public double SignalPrice {
-			get { return signalPrice; }
+			get { return price; }
 		}
 		
+		public double Price {
+			get { return price; }
+		}
+		
+		[Obsolete("Please use Time instead.",true)]
 		public TimeStamp SignalTime {
-			get { return signalTime; }
+			get { return time; }
+		}
+		
+		public TimeStamp Time {
+			get { return time; }
 		}
 		
 		public bool IsFlat {
-			get { return signal == 0; }
+			get { return current == 0; }
 		}
 		
 		public bool HasPosition {
-			get { return signal != 0; }
+			get { return current != 0; }
 		}
 		
 		public bool IsLong {
-			get { return signal > 0; }
+			get { return current > 0; }
 		}
 
 		public bool IsShort {
-			get { return signal < 0; }
+			get { return current < 0; }
 		}
 
 		public double Size {
-			get { return Math.Abs(signal); }
+			get { return Math.Abs(current); }
 		}
 	}
 }

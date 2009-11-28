@@ -71,15 +71,16 @@ namespace TickZoom.TradingFramework
 				public TradingTest( RandomTestInner formula ) : base(formula) {
 					this.model = formula;
 				}
-				public override double Signal  {
-	//				get { return base.Signal; }
-					set {
-						base.Signal = value;
-						if( model.prevSignal != value) {
-							model.signalChanges.Add(model.Ticks[0]);
-							model.signalDirection.Add(value);
-							model.prevSignal = value;
-						}
+				public override double Current  {
+					get { return base.current; }
+				}
+				public override void Change(double position, double price, TimeStamp time)
+				{
+					base.Change(position, price, time);
+					if( model.prevSignal != position) {
+						model.signalChanges.Add(model.Ticks[0]);
+						model.signalDirection.Add(position);
+						model.prevSignal = position;
 					}
 				}
 			}

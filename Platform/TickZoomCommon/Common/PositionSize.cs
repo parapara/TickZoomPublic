@@ -55,13 +55,13 @@ namespace TickZoom.Common
 	
 		public sealed override bool OnProcessTick(Tick tick)
 		{
-			if( IsTrace) Log.Trace("ProcessTick() Previous="+strategy+" Previous.Signal="+strategy.Position.Signal);
+			if( IsTrace) Log.Trace("ProcessTick() Previous="+strategy+" Previous.Signal="+strategy.Position.Current);
 
 			// Is this a new position?
-			if( previousSignal != strategy.Position.Signal ) {
+			if( previousSignal != strategy.Position.Current ) {
 				// Pass 
-				previousSignal = strategy.Position.Signal;
-				Position.Signal = strategy.Position.Signal * size;
+				previousSignal = strategy.Position.Current;
+				Position.Change(strategy.Position.Current * size);
 			}
 			return true;
 		}

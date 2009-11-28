@@ -67,7 +67,7 @@ namespace TickZoom
 		{
 			if( timeFrame.Equals(Intervals.Minute1)) {
 				// Only play if trend is flat.
-				if( Next.Position.Signal == 0) {
+				if( Next.Position.Current == 0) {
 					if( Position.IsFlat && Formula.CrossesOver( Bars.High, Weeks.High[1])) {
 						Orders.Enter.ActiveNow.SellMarket();
 					}

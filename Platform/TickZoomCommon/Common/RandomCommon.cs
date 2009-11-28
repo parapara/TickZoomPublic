@@ -59,8 +59,8 @@ namespace TickZoom.Common
 				    firstSession == true)
 				{
 					int sig = randomEntries[randomIndex].Second % 3 - 1;
-					if( sig != Position.Signal) {
-						Position.Signal = sig;
+					if( sig != Position.Current) {
+						Position.Change(sig);
 					}
 					randomIndex ++;
 				}

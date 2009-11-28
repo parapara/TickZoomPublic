@@ -57,12 +57,12 @@ namespace TickZoom
 			}
 			double median = (Bars.High[0] + Bars.Low[0])/2;
 			if( Position.IsLong) {
-				if( median < Position.SignalPrice) {
+				if( median < Position.Price) {
 					Orders.Exit.ActiveNow.GoFlat();
 				}
 			}
 			if( Position.IsShort) {
-				if( median > Position.SignalPrice) {
+				if( median > Position.Price) {
 					Orders.Exit.ActiveNow.GoFlat();
 				}
 			}
@@ -74,7 +74,7 @@ namespace TickZoom
 			
 			
 //			// If child strategy, make sure signal direction matches.
-			if( Next != null && Next.Position.Signal != Position.Signal) {
+			if( Next != null && Next.Position.Current != Position.Current) {
 				Orders.Exit.ActiveNow.GoFlat();
 			}
 			return true;

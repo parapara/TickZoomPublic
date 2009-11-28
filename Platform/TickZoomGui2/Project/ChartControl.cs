@@ -906,20 +906,20 @@ namespace TickZoom
 		public bool ProcessKeys(Keys keyData) {
 			bool blnProcess = false;
 			if( keyData == Keys.Up ) {
-				strategy.Position.Signal = 1;
+				strategy.Position.Change(1);
 				blnProcess = true;
 			}
 			if( keyData == Keys.Down ) {
-				strategy.Position.Signal = -1;
+				strategy.Position.Change(-1);
 				blnProcess = true;
 			}
 			if( keyData == Keys.Right) {
-				strategy.Position.Signal = - strategy.Position.Signal;
+				strategy.Position.Change(- strategy.Position.Current);
 				blnProcess = true;
 			}
 			if( keyData == Keys.Insert || keyData == Keys.D0 || keyData == Keys.NumPad0 ) {
 				// Go flat.
-				strategy.Position.Signal = 0;
+				strategy.Position.Change(0);
 				blnProcess = true;
 			}
 			return blnProcess;

@@ -34,16 +34,35 @@ namespace TickZoom.Api
 	}
 	
 	public interface PositionInterface {
+		[Obsolete("Please use Current instead.",true)]
 		double Signal {
 			get;
 			set;
 		}
 		
+		double Current {
+			get;
+		}
+		
+		void Change( double position);
+		
+		void Change( double position, double price, TimeStamp time);
+		
+		[Obsolete("Please use Price instead.",true)]
 		double SignalPrice {
 			get;
 		}
 		
+		double Price {
+			get;
+		}
+		
+		[Obsolete("Please use Time instead.",true)]
 		TimeStamp SignalTime {
+			get;
+		}
+		
+		TimeStamp Time {
 			get;
 		}
 		

@@ -63,15 +63,15 @@ namespace TickZoom
 				double low = Formula.Lowest(Bars.Low,slow+1);
 				int current = (int) tema[0];
 				if( sma.Count > slow) {
-					if( Next.Position.Signal > 0) low = (int) Math.Min(sma[0],Bars.Low[0]);
-					if( Next.Position.Signal < 0) high = (int) Math.Max(sma[0],Bars.High[0]);
+					if( Next.Position.Current > 0) low = (int) Math.Min(sma[0],Bars.Low[0]);
+					if( Next.Position.Current < 0) high = (int) Math.Max(sma[0],Bars.High[0]);
 				}
 				if( percentR.Count > 5) {
 					percentR[0] = (current - low) * 100 / (high - low + 1);
 				} else {
 					percentR[0] = 50;
 				}
-				if( Next.Position.Signal == 0) { 
+				if( Next.Position.Current == 0) { 
 					if( percentR[0] > 100 - threshhold) { Orders.Enter.ActiveNow.SellMarket(); }
 					if( percentR[0] < threshhold) { Orders.Enter.ActiveNow.BuyMarket(); }
 				} else {

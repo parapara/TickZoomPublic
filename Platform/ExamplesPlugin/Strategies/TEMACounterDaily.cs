@@ -57,7 +57,7 @@ namespace TickZoom
 		public override bool OnProcessTick(Tick tick)
 		{
 			if( fastTema.Count>0 && slowTema.Count>0) {
-				Position.Signal = fastTema[0] > slowTema[0] ? -1 : 1;
+				Position.Change(fastTema[0] > slowTema[0] ? -1 : 1);
 			} else {
 				Orders.Exit.ActiveNow.GoFlat();
 			}

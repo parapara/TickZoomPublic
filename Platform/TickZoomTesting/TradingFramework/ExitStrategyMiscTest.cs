@@ -73,7 +73,7 @@ namespace TickZoom.TradingFramework
 			Strategy logic = new Strategy();
 			ExitStrategy strategy = new ExitStrategy(logic);
 			Assert.AreEqual(false,strategy.ControlStrategy,"ControlStrategySignal");
-			Assert.AreEqual(0,strategy.Position.Signal,"Signal");
+			Assert.AreEqual(0,strategy.Position.Current,"Signal");
 			Assert.AreEqual(0,strategy.StopLoss,"Stop");
 			Assert.AreEqual(0,strategy.TargetProfit,"Target");
 		}

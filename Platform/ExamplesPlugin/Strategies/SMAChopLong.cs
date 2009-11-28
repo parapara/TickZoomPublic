@@ -71,7 +71,7 @@ namespace TickZoom
 				if( diff[0] > highTrigger) {
 					Orders.Exit.ActiveNow.GoFlat();
 				}
-				Elapsed span = Position.SignalTime - Bars.Time[0];
+				Elapsed span = Position.Time - Bars.Time[0];
 				if( span.TotalHours > maxHours) {
 					Orders.Exit.ActiveNow.GoFlat();
 				}

@@ -1180,20 +1180,20 @@ namespace TickZoom
 		public bool ProcessKeys(Keys keyData) {
 			bool blnProcess = false;
 			if( keyData == Keys.Up ) {
-				strategyForTrades.Position.Signal = 1;
+				strategyForTrades.Position.Change(1);
 				blnProcess = true;
 			}
 			if( keyData == Keys.Down ) {
-				strategyForTrades.Position.Signal = -1;
+				strategyForTrades.Position.Change(-1);
 				blnProcess = true;
 			}
 			if( keyData == Keys.Right) {
-				strategyForTrades.Position.Signal = - strategyForTrades.Position.Signal;
+				strategyForTrades.Position.Change(- strategyForTrades.Position.Current);
 				blnProcess = true;
 			}
 			if( keyData == Keys.Insert || keyData == Keys.D0 || keyData == Keys.NumPad0 ) {
 				// Go flat.
-				strategyForTrades.Position.Signal = 0;
+				strategyForTrades.Position.Change( 0);
 				blnProcess = true;
 			}
 			return blnProcess;

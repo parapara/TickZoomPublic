@@ -77,7 +77,7 @@ namespace TickZoom
 				Orders.Exit.ActiveNow.GoFlat();
 			}
 			// If child strategy, make sure signal direction matches.
-			if( Next != null && Next.Position.Signal != Position.Signal) {
+			if( Next != null && Next.Position.Current != Position.Current) {
 				Orders.Exit.ActiveNow.GoFlat();
 			}
 			return true;

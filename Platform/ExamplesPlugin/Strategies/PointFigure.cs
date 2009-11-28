@@ -59,7 +59,7 @@ namespace TickZoom
 						Orders.Enter.ActiveNow.SellMarket();
 					}
 				} else {
-					if( Ticks[0].Ask > high && Ticks[0].Ask < Position.SignalPrice - 100) {
+					if( Ticks[0].Ask > high && Ticks[0].Ask < Position.Price - 100) {
 						Orders.Enter.ActiveNow.BuyMarket(Position.Size*1.5);
 						barFlag = true;
 					}
@@ -74,7 +74,7 @@ namespace TickZoom
 						Orders.Enter.ActiveNow.BuyMarket();
 					}
 				} else {
-					if( Ticks[0].Bid < low && Ticks[0].Bid > Position.SignalPrice + 100) {
+					if( Ticks[0].Bid < low && Ticks[0].Bid > Position.Price + 100) {
 						Orders.Enter.ActiveNow.SellMarket(Position.Size*1.5);
 						barFlag = true;
 					}

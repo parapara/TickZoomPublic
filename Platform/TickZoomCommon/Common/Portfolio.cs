@@ -108,9 +108,9 @@ namespace TickZoom.Common
 			if( portfolioType == PortfolioType.SingleSymbol) {
 				double internalSignal = 0;
 				foreach( var strategy in strategies) {
-					internalSignal += strategy.Performance.Position.Signal;
+					internalSignal += strategy.Performance.Position.Current;
 				}
-				Position.Signal = internalSignal;
+				Position.Change(internalSignal);
 				return true;
 			} else if( portfolioType == PortfolioType.MultiSymbol) {
 				double tempClosedEquity = 0;

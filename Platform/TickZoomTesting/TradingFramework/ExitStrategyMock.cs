@@ -63,16 +63,18 @@ namespace TickZoom.TradingFramework
 			public TradeSignalTest( ExitStrategyMock formula ) : base(formula) {
 				this.model = formula;
 			}
-			public override double Signal  {
-				get { return base.Signal; }
-				set { base.Signal = value;
-						if( base.Signal != model.prevSignal) {
-							Tick tick = model.Ticks[0];
-							log.Debug( model.signalChanges.Count + " " + tick);
-							model.signalChanges.Add(tick.Time);
-							model.signalDirection.Add(base.Signal);
-							model.prevSignal = base.Signal;
-						}
+			public override double Current  {
+				get { return base.Current; }
+			}
+			public override void Change(double position, double price, TimeStamp time)
+			{
+				base.Change(position, price, time);
+				if( base.Current != model.prevSignal) {
+					Tick tick = model.Ticks[0];
+					log.Debug( model.signalChanges.Count + " " + tick);
+					model.signalChanges.Add(tick.Time);
+					model.signalDirection.Add(base.Current);
+					model.prevSignal = base.Current;
 				}
 			}
 	

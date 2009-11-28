@@ -93,14 +93,15 @@ namespace TickZoom.Common
 				public TradingSignalTest( PerformanceInner formula ) : base(formula) {
 					this.model = formula;
 				}
-				public override double Signal  {
-					get { return base.Signal; }
-					set { base.Signal = value;
-							if( base.Signal != model.prevSignal) {
+				public override double Current  {
+					get { return base.Current; }
+				}
+				public override void Change( double position, double price, TimeStamp time) {
+					base.Change( position,price,time);
+					if( base.Current != model.prevSignal) {
 							model.signalChanges.Add(model.Ticks[0]);
-							model.signalDirection.Add(base.Signal);
-							model.prevSignal = base.Signal;
-						}
+							model.signalDirection.Add(base.Current);
+							model.prevSignal = base.Current;
 					}
 				}
 			}

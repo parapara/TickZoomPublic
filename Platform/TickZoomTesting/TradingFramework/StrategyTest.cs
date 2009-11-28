@@ -79,7 +79,7 @@ namespace TickZoom.EngineTests
 		}
 
 		public Elapsed SignalElapsed {
-			get { return Ticks[0].Time - Position.SignalTime; }
+			get { return Ticks[0].Time - Position.Time; }
 		}
 		
 		public Interval IntervalDefault {

@@ -81,20 +81,20 @@ namespace TickZoom.Common
 	
 		public sealed override bool OnProcessTick(Tick tick)
 		{
-			if( IsTrace) Log.Trace("ProcessTick() Previous="+Strategy+" Previous.Signal="+Strategy.Position.Signal);
+			if( IsTrace) Log.Trace("ProcessTick() Previous="+Strategy+" Previous.Signal="+Strategy.Position.Current);
 			
 			if( stopTradingToday || stopTradingThisWeek || stopTradingThisMonth ) {
 				return true;
 			}
 			if( (strategySignal>0) != Strategy.Position.IsLong || (strategySignal<0) != Strategy.Position.IsShort ) {
-				strategySignal = Strategy.Position.Signal;
+				strategySignal = Strategy.Position.Current;
 				if( strategySignal > 0) {
 					entryPrice = tick.Ask;
 				} else {
 					entryPrice = tick.Bid;
 				}
 				maxPnl = 0;
-				Position.Signal = strategySignal;
+				Position.Change(strategySignal);
 				trailStop = 0;
 				breakEvenStop = 0;
 				CancelOrders();
@@ -102,7 +102,7 @@ namespace TickZoom.Common
 			
 			if( Position.HasPosition ) {
 				// copy signal in case of increased position size
-				Position.Signal = Strategy.Position.Signal;
+				Position.Change(Strategy.Position.Current);
 				double exitPrice;
 				if( strategySignal > 0) {
 					exitPrice = tick.Bid;
@@ -200,7 +200,7 @@ namespace TickZoom.Common
 				}
                 Strategy.Chart.DrawTrade(order, fillPrice, 0);
             }
-			Position.Signal = 0;
+            Position.Change(0);
 			CancelOrders();
 			if( controlStrategy) {
 				Strategy.Orders.Exit.ActiveNow.GoFlat();
