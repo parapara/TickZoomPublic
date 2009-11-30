@@ -99,8 +99,7 @@ namespace TickZoom.TickUtil
 				symbol = Factory.Symbol.LookupSymbol(baseName.Replace("_Tick",""));
 				lSymbol = symbol.BinaryIdentifier;
 			}
-			FileInfo f2 = new FileInfo(fileName);
-	       	length = f2.Length;
+   			Directory.CreateDirectory( Path.GetDirectoryName(fileName));
 		}
 		
 		public Y GetLastTick() {

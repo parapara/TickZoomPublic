@@ -51,6 +51,7 @@ namespace RealTime
 		public override void RunStrategy()
 		{
 			ConfigurationManager.AppSettings.Set("TestProviderCutOff-Daily4Sim","1984-12-31 00:00:00.000");
+			base.Symbols="Mock4Sim";
 			base.RunStrategy();
 		}
 	}

@@ -283,6 +283,8 @@ namespace TickZoom.Common
       <symbol name=""Design"" />
       <symbol name=""FullTick"" />
       <symbol name=""Daily4Ticks"" />
+      <symbol name=""MockFull"" />
+      <symbol name=""Mock4Ticks"" />
       <symbol name=""Daily4Sim"" />
       <symbol name=""TXF"" />
       <symbol name=""spyTestBars"" />

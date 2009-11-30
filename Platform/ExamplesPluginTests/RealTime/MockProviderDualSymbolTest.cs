@@ -41,7 +41,7 @@ namespace RealTime
 {
 #if ! PROVIDER
 	[TestFixture]
-	 public class MockProviderDualSymbol : ExampleDualSymbolTest
+	public class MockProviderDualSymbol : ExampleDualSymbolTest
 	{
 		public override Starter CreateStarter()
 		{
@@ -50,8 +50,7 @@ namespace RealTime
 		[TestFixtureSetUpAttribute()]
 		public override void RunStrategy()
 		{
-			ConfigurationManager.AppSettings.Set("TestProviderCutOff-Daily4Sim","1984-12-31 00:00:00.000");
-			ConfigurationManager.AppSettings.Set("TestProviderCutOff-FullTick","1984-12-31 00:00:00.000");
+			base.Symbols="MockFull,Mock4Sim";
 			base.RunStrategy();
 		}
 	}

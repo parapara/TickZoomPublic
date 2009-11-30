@@ -47,6 +47,7 @@ namespace Loaders
 		ExampleOrderStrategy fourTicksPerBar;
 		ExampleOrderStrategy fullTickData;
 		PortfolioCommon portfolio;
+		string symbols = "FullTick,Daily4Sim";
 		
 		public virtual Starter CreateStarter() {
 			return new HistoricalStarter();
@@ -61,7 +62,7 @@ namespace Loaders
 				starter.ProjectProperties.Starter.StartTime = new TimeStamp(1800,1,1);
 	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp(1990,1,1);
 	    		starter.DataFolder = "TestData";
-	    		starter.ProjectProperties.Starter.Symbols = "FullTick,Daily4Sim";
+	    		starter.ProjectProperties.Starter.Symbols = symbols;
 				starter.ProjectProperties.Starter.IntervalDefault = Intervals.Day1;
 				starter.ProjectProperties.Engine.RealtimeOutput = false;
 				
@@ -148,6 +149,11 @@ namespace Loaders
 		[Test]
 		public void CompareBars1() {
 			CompareChart(fourTicksPerBar);
+		}
+		
+		public string Symbols {
+			get { return symbols; }
+			set { symbols = value; }
 		}
 	}
 

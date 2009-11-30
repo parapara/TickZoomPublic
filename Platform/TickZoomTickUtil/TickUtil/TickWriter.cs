@@ -43,7 +43,7 @@ namespace TickZoom.TickUtil
    		int maxCount = 0;
    		SymbolInfo symbol = null;
 		string fileName = null;
-		Task appendThread = null;
+		Thread appendThread = null;
 		protected TickQueue writeQueue;
 		private static readonly Log log = Factory.Log.GetLogger(typeof(TickWriter));
 		private static readonly bool debug = log.IsDebugEnabled;
@@ -70,12 +70,17 @@ namespace TickZoom.TickUtil
 		}
 		
 		public void Initialize(string _folder, SymbolInfo _symbol) {
-			this.symbol = _symbol;
+			symbol = _symbol;
        		string storageFolder = Factory.Settings["AppDataFolder"];
        		if( storageFolder == null) {
        			throw new ApplicationException( "Must set AppDataFolder property in app.config");
        		}
-       		string fileNameRoot = storageFolder + "\\" + _folder + "\\" + symbol + "_Tick";
+       		char[] invalidChars = Path.GetInvalidPathChars();
+       		string symbolStr = _symbol.Symbol;
+       		foreach( char invalid in invalidChars) {
+       			symbolStr = symbolStr.Replace(new string(invalid,1),"");
+       		}
+       		string fileNameRoot = storageFolder + "\\" + _folder + "\\" + symbolStr + "_Tick";
 			fileName = fileNameRoot+".tck";
 			Initialize( fileName);
 		}
@@ -85,31 +90,42 @@ namespace TickZoom.TickUtil
     		this.fileName = filePath;
 			Directory.CreateDirectory( Path.GetDirectoryName(FileName));
 			string baseName = Path.GetFileNameWithoutExtension(filePath);
-			this.symbol = Factory.Symbol.LookupSymbol(baseName.Replace("_Tick",""));
+			if( this.symbol == null) {
+				this.symbol = Factory.Symbol.LookupSymbol(baseName.Replace("_Tick",""));
+			}
 			if( eraseFileToStart) {
     			File.Delete( fileName);
     			log.Notice("TickWriter file was erased to begin writing.");
     		}
+			if( keepFileOpen) {
+    			fs = new FileStream(fileName, FileMode.Append);
+   				log.Debug("keepFileOpen - Open()");
+    			memory = new MemoryStream();
+			}
      		if( !CancelPending ) {
 				StartAppendThread();
 			}
 		}
 
 		protected virtual void StartAppendThread() {
-			Directory.CreateDirectory( Path.GetDirectoryName(fileName));
-			if( keepFileOpen) {
-    			fs = new FileStream(fileName, FileMode.Append);
-   				log.Debug("keepFileOpen - Open()");
-    			memory = new MemoryStream();
-			}
-	        appendThread = Factory.Parallel.IO.Loop(this,AppendData);
+			string baseName = Path.GetFileNameWithoutExtension(fileName);
+	        appendThread = new Thread(AppendDataLoop);
+	        appendThread.Name = baseName + " writer";
+	        appendThread.Start();
 		}
 		
 		TickBinary tick = new TickBinary();
 		TickIO tickIO = new TickImpl();
+		protected virtual void AppendDataLoop() {
+			try { 
+				while( AppendData());
+			} catch( Exception ex) {
+				log.Error( ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
+			}
+		}
+		
 		protected virtual bool AppendData() {
 			try {
-				if( !writeQueue.CanDequeue) return false;
 				writeQueue.Dequeue(ref tick);
 				tickIO.init(tick);
 				if( trace) {
@@ -126,7 +142,6 @@ namespace TickZoom.TickUtil
 						fs.Close();
 	    				log.Debug("Terminate - Close()");
 					}
-					Factory.Parallel.CurrentTask.Stop();
 					return false;
 				} else {
 					Exception exception = new ApplicationException("Queue returned unexpected: " + ex.EntryType);
@@ -192,6 +207,12 @@ namespace TickZoom.TickUtil
 		public void Add(TickIO tickIO) {
 			TickBinary tick = tickIO.Extract();
 			writeQueue.EnQueue(ref tick);
+		}
+		
+		public bool CanReceive {
+			get {
+				return writeQueue.CanEnqueue;
+			}
 		}
 		
 		public virtual void Close() {
