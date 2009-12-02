@@ -32,13 +32,19 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of StrategySupport.
 	/// </summary>
-	public class PositionSizeCommon : StrategySupport
+	[Obsolete("Please use PositionSize instead.",true)]
+	public class PositionSizeCommon : PositionSize
+	{
+		public PositionSizeCommon(Strategy strategy) : base(strategy) {
+		}
+	}
+	public class PositionSize : StrategySupport
 	{
 		double size = 1;
 		double previousSignal = 0;
 		StrategySupportInterface strategy;
 		
-		public PositionSizeCommon(StrategyCommon strategy) : base(strategy) {
+		public PositionSize(Strategy strategy) : base(strategy) {
 		}
 		
 		public override void OnInitialize()

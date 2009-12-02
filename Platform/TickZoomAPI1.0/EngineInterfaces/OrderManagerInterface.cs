@@ -38,7 +38,7 @@ namespace TickZoom.Api
 	public interface OrderManagerInterface
 	{
 	 	IList<LogicalOrder> Orders { get; }
-	 	Position Position {
+	 	PositionInterface Position {
 	 		get;
 	 	}
 	}

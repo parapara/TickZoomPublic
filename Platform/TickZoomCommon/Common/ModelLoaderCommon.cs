@@ -36,10 +36,10 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of Starter.
 	/// </summary>
-	public abstract class ModelLoaderCommon : ModelLoader
+	public abstract class ModelLoaderCommon : ModelLoaderInterface
 	{
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		IList<StrategyCommon> models = new List<StrategyCommon>();
+		IList<Strategy> models = new List<Strategy>();
 		List<ModelProperty> variables = new List<ModelProperty>();
 		List<OptimizeRange> rules = new List<OptimizeRange>();
 		bool isVisibleInGUI = true;
@@ -71,19 +71,19 @@ namespace TickZoom.Common
 			return CreateStrategy(type,name);
 		}
 		 
-		public StrategyCommon CreateStrategy( string type, string name) {
+		public Strategy CreateStrategy( string type, string name) {
 			ModelInterface model;
 			for( int i = 0; i< models.Count; i++) {
 				if( models[i].Name == name) {
 					if( models[i].GetType().Name != type) {
 						throw new ApplicationException("Model already exists with name " + name + " with different type");
 					}
-					return models[i] as StrategyCommon;
+					return models[i] as Strategy;
 				}
 			}
 			model = CreateStrategy(type);
 			model.Name = name;
-			return model as StrategyCommon;
+			return model as Strategy;
 		}
 		
 		[Obsolete("Please use CreateStrategy() instead.",true)]
@@ -91,7 +91,7 @@ namespace TickZoom.Common
 			return CreateStrategy( type);
 		}
 		
-		public StrategyCommon CreateStrategy( string type) {
+		public Strategy CreateStrategy( string type) {
 			ModelInterface model;
 			for( int i = 0; i< models.Count; i++) {
 				if( models[i].Name == type) {
@@ -107,12 +107,12 @@ namespace TickZoom.Common
 				log.Error( "Please make sure " + type + " exists and has a default constructor. ", ex);
 				return null;
 			}
-			models.Add( model as StrategyCommon);
-			return model as StrategyCommon;
+			models.Add( model as Strategy);
+			return model as Strategy;
 		}
 
-		public StrategyCommon GetStrategy( string name) {
-			return (StrategyCommon) GetModelInternal( name);
+		public Strategy GetStrategy( string name) {
+			return (Strategy) GetModelInternal( name);
 		}
 		
 		[Obsolete("Please use GetStrategy() instead",true)]
@@ -142,7 +142,7 @@ namespace TickZoom.Common
 		}
 		
 		public void AddDependency( string current, string previous) {
-			StrategyCommon previousStrategy = null;
+			Strategy previousStrategy = null;
 			for( int i = 0; i< models.Count; i++) {
 				if( models[i].Name == previous) {
 					previousStrategy = models[i];
@@ -157,8 +157,8 @@ namespace TickZoom.Common
 			AddDependency( current, previousStrategy);
 		}
 		
-		public void AddDependency( string current, StrategyCommon previousStrategy) {
-			StrategyCommon currentStrategy = null;
+		public void AddDependency( string current, Strategy previousStrategy) {
+			Strategy currentStrategy = null;
 			for( int i = 0; i< models.Count; i++) {
 				if( models[i].Name == current) {
 					currentStrategy = models[i];
@@ -173,7 +173,7 @@ namespace TickZoom.Common
 			AddDependency(currentStrategy,previousStrategy);
 		}
 		
-		public void AddDependency( StrategyCommon currentStrategy, StrategyCommon previousStrategy) {
+		public void AddDependency( Strategy currentStrategy, Strategy previousStrategy) {
 			currentStrategy.Chain.Dependencies.Add(previousStrategy.Chain.Root);
 		}
 		                          

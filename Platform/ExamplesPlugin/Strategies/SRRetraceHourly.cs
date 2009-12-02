@@ -30,7 +30,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class SRRetraceHourly : StrategyCommon
+	public class SRRetraceHourly : Strategy
 	{
 		Retrace retrace;
 		int contractSize = 1;

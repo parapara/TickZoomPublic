@@ -31,7 +31,7 @@ using TickZoom.TickUtil;
 #if TESTING
 namespace TickZoom.TradingFramework
 {
-	public class StrategySupportMock : StrategyCommon {
+	public class StrategySupportMock : Strategy {
 		public BarsList openMinuteBars = new BarsList();
 		public BarsList openMinute30Bars = new BarsList();
 		public BarsList openHourBars = new BarsList();

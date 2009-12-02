@@ -31,7 +31,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class FractalStrategy : StrategyCommon
+	public class FractalStrategy : Strategy
 	{
 		bool isActivated = false;
 		TEMA average;

@@ -45,7 +45,7 @@ namespace TickZoom.Common
 		List<Chromosome> alreadyTried;
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		List<TickEngine> engineIterations = new List<TickEngine>();
-		ModelLoader loader;
+		ModelLoaderInterface loader;
 		
 		public static List<int> GetIndexes(ModelProperty var) {
 			List<int> list = new List<int>(var.Count);
@@ -74,7 +74,7 @@ namespace TickZoom.Common
 			throw new MustUseLoaderException("Must set only ModelLoader instead of Model for Genetic Optimization");
 		}
 		
-		public override void Run(ModelLoader loader)
+		public override void Run(ModelLoaderInterface loader)
 		{
 			this.loader = loader;
 			log.Notice( "Beginning Genetic Optimize of: ");

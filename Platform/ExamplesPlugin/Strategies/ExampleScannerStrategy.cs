@@ -30,7 +30,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class ExampleScannerStrategy : PortfolioCommon
+	public class ExampleScannerStrategy : Portfolio
 	{
 		
 		public ExampleScannerStrategy() {

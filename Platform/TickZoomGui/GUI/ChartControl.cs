@@ -55,7 +55,7 @@ namespace TickZoom
 	    TimeStamp firstTime;
 		StockPointList stockPointList;
 		List<PointPairList> lineList;
-		List<Indicator> indicators; 
+		List<IndicatorInterface> indicators; 
 		object chartLocker = new Object();
 		bool showPriceGraph = true;
 		int objectId = 0;
@@ -89,7 +89,7 @@ namespace TickZoom
 			InitializeComponent();
 		    stockPointList = new StockPointList();
 		    lineList = new List<PointPairList>();
-		    indicators = new List<Indicator>();
+		    indicators = new List<IndicatorInterface>();
 		    try {
 				log = Factory.Log.GetLogger(typeof(ChartControl));
 				debug = log.IsDebugEnabled;
@@ -320,7 +320,7 @@ namespace TickZoom
 			myPaneT.Margin.Bottom = 10;
 		}
 	
-		public List<Indicator> Indicators {
+		public List<IndicatorInterface> Indicators {
 			get { return indicators; }
 		}
 		
@@ -560,7 +560,7 @@ namespace TickZoom
 		// Update lines for all indicators.
 		private void UpdateIndicators(Bars updateSeries) {
 		    for( int j = 0; j < indicators.Count; j++) {
-    			Indicator indicator = indicators[j];
+    			IndicatorInterface indicator = indicators[j];
     			if( lineList.Count <= j) {
 					lineList.Add( new PointPairList());
     			}
@@ -568,7 +568,7 @@ namespace TickZoom
 			}
 		}
 		
-		private void UpdateIndicator(int index, Indicator indicator, Bars updateSeries) {
+		private void UpdateIndicator(int index, IndicatorInterface indicator, Bars updateSeries) {
 			if( indicator.Count > 0) { 
 				while( lineList[index].Count <= updateSeries.CurrentBar) {
 					lineList[index].Add(double.NaN,double.NaN);
@@ -587,7 +587,7 @@ namespace TickZoom
 			}
 		}
 
-		private void UpdateOrdinaryIndicator(int index, Indicator indicator, Bars updateSeries) {
+		private void UpdateOrdinaryIndicator(int index, IndicatorInterface indicator, Bars updateSeries) {
 			int colorIndex = 1;
 			try {
 				colorIndex = indicator.Drawing.ColorIndex;
@@ -602,7 +602,7 @@ namespace TickZoom
 			ppair.Z = colorIndex;
 		}
 		
-		private void UpdatePaintBar(Indicator indicator) {
+		private void UpdatePaintBar(IndicatorInterface indicator) {
 			if( paintBarName.Length > 0) {
 				throw new ApplicationException( "Only one paint bar: " + paintBarName + 
 				                           ". Found conflicting paint bar: " + indicator.Name);
@@ -612,7 +612,7 @@ namespace TickZoom
 			lastColorValue = (int) indicator[0];
 		}
 
-		private void UpdateHistoGram(int index, Indicator indicator, Bars updateSeries) {
+		private void UpdateHistoGram(int index, IndicatorInterface indicator, Bars updateSeries) {
 			int colorIndex = 1;
 			try {
 				colorIndex = indicator.Drawing.ColorIndex;

@@ -31,9 +31,12 @@ using System;
 
 namespace TickZoom.Api
 {
-	/// <summary>
-	/// Description of Indicator.
-	/// </summary>
+	public interface IndicatorInterface : ModelInterface, Doubles
+	{
+		
+	}
+	
+	[Obsolete("Please use IndicatorInterface instead.",true)]
 	public interface Indicator : ModelInterface, Doubles
 	{
 		

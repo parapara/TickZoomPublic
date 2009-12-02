@@ -37,7 +37,7 @@ namespace TickZoom
 		public double ProfitLoss;
 	}
 		
-	public class SRTraverseMinutes : StrategyCommon
+	public class SRTraverseMinutes : Strategy
 	{
 		int contractSize = 1;
 		IndicatorCommon stretch;

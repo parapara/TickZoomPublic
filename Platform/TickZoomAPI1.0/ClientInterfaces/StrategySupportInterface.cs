@@ -34,7 +34,7 @@ namespace TickZoom.Api
 {
 	public interface StrategySupportInterface : ModelInterface
 	{
-		Position Position {
+		PositionInterface Position {
 			get;
 			set;
 		}

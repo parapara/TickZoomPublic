@@ -32,10 +32,7 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	/// <summary>
-	/// Description of StrategySupport.
-	/// </summary>
-	public class ExitStrategyCommon : StrategySupport
+	public class ExitStrategy : StrategySupport
 	{
 		private bool controlStrategy = false;
 		private double strategySignal = 0;
@@ -60,7 +57,7 @@ namespace TickZoom.Common
 		bool stopTradingThisWeek = false;
 		bool stopTradingThisMonth = false;
 		
-		public ExitStrategyCommon(StrategyCommon strategy) : base( strategy) {
+		public ExitStrategy(Strategy strategy) : base( strategy) {
 			RequestUpdate(Intervals.Day1);
 			RequestUpdate(Intervals.Week1);
 			RequestUpdate(Intervals.Month1);
@@ -366,4 +363,13 @@ namespace TickZoom.Common
 		}
 		
 	}
+
+	[Obsolete("Please use ExitStrategy instead.",true)]
+	public class ExitStrategyCommon : ExitStrategy
+	{
+		public ExitStrategyCommon(Strategy strategy) : base( strategy) {
+			
+		}
+	}
+		
 }

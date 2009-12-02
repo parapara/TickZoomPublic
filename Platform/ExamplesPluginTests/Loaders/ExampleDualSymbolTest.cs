@@ -46,7 +46,7 @@ namespace Loaders
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		ExampleOrderStrategy fourTicksPerBar;
 		ExampleOrderStrategy fullTickData;
-		PortfolioCommon portfolio;
+		Portfolio portfolio;
 		string symbols = "FullTick,Daily4Sim";
 		
 		public virtual Starter CreateStarter() {
@@ -78,7 +78,7 @@ namespace Loaders
 	 			showChartCallback();
 	 
 	 			// Get the stategy
-	    		portfolio = loader.TopModel as PortfolioCommon;
+	    		portfolio = loader.TopModel as Portfolio;
 	    		fullTickData = portfolio.Strategies[0] as ExampleOrderStrategy;
 	    		fourTicksPerBar = portfolio.Strategies[1] as ExampleOrderStrategy;
 			} catch( Exception ex) {

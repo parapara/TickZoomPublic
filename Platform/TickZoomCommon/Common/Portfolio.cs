@@ -29,18 +29,14 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-
-	/// <summary>
-	/// Description of StrategyManager.
-	/// </summary>
-	public class PortfolioCommon : StrategyCommon, PortfolioInterface
+	public class Portfolio : Strategy, PortfolioInterface
 	{
-		List<StrategyCommon> strategies = new List<StrategyCommon>();
+		List<Strategy> strategies = new List<Strategy>();
 		PortfolioType portfolioType = PortfolioType.None;
 		double closedEquity = 0;
 		double openEquity;
 		
-		public PortfolioCommon()
+		public Portfolio()
 		{
 		    Performance.GraphTrades = false;
 		}
@@ -49,24 +45,24 @@ namespace TickZoom.Common
 			do {
 				// Count all the unique symbols used by dependencies and
 				// get a list of all the strategies.
-				strategies = new List<StrategyCommon>();
-				Dictionary<string,List<StrategyCommon>> symbolMap = new Dictionary<string,List<StrategyCommon>>();
+				strategies = new List<Strategy>();
+				Dictionary<string,List<Strategy>> symbolMap = new Dictionary<string,List<Strategy>>();
 				for( int i=0; i<Chain.Dependencies.Count; i++) {
 					Chain chain = Chain.Dependencies[i];
-					StrategyCommon strategy = null;
+					Strategy strategy = null;
 					for( Chain link = chain.Tail; link.Model != null; link = link.Previous) {
-						strategy = link.Model as StrategyCommon;
+						strategy = link.Model as Strategy;
 						if( strategy != null) {
 							break;
 						}
 						chain = chain.Next;
 					}
 					if( strategy != null) {
-						List<StrategyCommon> tempStrategies;
+						List<Strategy> tempStrategies;
 						if( symbolMap.TryGetValue(strategy.SymbolDefault,out tempStrategies)) {
 							tempStrategies.Add(strategy);
 						} else {
-							tempStrategies = new List<StrategyCommon>();
+							tempStrategies = new List<Strategy>();
 							tempStrategies.Add(strategy);
 							symbolMap[strategy.SymbolDefault] = tempStrategies;
 						}
@@ -84,9 +80,9 @@ namespace TickZoom.Common
 					// Insert additional Portfolios for each symbol.
 					foreach( var kvp in symbolMap) {
 						string symbol = kvp.Key;
-						List<StrategyCommon> tempStrategies = kvp.Value;
+						List<Strategy> tempStrategies = kvp.Value;
 						if( tempStrategies.Count > 1) {
-							PortfolioCommon portfolio = new PortfolioCommon();
+							Portfolio portfolio = new Portfolio();
 							portfolio.Name = "Portfolio-"+symbol;
 							portfolio.SymbolDefault = symbol;
 							foreach( var strategy in tempStrategies) {
@@ -94,7 +90,7 @@ namespace TickZoom.Common
 							}
 							Chain.Dependencies.Add( portfolio.Chain);
 						} else {
-							StrategyCommon strategy = tempStrategies[0];
+							Strategy strategy = tempStrategies[0];
 							Chain.Dependencies.Add( strategy.Chain);
 						}
 					}
@@ -137,11 +133,11 @@ namespace TickZoom.Common
 		/// <summary>
 		/// Shortcut to look at the data of and control any dependant strategies.
 		/// </summary>
-		public List<StrategyCommon> Strategies {
+		public List<Strategy> Strategies {
 			get { return strategies; }
 		}
 		
-		public List<StrategyCommon> Markets {
+		public List<Strategy> Markets {
 			get { return strategies; }
 		}
 		
@@ -149,5 +145,10 @@ namespace TickZoom.Common
 			get { return portfolioType; }
 			set { portfolioType = value; }
 		}
+	}
+
+	[Obsolete("Please use Portfolio instead.",true)]
+	public class PortfolioCommon : Portfolio {
+		
 	}
 }

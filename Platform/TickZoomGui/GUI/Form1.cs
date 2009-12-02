@@ -139,7 +139,7 @@ namespace TickZoom
     		modelLoaderBox.Enabled = true;
         	
 			Plugins plugins = Plugins.Instance;
-			List<ModelLoader> loaders = plugins.GetLoaders();
+			List<ModelLoaderInterface> loaders = plugins.GetLoaders();
 			List<string> modelLoaderList = new List<string>();
 			for( int i=0; i<loaders.Count; i++) {
 				if( loaders[i].IsVisibleInGUI) {

@@ -34,7 +34,7 @@ using TickZoom.Examples.Indicators;
 
 namespace TickZoom
 {
-	public class ExampleSimpleStrategy : StrategyCommon
+	public class ExampleSimpleStrategy : Strategy
 	{
 		
 		public ExampleSimpleStrategy() {

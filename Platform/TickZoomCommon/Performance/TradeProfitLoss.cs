@@ -31,14 +31,14 @@ namespace TickZoom.Common
 		double slippage = 0.0D;
 		double commission = 0.0D;
 		double fullPointValue = 1.0D;
-		StrategyCommon strategy;
+		Strategy strategy;
 		bool firstTime = true;
 		bool userImplemented = false;
 		
 		public TradeProfitLoss() {
 		}
 		
-		public TradeProfitLoss(StrategyCommon strategy) {
+		public TradeProfitLoss(Strategy strategy) {
 			this.strategy = strategy;
 		}
 		

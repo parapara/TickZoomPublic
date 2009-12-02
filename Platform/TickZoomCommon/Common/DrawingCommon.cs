@@ -29,7 +29,7 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public class DrawingCommon : Drawing {
+	public class DrawingCommon : DrawingInterface {
 		Color color;
 		ModelInterface model;
 		string groupName;

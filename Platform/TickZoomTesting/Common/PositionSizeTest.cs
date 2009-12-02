@@ -49,7 +49,7 @@ namespace TickZoom.Common
 		[Test]
 		public void Constructor()
 		{
-			StrategyCommon strategy = new StrategyCommon();
+			Strategy strategy = new Strategy();
 			performance = new PositionSizeInner(strategy);
 			Assert.IsNotNull(performance,"MoneyManagerSupport constructor");
 		}
@@ -58,22 +58,22 @@ namespace TickZoom.Common
 		{
 			Constructor();
 			RandomCommon strategy = new RandomCommon();
-			strategy.ExitStrategy = new ExitStrategyCommon(strategy);
+			strategy.ExitStrategy = new ExitStrategy(strategy);
 			strategy.PositionSize = performance;
-			strategy.Performance = new PerformanceCommon(strategy);
+			strategy.Performance = new Performance(strategy);
 			Assert.AreSame(strategy.PositionSize,performance);
 			log.Notice(performance.Chain.ToChainString());
 			Assert.AreSame(strategy.Performance.Equity,performance.Chain.Previous.Model);
 			Assert.AreSame(strategy.ExitStrategy,performance.Chain.Next.Model);
 		}
 
-		public class PositionSizeInner : PositionSizeCommon {
+		public class PositionSizeInner : PositionSize {
 			Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 			public List<Tick> signalChanges = new List<Tick>();
 			public List<double> signalDirection = new List<double>();
 			double prevSignal = 0;
 			public TradingSignalTest tradingSignalTest;
-			public PositionSizeInner(StrategyCommon strategy) : base(strategy) {
+			public PositionSizeInner(Strategy strategy) : base(strategy) {
 				
 			}
 			public override void OnInitialize()
@@ -109,7 +109,7 @@ namespace TickZoom.Common
 			}
 		}
 
-		public PerformanceCommon TradeTickProcessing(int stop, int target, int count) {
+		public Performance TradeTickProcessing(int stop, int target, int count) {
 
 			// Creation.
 			RandomCommon random = new RandomCommon();
@@ -209,7 +209,7 @@ namespace TickZoom.Common
 		
 		[Test]
 		public void TradeTesting() {
-			PerformanceCommon performance = TradeTickProcessing(0,0,30000);
+			Performance performance = TradeTickProcessing(0,0,30000);
 			TransactionPairBinary expected = TransactionPairBinary.Create();
 
 			expected.Direction = 2;
@@ -222,7 +222,7 @@ namespace TickZoom.Common
 		}
 		[Test]
 		public void TradeTesting7() {
-			PerformanceCommon performance = TradeTickProcessing(0,0,30000);
+			Performance performance = TradeTickProcessing(0,0,30000);
 			TransactionPairBinary expected = TransactionPairBinary.Create();
 			expected.Direction = -2;
 			expected.EntryPrice = 106.24;
@@ -233,14 +233,14 @@ namespace TickZoom.Common
 		}
 		[Test]
 		public void TradeTesting8() {
-			PerformanceCommon performance = TradeTickProcessing(0,0,30000);
+			Performance performance = TradeTickProcessing(0,0,30000);
 			TransactionPairBinary expected = TransactionPairBinary.Create();
 			expected.SetProperties("2,106.24,2004-01-05 09:55:44.312,106.25,2004-01-05 10:06:27.284");
 			Assert.AreEqual(expected,performance.TransactionPairs.GetBinary(8),"Trade 8");
 		}
 		[Test]
 		public void DailyTesting() {
-			PerformanceCommon manager = TradeTickProcessing(0,0,20000);
+			Performance manager = TradeTickProcessing(0,0,20000);
 			TransactionPairs daily = manager.Equity.Daily;
 			for( int i = 0; i< daily.Count; i++) {
 				log.Debug(i + ": " + daily[i]);
@@ -250,7 +250,7 @@ namespace TickZoom.Common
 		}
 		[Test]
 		public void WeeklyTesting() {
-			PerformanceCommon manager = TradeTickProcessing(0,0,30000);
+			Performance manager = TradeTickProcessing(0,0,30000);
 			TransactionPairs weekly = manager.Equity.Weekly;
 //			for( int i = 0; i< weekly.Count; i++) {
 //				TickConsole.WriteLine(i + ": " + weekly[i]);
@@ -260,7 +260,7 @@ namespace TickZoom.Common
 		}
 		[Test]
 		public void MonthlyTesting() {
-			PerformanceCommon manager = TradeTickProcessing(0,0,101000);
+			Performance manager = TradeTickProcessing(0,0,101000);
 			TransactionPairs monthly = manager.Equity.Monthly;
 			Assert.AreEqual(4,monthly.Count,"Monthly Count");
 			Assert.AreEqual(5.380,Math.Round(monthly.CurrentProfitLoss,3),"Final trade completion");

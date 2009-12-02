@@ -46,7 +46,7 @@ namespace TickZoom.Common
 		private bool allowReversal;
 		private bool nextBar;
 		
-		public EnterCommon(bool allowReversal, bool nextBar, StrategyCommon strategy) : base(strategy) {
+		public EnterCommon(bool allowReversal, bool nextBar, Strategy strategy) : base(strategy) {
 			this.allowReversal = allowReversal;
 			this.nextBar = nextBar;
 		}

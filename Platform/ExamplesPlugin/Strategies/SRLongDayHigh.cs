@@ -42,7 +42,7 @@ namespace TickZoom
 	/// And it has a stop loss.
 	/// 
 	/// 	/// </summary>
-	public class SRLongDayHigh : StrategyCommon
+	public class SRLongDayHigh : Strategy
 	{
 		double entryLevel = 0;
 		double profitTarget = 1000;

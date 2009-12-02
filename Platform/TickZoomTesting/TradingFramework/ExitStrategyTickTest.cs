@@ -60,7 +60,7 @@ namespace TickZoom.TradingFramework
     	}
 		
 		public void TickProcessing() {
-			StrategyCommon random = new RandomCommon();
+			Strategy random = new RandomCommon();
 			exitStrategy = new ExitStrategyMock(random);
 			exitStrategy.IntervalDefault = Intervals.Day1;
 			random.IntervalDefault = Intervals.Day1;

@@ -71,11 +71,11 @@ namespace TickZoom
 		Trend traverseDirection = Trend.Flat;
 		Doubles highMaxVolume = Factory.Engine.Doubles();
 		Doubles lowMaxVolume = Factory.Engine.Doubles();
-		ModelCommon model;
+		Model model;
 		
 		int length = 0;
 		
-		public LRLine(ModelCommon model, Bars bars, Chart chart, int length) 
+		public LRLine(Model model, Bars bars, Chart chart, int length) 
 		{
 			this.model = model;
 			this.bars = bars;

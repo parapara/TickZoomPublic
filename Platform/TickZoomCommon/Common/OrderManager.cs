@@ -40,7 +40,7 @@ namespace TickZoom.Common
 	{
 		List<LogicalOrder> orders = new List<LogicalOrder>();
 		
-		public OrderManager(StrategyCommon strategy) : base(strategy) {
+		public OrderManager(Strategy strategy) : base(strategy) {
 		}
 		
 		public void Add(LogicalOrder order)
@@ -65,7 +65,7 @@ namespace TickZoom.Common
 			get { return true; }
 		}
 		
-		public override Position Position {
+		public override PositionInterface Position {
 			get { return Strategy.Position; }
 		}
 	}

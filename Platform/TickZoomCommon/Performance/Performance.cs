@@ -33,16 +33,13 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	/// <summary>
-	/// Description of MoneyManagerSupport.
-	/// </summary>
-	public class PerformanceCommon : StrategySupport
+	public class Performance : StrategySupport
 	{
 		TransactionPairs pairs;
 		TransactionPairs comboTrades;
 		TransactionPairsBinary transactionPairsBinary;
 		TransactionPairsBinary comboTradesBinary;
-		StrategyCommon strategy;
+		Strategy strategy;
 		bool graphTrades = true;
 		bool graphAveragePrice = false;
 		IndicatorCommon avgPrice;
@@ -50,11 +47,11 @@ namespace TickZoom.Common
 		StrategySupport next;
 		TradeProfitLoss profitLoss;
 
-		public PerformanceCommon(StrategyCommon strategy) : base(strategy)
+		public Performance(Strategy strategy) : base(strategy)
 		{
 			this.strategy = strategy;
 			profitLoss = new TradeProfitLoss(strategy);
-			ModelCommon equity = new Equity(strategy);
+			Model equity = new Equity(strategy);
 			equityChain = Chain.InsertAfter(equity.Chain);
 			transactionPairsBinary  = new TransactionPairsBinary();
 			pairs = new TransactionPairs(profitLoss,transactionPairsBinary);
@@ -446,4 +443,13 @@ namespace TickZoom.Common
 #endregion		
 
 	}
+
+	[Obsolete("Please user Performance instead.",true)]
+	public class PerformanceCommon : Performance {
+		public PerformanceCommon(Strategy strategy) : base(strategy)
+		{
+			
+		}
+	}
+	
 }

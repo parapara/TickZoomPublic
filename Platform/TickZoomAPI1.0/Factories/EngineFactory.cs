@@ -43,9 +43,6 @@ namespace TickZoom.Api
 			get;
 		}
 		
-		[Obsolete("Please use a parameter of ModelInterface instead.")]
-		Chain Chain(Model model);
-		
 		Chain Chain(ModelInterface model);
 		
 		Series<T> Series<T>();

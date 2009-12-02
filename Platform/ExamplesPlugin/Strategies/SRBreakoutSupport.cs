@@ -30,7 +30,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class SRBreakoutSupport : StrategyCommon
+	public class SRBreakoutSupport : Strategy
 	{
 		int minimumMove = 370;
 		AvgRange avgRange;

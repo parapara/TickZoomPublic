@@ -22,22 +22,50 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace TickZoom.Api
 {
-	public interface Trade
-	{
-	    decimal Price { get; }
-	   	bool isValid { get; }
-	   	
-	    void Fill(decimal xp);
-	    void Fill(decimal xp, int xs, int xt);
-	    void Fill(decimal xprice, int xsize, int xtime, int xdate, int xsec);
-	    
-	    Trade FromString(string tradestring);
-	    
-	    Trade FromString(string tradestring, char delimiter);
-	    
-	    Security Sec { get; }
+	[Obsolete("Please use PositionInterface instead.",true)]
+	public interface Position : PositionInterface {
+		
+	}
+	
+	public interface PositionInterface {
+		double Signal {
+			get;
+			set;
+		}
+		
+		double SignalPrice {
+			get;
+		}
+		
+		TimeStamp SignalTime {
+			get;
+		}
+		
+		bool HasPosition {
+			get;
+		}
+		
+		bool IsFlat {
+			get;
+		}
+		
+		bool IsLong {
+			get;
+		}
+		
+		bool IsShort {
+			get;
+		}
+		
+		double Size {
+			get;
+		}
+		
 	}
 }

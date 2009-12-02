@@ -44,7 +44,7 @@ namespace TickZoom
 		public override void OnLoad(ProjectProperties properties) {
 			foreach( SymbolInfo symbol in properties.Starter.SymbolInfo) {
 				string name = symbol.Symbol;				
-				StrategyCommon strategy = CreateStrategy("ExampleSimpleStrategy","ExampleOrder-"+name);
+				Strategy strategy = CreateStrategy("ExampleSimpleStrategy","ExampleOrder-"+name);
 				strategy.SymbolDefault = name;
 				strategy.Performance.Equity.GraphEquity = false;
 		    	AddDependency( "PortfolioCommon", strategy);

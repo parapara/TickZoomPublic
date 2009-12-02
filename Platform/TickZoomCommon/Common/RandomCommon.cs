@@ -31,7 +31,7 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class RandomCommon : StrategyCommon
+	public class RandomCommon : Strategy
 	{
 		TimeStamp[] randomEntries = null;
 		int randomIndex = 0;

@@ -30,7 +30,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class ExampleMultiStrategy : PortfolioCommon
+	public class ExampleMultiStrategy : Portfolio
 	{
 		IndicatorCommon equity;
 		

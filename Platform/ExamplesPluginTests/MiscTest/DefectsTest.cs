@@ -76,9 +76,9 @@ namespace MiscTest
     		starter.CreateChartCallback = new CreateChartCallback(HistoricalCreateChart);
     		starter.ShowChartCallback = new ShowChartCallback(HistoricalShowChart);
 		
-			ModelLoader loader = new MQ_BadFakeTickLoader();
+			ModelLoaderInterface loader = new MQ_BadFakeTickLoader();
     		starter.Run(loader);
-    		PortfolioCommon strategy = loader.TopModel as PortfolioCommon;
+    		Portfolio strategy = loader.TopModel as Portfolio;
     		
     		MQ_BadFakeTick_0 mq0 = (MQ_BadFakeTick_0) strategy.Strategies[0];
     		MQ_BadFakeTick_1 mq1 = (MQ_BadFakeTick_1) strategy.Strategies[1];

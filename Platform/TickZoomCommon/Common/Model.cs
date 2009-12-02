@@ -32,10 +32,7 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	/// <summary>
-	/// Description of Formula.
-	/// </summary>
-	public partial class ModelCommon : ModelInterface
+	public partial class Model : ModelInterface
 	{
 		string name;
 		Chain chain;
@@ -43,19 +40,19 @@ namespace TickZoom.Common
 		protected bool isIndicator = false;
 		Interval intervalDefault = Intervals.Default;
 		string symbolDefault = "Default";
-		Drawing drawing;
-
+		DrawingInterface drawing;
+	
 		List<Interval> updateIntervals = new List<Interval>();
 		Data data;
 		Chart chart;
 		Context context;
 		Formula formula;
-		private static readonly Log log = Factory.Log.GetLogger(typeof(ModelCommon));
+		private static readonly Log log = Factory.Log.GetLogger(typeof(Model));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly bool trace = log.IsTraceEnabled;		ModelProperties properties;
 		bool isOptimizeMode = false;
 		
-		public ModelCommon()
+		public Model()
 		{
 			name = GetType().Name;
 			fullName = name;
@@ -79,7 +76,7 @@ namespace TickZoom.Common
 		public virtual bool OnWriteReport(string folder) {
 			return false;
 		}
-
+	
 		[Browsable(false)]
 		public virtual Interval IntervalDefault {
 			get { return intervalDefault; }
@@ -93,15 +90,15 @@ namespace TickZoom.Common
 			if( this is StrategySupport) {
 				StrategySupport support = this as StrategySupport;
 				indicator.Performance = support.Strategy.Performance;
-			} else if( this is StrategyCommon) {
-				StrategyCommon strategy = this as StrategyCommon;
+			} else if( this is Strategy) {
+				Strategy strategy = this as Strategy;
 				indicator.Performance = strategy.Performance;
 			} else if( this is IndicatorCommon) {
 				IndicatorCommon thisIndicator = this as IndicatorCommon;
 				indicator.Performance = thisIndicator.Performance;
 			} else {
 				throw new ApplicationException("Sorry, indicators can only be added to objects derived from " +
-				                               typeof(StrategyCommon).Name + ", " +
+				                               typeof(Strategy).Name + ", " +
 				                               typeof(StrategySupport).Name + ", or " +
 				                               typeof(IndicatorCommon).Name + ".");
 			}
@@ -119,7 +116,7 @@ namespace TickZoom.Common
 			}
 			chain.Dependencies.Add(indicator.Chain);
 		}
-
+	
 		[Browsable(false)]
 		public Chart Chart {
 			get { return chart; }
@@ -225,7 +222,7 @@ namespace TickZoom.Common
 			set { bars = value; }
 		}
 		#endregion
-
+	
 		[Browsable(false)]
 		public Context Context {
 			get { return context; }
@@ -235,7 +232,7 @@ namespace TickZoom.Common
 		public void OnProperties(ModelProperties properties)
 		{
 			this.properties = properties;
-   			if( trace) log.Trace(GetType().Name+".OnProperties() - NotImplemented");
+	   			if( trace) log.Trace(GetType().Name+".OnProperties() - NotImplemented");
 			string[] propertyKeys = properties.GetPropertyKeys();
 			for( int i=0; i<propertyKeys.Length; i++) {
 				HandleProperty(propertyKeys[i],properties.GetProperty(propertyKeys[i]).Value);
@@ -247,78 +244,78 @@ namespace TickZoom.Common
 			Type propertyType = property.PropertyType;
 			object value = Converters.Convert(propertyType,str);
 			property.SetValue(this,value,null);
-//			log.WriteFile("Property " + property.Name + " = " + value);
+	//			log.WriteFile("Property " + property.Name + " = " + value);
 		}		
 		
 		public virtual void OnBeforeInitialize() {
-   			if( trace) log.Trace("OnBeforeInitialize() - NotImplemented");
+	   			if( trace) log.Trace("OnBeforeInitialize() - NotImplemented");
 		}
 		
 		public virtual void OnInitialize() {
-   			if( trace) log.Trace("OnInitialize() - NotImplemented");
+	   			if( trace) log.Trace("OnInitialize() - NotImplemented");
 		}
 		
 		public virtual void OnStartHistorical() {
-   			if( trace) log.Trace("OnStartHistorical() - NotImplemented");
+	   			if( trace) log.Trace("OnStartHistorical() - NotImplemented");
 		}
 			
 		public virtual bool OnBeforeIntervalOpen() {
-   			if( trace) log.Trace("OnBeforeIntervalOpen() - NotImplemented");
-   			// Return false means never call this method again for performance.
-   			return false;
+	   			if( trace) log.Trace("OnBeforeIntervalOpen() - NotImplemented");
+	   			// Return false means never call this method again for performance.
+	   			return false;
 		}
-
+	
 		public virtual bool OnBeforeIntervalOpen(Interval interval) {
-   			if( trace) log.Trace("OnBeforeIntervalOpen("+interval+") - NotImplemented");
-   			// Return false means never call this method again for performance.
-   			return false;
+	   			if( trace) log.Trace("OnBeforeIntervalOpen("+interval+") - NotImplemented");
+	   			// Return false means never call this method again for performance.
+	   			return false;
 		}
-
+	
 		public virtual bool OnIntervalOpen() {
-   			if( trace) log.Trace("OnIntervalOpen() - NotImplemented");
-   			// return false means the engine will never call this method again.
+	   			if( trace) log.Trace("OnIntervalOpen() - NotImplemented");
+	   			// return false means the engine will never call this method again.
 			return false;
 		}
-
+	
 		public virtual bool OnIntervalOpen(Interval interval) {
-   			if( trace) log.Trace("OnIntervalOpen("+interval+") - NotImplemented");
-   			// return false means the engine will never call this method again.
+	   			if( trace) log.Trace("OnIntervalOpen("+interval+") - NotImplemented");
+	   			// return false means the engine will never call this method again.
 			return false;
 		}
 		
 		public virtual bool OnProcessTick(Tick tick) {
-   			if( trace) log.Trace("OnProcessTick() - NotImplemented");
-   			// return false means the engine will never call this method again.
+	   			if( trace) log.Trace("OnProcessTick() - NotImplemented");
+	   			// return false means the engine will never call this method again.
 			return false;
 		}
 		
 		public virtual bool OnBeforeIntervalClose() {
-   			if( trace) log.Trace("OnBeforeIntervalClose() - NotImplemented");
-   			// return false means the engine will never call this method again.
+	   			if( trace) log.Trace("OnBeforeIntervalClose() - NotImplemented");
+	   			// return false means the engine will never call this method again.
 			return false;
 		}
 		
 		public virtual bool OnBeforeIntervalClose(Interval interval) {
-   			if( trace) log.Trace("OnBeforeIntervalClose("+interval+") - NotImplemented");
-   			// return false means the engine will never call this method again.
+	   			if( trace) log.Trace("OnBeforeIntervalClose("+interval+") - NotImplemented");
+	   			// return false means the engine will never call this method again.
 			return false;
 		}
 		
 		public virtual bool OnIntervalClose() {
-   			if( trace) log.Trace("OnIntervalClose() - NotImplemented");
-   			// return false means the engine will never call this method again.
+	   			if( trace) log.Trace("OnIntervalClose() - NotImplemented");
+	   			// return false means the engine will never call this method again.
 			return false;
 		}
 		
 		public virtual bool OnIntervalClose(Interval interval) {
-   			if( trace) log.Trace("OnIntervalClose("+interval+") - NotImplemented");
-   			// return false means the engine will never call this method again.
+	   			if( trace) log.Trace("OnIntervalClose("+interval+") - NotImplemented");
+	   			// return false means the engine will never call this method again.
 			return false;
 		}
-
+	
 		public virtual void OnEndHistorical() {
-   			if( trace) log.Trace("OnEndHistorical() - NotImplemented");
-   			// return false means the engine will never call this method again.
+	   			if( trace) log.Trace("OnEndHistorical() - NotImplemented");
+	   			// return false means the engine will never call this method again.
 		}
 		
 		public virtual void Save( string fileName) {
@@ -328,7 +325,7 @@ namespace TickZoom.Common
 		public void AddDependency( ModelInterface formula) {
 			chain.Dependencies.Add(formula.Chain);
 		}
-
+	
 		[Browsable(false)]
 		public bool IsStrategy {
 			get { return isStrategy; }
@@ -344,7 +341,7 @@ namespace TickZoom.Common
 			get { return name; }
 			set { name = value; }
 		}
-
+	
 		[Browsable(false)]
 		public Chain Chain {
 			get { return chain; }
@@ -355,7 +352,7 @@ namespace TickZoom.Common
 		public string LogName {
 			get { return name.Equals(GetType().Name) ? name : name+"."+GetType().Name; }
 		}
-
+	
 		string fullName;
 		public virtual string FullName {
 			get { return fullName; }
@@ -387,7 +384,7 @@ namespace TickZoom.Common
 		}
 		
 		[Browsable(false)]
-		public virtual Drawing Drawing {
+		public virtual DrawingInterface Drawing {
 			get { return drawing; }
 			set { drawing = value; }
 		}
@@ -407,19 +404,6 @@ namespace TickZoom.Common
 			get { return formula; }
 		}
 		
-		public void GotOrder(Order order) {
-			throw new NotImplementedException();
-		}
-		public void GotFill(Trade fill) {
-			throw new NotImplementedException();
-		}
-		public void GotOrderCancel(uint orderid) {
-			throw new NotImplementedException();
-		}
-		public void GotPosition(Position pos) {
-			throw new NotImplementedException();
-		}
-		 
 		[Browsable(false)]
 		public Provider Provider {
 			get {
@@ -434,10 +418,20 @@ namespace TickZoom.Common
 			get { return isOptimizeMode; }
 			set { isOptimizeMode = value; }
 		}
-
+	
 		public virtual string SymbolDefault {
 			get { return symbolDefault; }
 			set { symbolDefault = value; }
 		}
 	}
+
+
+	/// <summary>
+	/// Description of Formula.
+	/// </summary>
+	[Obsolete("Please use Model instead.",true)]
+	public class ModelCommon : Model {
+		
+	}
+	
 }

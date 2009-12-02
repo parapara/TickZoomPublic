@@ -69,7 +69,7 @@ namespace Loaders
 			return aggregator;
 		}
 		
-		public void VerifyPair(StrategyCommon strategy, int pairNum,
+		public void VerifyPair(Strategy strategy, int pairNum,
 		                       string expectedEntryTime,
 		                     double expectedEntryPrice,
 		                      string expectedExitTime,
@@ -160,7 +160,7 @@ namespace Loaders
     		Assert.AreEqual(expectedCount,pane.CurveList[0].Points.Count,"Chart Curve");
 		}
    		
-		public static void CompareChart(StrategyCommon strategy, ChartControl chart) {
+		public static void CompareChart(Strategy strategy, ChartControl chart) {
      		GraphPane pane = chart.DataGraph.MasterPane.PaneList[0];
     		Assert.IsNotNull(pane.CurveList);
     		Assert.Greater(pane.CurveList.Count,0);
@@ -202,7 +202,7 @@ namespace Loaders
 			}
    		}
 			
-		public void CompareChartCount(StrategyCommon strategy) {
+		public void CompareChartCount(Strategy strategy) {
 			ChartControl chart = GetChart(strategy.SymbolDefault);
      		GraphPane pane = chart.DataGraph.MasterPane.PaneList[0];
     		Assert.IsNotNull(pane.CurveList);

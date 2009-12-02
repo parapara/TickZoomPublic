@@ -73,9 +73,9 @@ namespace TickZoom.StarterTest
 			
 			// No charting setup for these tests. Running without charts.
 			
-			ModelLoader loader = new OptimizeLoader();
+			ModelLoaderInterface loader = new OptimizeLoader();
     		starter.Run(loader);
-    		PortfolioCommon strategy = loader.TopModel as PortfolioCommon;
+    		Portfolio strategy = loader.TopModel as Portfolio;
     		Assert.AreEqual(33,strategy.Performance.ComboTrades.Count);
     		
 		}
@@ -165,7 +165,7 @@ namespace TickZoom.StarterTest
 			public override void OnLoad(ProjectProperties projectProperties)
 			{
 				ModelInterface model = CreateStrategy("ExampleSimpleStrategy");
-				StrategyCommon strategy = model as StrategyCommon;
+				Strategy strategy = model as Strategy;
 		    	AddDependency( "PortfolioCommon", "ExampleSimpleStrategy");
 		    	TopModel = GetStrategy( "PortfolioCommon");
 			}
@@ -184,7 +184,7 @@ namespace TickZoom.StarterTest
 			public override void OnLoad(ProjectProperties projectProperties)
 			{
 				ModelInterface model = CreateStrategy("ExampleSimpleStrategy");
-				StrategyCommon strategy = model as StrategyCommon;
+				Strategy strategy = model as Strategy;
 		    	AddDependency( "PortfolioCommon", "ExampleSimpleStrategy");
 		    	TopModel = GetStrategy( "PortfolioCommon");
 			}

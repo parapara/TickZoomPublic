@@ -33,7 +33,7 @@ namespace TickZoom.TradingFramework
 	[TestFixture]
 	public class PortfolioSupportTest
 	{
-		PortfolioCommon portfolio;
+		Portfolio portfolio;
 		
 		[TestFixtureSetUp]
 		public void Init()
@@ -53,14 +53,14 @@ namespace TickZoom.TradingFramework
 		
 		public void Constructor()
 		{
-			portfolio = new PortfolioCommon();
+			portfolio = new Portfolio();
 		}
 		
 		[Test]
 		public void InitializeTick() 
 		{
 			Constructor();
-			StrategyCommon strategy = new StrategyCommon();
+			Strategy strategy = new Strategy();
 			strategy.IntervalDefault = Intervals.Day1;
 			portfolio.IntervalDefault = Intervals.Day1;
 			portfolio.OnBeforeInitialize();

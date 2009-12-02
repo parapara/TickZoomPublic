@@ -22,10 +22,58 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace TickZoom.Api
 {
-	public interface TickFeed {
-		void GotTick(Tick tick);
+	/// <summary>
+	/// Description of Starter.
+	/// </summary>
+	[Obsolete("Please user ModelLoaderInterface instead.",true)]
+	public interface ModelLoader : ModelLoaderInterface {
+		
+	}
+		
+	public interface ModelLoaderInterface
+	{
+		void OnInitialize(ProjectProperties properties);
+		void OnLoad(ProjectProperties properties);
+		void OnClear();
+		
+		ModelInterface TopModel {
+			get;
+		}
+		
+		IList<ModelInterface> Models {
+			get;
+		}
+		
+		List<ModelProperty> Variables {
+			get;
+		}
+		
+		string Name {
+			get;
+		}
+		
+		string Category {
+			get;
+		}
+		
+		bool IsVisibleInGUI {
+			get;
+		}
+		
+		bool QuietMode {
+			get;
+			set;
+		}
+		
+		Stream OptimizeOutput {
+			get;
+			set;
+		}
+		
 	}
 }

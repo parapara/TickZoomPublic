@@ -53,18 +53,18 @@ namespace TickZoom
 			// and 2 strategies on symbol B to demonstrate
 			// portfolio "self-organization".
 			string symbol = properties.Starter.SymbolInfo[0].Symbol;
-			StrategyCommon strategy = CreateStrategy("ExampleOrderStrategy","ExampleOrder-"+symbol) as StrategyCommon;
+			Strategy strategy = CreateStrategy("ExampleOrderStrategy","ExampleOrder-"+symbol) as Strategy;
 			strategy.SymbolDefault = symbol;
 			strategy.Performance.Equity.GraphEquity = false;
 	    	AddDependency( "PortfolioCommon", "ExampleOrder-"+symbol);
 
 			symbol = properties.Starter.SymbolInfo[1].Symbol;
-			strategy = CreateStrategy("ExampleOrderStrategy","ExampleOrder-"+symbol) as StrategyCommon;
+			strategy = CreateStrategy("ExampleOrderStrategy","ExampleOrder-"+symbol) as Strategy;
 			strategy.SymbolDefault = symbol;
 			strategy.Performance.Equity.GraphEquity = false;
 	    	AddDependency( "PortfolioCommon", "ExampleOrder-"+symbol);
 			
-			strategy = CreateStrategy("ExampleSimpleStrategy","ExampleSimple-"+symbol) as StrategyCommon;
+			strategy = CreateStrategy("ExampleSimpleStrategy","ExampleSimple-"+symbol) as Strategy;
 			strategy.SymbolDefault = symbol;
 			strategy.Performance.Equity.GraphEquity = false;
 	    	AddDependency( "PortfolioCommon", "ExampleSimple-"+symbol);

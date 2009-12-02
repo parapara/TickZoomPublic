@@ -10,7 +10,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-    public class ExampleDataChecker : StrategyCommon
+    public class ExampleDataChecker : Strategy
     {
         int countBarMsgs = 0;
         int barMsgLimit = 3;

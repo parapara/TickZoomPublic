@@ -32,7 +32,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class SimpleStrategy3 : StrategyCommon
+	public class SimpleStrategy3 : Strategy
 	{
 		bool isActivated = false;
 		TEMA average;

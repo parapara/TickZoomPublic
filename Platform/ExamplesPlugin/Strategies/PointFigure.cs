@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class PointFigure : StrategyCommon
+	public class PointFigure : Strategy
 	{
 		bool barFlag = false;
 		int boxSize = 50;

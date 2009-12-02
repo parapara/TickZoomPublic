@@ -35,7 +35,7 @@ namespace TickZoom
 	/// </summary>
 	public class NarrowChannels : IndicatorCommon
 	{
-		StrategyCommon strategy;
+		Strategy strategy;
 		Series<NarrowChannel> tapes;
 		Series<WideChannel> channels;
 		
@@ -59,7 +59,7 @@ namespace TickZoom
 			lows = Series<ChartPoint>();
 		}
 			
-		public NarrowChannels(StrategyCommon strategy)
+		public NarrowChannels(Strategy strategy)
 		{
 			this.strategy = strategy;
 		}

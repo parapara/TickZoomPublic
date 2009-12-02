@@ -74,7 +74,7 @@ namespace TickZoom.Common
 			if( !QuietMode) {
 				log.Debug( properties.ModelType + " " + properties.Name + ", type = " + properties.Type);
 			}
-			StrategyCommon model = CreateStrategy( properties.Type, properties.Name);
+			Strategy model = CreateStrategy( properties.Type, properties.Name);
 			model.OnProperties(properties);
 			if( !QuietMode) {
 				log.Indent();
@@ -91,7 +91,7 @@ namespace TickZoom.Common
 						HandlePropertySet( model, nestedProperties);
 					} else {
 						LoadModel(nestedProperties);
-						StrategyCommon nestedModel = TopModel as StrategyCommon;
+						Strategy nestedModel = TopModel as Strategy;
 						nestedModel.OnProperties(nestedProperties);
 						AddDependency( model, nestedModel);
 					}
@@ -110,15 +110,15 @@ namespace TickZoom.Common
 			}
 			
 			if( "exitstrategy".Equals(properties.Name)) {
-				StrategyCommon strategy = (StrategyCommon) model;
+				Strategy strategy = (Strategy) model;
 				model = strategy.ExitStrategy;
 			}
 			if( "performance".Equals(properties.Name)) {
-				StrategyCommon strategy = (StrategyCommon) model;
+				Strategy strategy = (Strategy) model;
 				model = strategy.Performance;
 			}
 			if( "positionsize".Equals(properties.Name)) {
-				StrategyCommon strategy = (StrategyCommon) model;
+				Strategy strategy = (Strategy) model;
 				model = strategy.PositionSize;
 			}
 			model.OnProperties(properties);

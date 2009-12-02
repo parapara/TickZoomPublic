@@ -30,7 +30,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class RandomIntraday : StrategyCommon
+	public class RandomIntraday : Strategy
 	{
 		TimeStamp[] randomEntries = null;
 		int randomIndex = 0;

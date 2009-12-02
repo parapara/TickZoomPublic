@@ -32,7 +32,7 @@ using TickZoom.Common;
 
 namespace MiscTest
 {
-    public class MQ_BadFakeTick_2 : StrategyCommon
+    public class MQ_BadFakeTick_2 : Strategy
     {
 
         /// <summary>

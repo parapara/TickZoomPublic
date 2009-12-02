@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class BreakoutTrend : StrategyCommon
+	public class BreakoutTrend : Strategy
 	{
 		Interval indicatorTimeFrame;
 		int length = 0;

@@ -34,8 +34,8 @@ using TickZoom.Api;
 namespace TickZoom.Common
 {
 	public class TradeStatsReport : ReportHelper {
-		PerformanceCommon performance;
-		public TradeStatsReport(PerformanceCommon performance) {
+		Performance performance;
+		public TradeStatsReport(Performance performance) {
 			this.performance = performance;
 		}
 		

@@ -31,7 +31,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class TrendStrategyMA : StrategyCommon
+	public class TrendStrategyMA : Strategy
 	{
 //		DOMRatio dom;
 		bool isActivated = false;

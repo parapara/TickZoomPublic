@@ -41,7 +41,7 @@ namespace Loaders
 	{
 		#region SetupTest
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		StrategyCommon strategy;
+		Strategy strategy;
 		ExampleScannerStrategy scanner;
 			
 		[TestFixtureSetUp]

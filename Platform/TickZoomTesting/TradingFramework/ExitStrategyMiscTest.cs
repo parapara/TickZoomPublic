@@ -59,7 +59,7 @@ namespace TickZoom.TradingFramework
 		[Test]
 		public void Constructor()
 		{
-			StrategyCommon logic = new StrategyCommon();
+			Strategy logic = new Strategy();
 			exitStrategy = new ExitStrategyMock(logic);
 			Assert.IsNotNull(exitStrategy,"ExitSupport constructor");
 			logic.ExitStrategy = exitStrategy;
@@ -70,8 +70,8 @@ namespace TickZoom.TradingFramework
 		[Test]
 		public void Variables()
 		{
-			StrategyCommon logic = new StrategyCommon();
-			ExitStrategyCommon strategy = new ExitStrategyCommon(logic);
+			Strategy logic = new Strategy();
+			ExitStrategy strategy = new ExitStrategy(logic);
 			Assert.AreEqual(false,strategy.ControlStrategy,"ControlStrategySignal");
 			Assert.AreEqual(0,strategy.Position.Signal,"Signal");
 			Assert.AreEqual(0,strategy.StopLoss,"Stop");
@@ -81,8 +81,8 @@ namespace TickZoom.TradingFramework
 		[Test]
 		public void DataSeriesSetup()
 		{
-	    		StrategyCommon logic = new StrategyCommon();
-			ExitStrategyCommon exit = logic.ExitStrategy;
+	    		Strategy logic = new Strategy();
+			ExitStrategy exit = logic.ExitStrategy;
 			
 			Starter starter = new HistoricalStarter();
 			starter.EndCount = 1;

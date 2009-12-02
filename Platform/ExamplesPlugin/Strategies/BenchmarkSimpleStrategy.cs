@@ -33,7 +33,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class BenchmarkSimpleStrategy : StrategyCommon
+	public class BenchmarkSimpleStrategy : Strategy
 	{
 		public BenchmarkSimpleStrategy() {
 		}

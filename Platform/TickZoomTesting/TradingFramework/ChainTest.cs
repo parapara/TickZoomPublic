@@ -42,17 +42,17 @@ namespace TickZoom.TradingFramework
 		{
 			log.Notice("Setup ChainTest");
 			
-			ModelCommon formula = new ModelCommon();
+			Model formula = new Model();
 			formula.Name = "third";
 			chain = formula.Chain;
 			if( trace) log.Trace( formula.Chain.ToChainString());
 			
-			formula = new ModelCommon();
+			formula = new Model();
 			formula.Name = "second";
 			chain = chain.InsertBefore( formula.Chain);
 			if( trace) log.Trace( chain.ToChainString());
 			
-			formula = new ModelCommon();
+			formula = new Model();
 			formula.Name = "first";
 			chain.InsertBefore( formula.Chain);
 			if( trace) log.Trace( chain.ToChainString());
@@ -92,7 +92,7 @@ namespace TickZoom.TradingFramework
 		public void TestInsert() {
 			Chain link = chain.GetAt(1);
 			Assert.AreEqual("second",link.Model.Name);
-			ModelCommon formula = new ModelCommon();
+			Model formula = new Model();
 			formula.Name = "inserted";
 			link.InsertBefore(formula.Chain);
 			link = chain.GetAt(1);

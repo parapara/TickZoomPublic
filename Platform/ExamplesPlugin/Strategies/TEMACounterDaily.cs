@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class TEMACounterDaily : StrategyCommon
+	public class TEMACounterDaily : Strategy
 	{
 		int slow = 28;
 		int fast = 14;

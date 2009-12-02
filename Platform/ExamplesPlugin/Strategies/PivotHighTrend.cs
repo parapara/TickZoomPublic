@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class PivotHighTrend : StrategyCommon
+	public class PivotHighTrend : Strategy
 	{
 		PivotHighVs pivotHigh;
 		PivotLowVs pivotLow;

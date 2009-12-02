@@ -61,7 +61,7 @@ namespace TickZoom.TradingFramework
     	}
 		
 		public void ExitTickProcessing(int stop, int target) {
-			StrategyCommon random = new RandomCommon();
+			Strategy random = new RandomCommon();
 			exitStrategy = new ExitStrategyMock(random);
 			random.ExitStrategy = exitStrategy;
 			exitStrategy.StopLoss = stop;

@@ -53,7 +53,7 @@ namespace TickZoom.TickUtil
     
     public struct PositionFill {
 	    public int Receiver;
-	    public double Position;
+	    public double PositionInterface;
     }
     
 	public enum ProviderEventType {

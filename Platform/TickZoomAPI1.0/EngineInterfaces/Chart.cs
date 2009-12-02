@@ -122,7 +122,7 @@ namespace TickZoom.Api
 			set;
 		}
 		
-		List<Indicator> Indicators {
+		List<IndicatorInterface> Indicators {
 			get;
 		}
 	}

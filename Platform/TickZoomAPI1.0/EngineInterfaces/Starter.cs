@@ -84,7 +84,7 @@ namespace TickZoom.Api
     	
 		void Run();
 		void Run(ModelInterface model);
-		void Run(ModelLoader loader);
+		void Run(ModelLoaderInterface loader);
 		
 		void Wait();
 		

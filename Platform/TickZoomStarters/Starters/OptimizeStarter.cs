@@ -41,7 +41,7 @@ namespace TickZoom.Common
 	{
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		int totalTasks=0;
-		ModelLoader loader;
+		ModelLoaderInterface loader;
 	    string storageFolder;
 	    int tasksRemaining;
 	    string fileName;
@@ -59,7 +59,7 @@ namespace TickZoom.Common
 		}
 			
 		List<TickEngine> engineIterations;
-		public override void Run(ModelLoader loader)
+		public override void Run(ModelLoaderInterface loader)
 		{
     		fileName = storageFolder + @"\Statistics\optimizeResults.csv";
     		try {

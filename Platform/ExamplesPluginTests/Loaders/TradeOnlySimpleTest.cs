@@ -41,7 +41,7 @@ namespace Loaders
 	public class TradeOnlySimpleTest : StrategyTest
 	{
 		#region SetupTest
-		StrategyCommon strategy;
+		Strategy strategy;
 			
 		[TestFixtureSetUp]
 		public void RunStrategy() {

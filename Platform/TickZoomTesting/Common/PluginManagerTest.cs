@@ -40,8 +40,8 @@ namespace TickZoom.Common
 		public void TestModelLoaderManager()
 		{
 			Plugins manager = Plugins.Instance;
-			Assert.IsTrue(typeof(ModelLoader).IsAssignableFrom(manager.GetLoader("Test: Simple Single-Symbol").GetType()));
-			Assert.IsTrue(typeof(ModelLoader).IsAssignableFrom(manager.GetLoaders()[0].GetType()));
+			Assert.IsTrue(typeof(ModelLoaderInterface).IsAssignableFrom(manager.GetLoader("Test: Simple Single-Symbol").GetType()));
+			Assert.IsTrue(typeof(ModelLoaderInterface).IsAssignableFrom(manager.GetLoaders()[0].GetType()));
 			Assert.AreEqual(0,manager.ErrorCount, "Check the log for detailed errors.");
 		}
 		[Test]

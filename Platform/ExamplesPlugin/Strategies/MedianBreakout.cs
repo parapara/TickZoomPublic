@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class MedianBreakout : StrategyCommon
+	public class MedianBreakout : Strategy
 	{
 		int breakoutLength = 0;
 		int averageLength = 0;

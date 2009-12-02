@@ -45,9 +45,9 @@ namespace Loaders
 		ExampleOrderStrategy fourTicksPerBar;
 		ExampleOrderStrategy fullTickData;
 		
-		PortfolioCommon multiSymbolPortfolio;			
-		PortfolioCommon singleSymbolPortfolio;			
-   		StrategyCommon exampleSimple;
+		Portfolio multiSymbolPortfolio;			
+		Portfolio singleSymbolPortfolio;			
+   		Strategy exampleSimple;
 			
 		[TestFixtureSetUp]
 		public void RunStrategy() {
@@ -73,9 +73,9 @@ namespace Loaders
  			showChartCallback();
  
  			// Get the stategy
-    		multiSymbolPortfolio = loader.TopModel as PortfolioCommon;
+    		multiSymbolPortfolio = loader.TopModel as Portfolio;
     		fullTickData = multiSymbolPortfolio.Strategies[0] as ExampleOrderStrategy;
-    		singleSymbolPortfolio = multiSymbolPortfolio.Strategies[1] as PortfolioCommon;
+    		singleSymbolPortfolio = multiSymbolPortfolio.Strategies[1] as Portfolio;
     		fourTicksPerBar = singleSymbolPortfolio.Strategies[0] as ExampleOrderStrategy;
     		exampleSimple = singleSymbolPortfolio.Strategies[1] as ExampleSimpleStrategy;
 		}

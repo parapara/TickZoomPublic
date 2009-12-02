@@ -33,7 +33,7 @@ using TickZoom.Common;
 
 namespace TickZoom.StarterTest
 {
-	public class TestSimpleStrategy : StrategyCommon
+	public class TestSimpleStrategy : Strategy
 	{
 		
 		public TestSimpleStrategy() {

@@ -79,12 +79,13 @@
     <Compile Include="Classes\Settings.cs" />
     <Compile Include="Classes\TickBinary.cs" />
     <Compile Include="Classes\TimeStamp.cs" />
+    <Compile Include="ClientInterfaces\DrawingInterface.cs" />
+    <Compile Include="ClientInterfaces\IndicatorInterface.cs" />
     <Compile Include="ClientInterfaces\ModelInterface.cs" />
+    <Compile Include="ClientInterfaces\ModelLoaderInterface.cs" />
     <Compile Include="ClientInterfaces\PortfolioInterface.cs" />
+    <Compile Include="ClientInterfaces\PositionInterface.cs" />
     <Compile Include="ClientInterfaces\ServiceConnection.cs" />
-    <Compile Include="ClientInterfaces\Model.cs" />
-    <Compile Include="ClientInterfaces\Portfolio.cs" />
-    <Compile Include="ClientInterfaces\Strategy.cs" />
     <Compile Include="ClientInterfaces\StrategyInterface.cs" />
     <Compile Include="ClientInterfaces\StrategySupportInterface.cs" />
     <Compile Include="Converters\Converters.cs" />
@@ -101,20 +102,16 @@
     <Compile Include="EngineInterfaces\ChartProperties.cs" />
     <Compile Include="EngineInterfaces\Context.cs" />
     <Compile Include="EngineInterfaces\Data.cs" />
-    <Compile Include="EngineInterfaces\Drawing.cs" />
     <Compile Include="EngineInterfaces\EngineProperties.cs" />
     <Compile Include="EngineInterfaces\FitnessAware.cs" />
-    <Compile Include="EngineInterfaces\Indicator.cs" />
     <Compile Include="EngineInterfaces\Integers.cs" />
     <Compile Include="EngineInterfaces\Interval.cs" />
     <Compile Include="EngineInterfaces\Log.cs" />
     <Compile Include="EngineInterfaces\LogicalOrder.cs" />
-    <Compile Include="EngineInterfaces\ModelLoader.cs" />
     <Compile Include="EngineInterfaces\ModelProperties.cs" />
     <Compile Include="EngineInterfaces\ModelProperty.cs" />
     <Compile Include="EngineInterfaces\OptimizeVariable.cs" />
     <Compile Include="EngineInterfaces\OrderManagerInterface.cs" />
-    <Compile Include="EngineInterfaces\Position.cs" />
     <Compile Include="EngineInterfaces\Prices.cs" />
     <Compile Include="EngineInterfaces\Progress.cs" />
     <Compile Include="EngineInterfaces\ProjectProperties.cs" />
@@ -166,17 +163,6 @@
     <Compile Include="HTTP\HTTPSession.cs" />
     <Compile Include="HTTP\HTTPRequestHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Response\Broker.cs" />
-    <Compile Include="Response\BrokerEvent.cs" />
-    <Compile Include="Response\Order.cs" />
-    <Compile Include="Response\OrderField.cs" />
-    <Compile Include="Response\Position.cs" />
-    <Compile Include="Response\Response.cs" />
-    <Compile Include="Response\Security.cs" />
-    <Compile Include="Response\SecurityType.cs" />
-    <Compile Include="Response\TickFeed.cs" />
-    <Compile Include="Response\Trade.cs" />
-    <Compile Include="Response\TradeField.cs" />
     <None Include="Lib\ICSharpCode.SharpZipLib.dll" />
   </ItemGroup>
   <ItemGroup>

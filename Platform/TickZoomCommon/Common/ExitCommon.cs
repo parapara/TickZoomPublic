@@ -41,10 +41,10 @@ namespace TickZoom.Common
 		private LogicalOrder sellStop;
 		private LogicalOrder buyLimit;
 		private LogicalOrder sellLimit;
-		private Position position;
+		private PositionInterface position;
 		private bool enableWrongSideOrders = false;
 		
-		public ExitCommon(StrategyCommon strategy) : base(strategy) {
+		public ExitCommon(Strategy strategy) : base(strategy) {
 		}
 		
 		public override void OnInitialize()

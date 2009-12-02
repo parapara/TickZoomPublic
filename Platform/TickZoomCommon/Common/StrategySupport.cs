@@ -37,16 +37,16 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of StrategySupport.
 	/// </summary>
-	public class StrategySupport : ModelCommon, StrategySupportInterface
+	public class StrategySupport : Model, StrategySupportInterface
 	{
-		Position position;
-		StrategyCommon strategy;
+		PositionInterface position;
+		Strategy strategy;
 		private readonly Log instanceLog;
 		private readonly bool instanceDebug;
 		private readonly bool instanceTrace;
 		private string fullName;
 
-		public StrategySupport(StrategyCommon strategy)
+		public StrategySupport(Strategy strategy)
 		{
 			instanceLog = Factory.Log.GetLogger(this.GetType()+"."+strategy.Name);
 			instanceDebug = instanceLog.IsDebugEnabled;
@@ -66,12 +66,12 @@ namespace TickZoom.Common
 			set { /* ignore */ }
 		}
 		
-		public virtual Position Position {
+		public virtual PositionInterface Position {
 			get { return position; }
 			set { position = value; }
 		}
 		
-		public StrategyCommon Strategy {
+		public Strategy Strategy {
 			get { return strategy; }
 		}
 		

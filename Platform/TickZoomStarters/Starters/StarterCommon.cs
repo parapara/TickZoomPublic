@@ -153,12 +153,12 @@ namespace TickZoom.Common
 		private static readonly string projectFileLoaderCategory = "TickZOOM";
 		private static readonly string projectFileLoaderName = "Project File";
 		public virtual void Run() {
-			ModelLoader loader = Plugins.Instance.GetLoader(projectFileLoaderCategory + ": " + projectFileLoaderName);
+			ModelLoaderInterface loader = Plugins.Instance.GetLoader(projectFileLoaderCategory + ": " + projectFileLoaderName);
 			projectProperties = ProjectPropertiesCommon.Create(new StreamReader(ProjectFile));
 			Run(loader);
 		}
 		
-		public virtual void Run(ModelLoader loader) {
+		public virtual void Run(ModelLoaderInterface loader) {
 			if( loader.Category == projectFileLoaderCategory && loader.Name == projectFileLoaderName ) {
 				log.Notice("Loading project from " + ProjectFile);
 				projectProperties = ProjectPropertiesCommon.Create(new StreamReader(ProjectFile));

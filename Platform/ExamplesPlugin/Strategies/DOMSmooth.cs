@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class DOMSmooth : StrategyCommon
+	public class DOMSmooth : Strategy
 	{
 		IndicatorCommon ratio, bid, ask;
 		

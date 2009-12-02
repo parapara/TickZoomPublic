@@ -52,7 +52,7 @@ namespace TickZoom.TradingFramework
 		[Test]
 		public void TestEmptyMethods()
 		{
-			StrategyCommon logic = new StrategyCommon();
+			Strategy logic = new Strategy();
 			logic.OnEndHistorical();
 	
 			if( logic.OnIntervalOpen(Intervals.Define(BarUnit.Minute,1))) {

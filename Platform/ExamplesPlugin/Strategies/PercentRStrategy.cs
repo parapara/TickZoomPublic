@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class PercentRStrategy : StrategyCommon
+	public class PercentRStrategy : Strategy
 	{
 		int slow=14;
 		int fast=14;

@@ -34,7 +34,7 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of IndicatorSupport.
 	/// </summary>
-	public class IndicatorCommon : ModelCommon, Indicator
+	public class IndicatorCommon : Model, IndicatorInterface
 	{
 		private readonly Log instanceLog;
 		private readonly bool instanceDebug;
@@ -45,7 +45,7 @@ namespace TickZoom.Common
 		Doubles output;
 		Doubles input;
 		object anyInput;
-		private PerformanceCommon performance;
+		private Performance performance;
 		
 		protected object AnyInput {
 			set { anyInput = value; }
@@ -140,7 +140,7 @@ namespace TickZoom.Common
 		}
 		
 		[Browsable(true)]
-		public override Drawing Drawing {
+		public override DrawingInterface Drawing {
 			get { return base.Drawing; }
 			set { base.Drawing = value; }
 		}
@@ -205,7 +205,7 @@ namespace TickZoom.Common
 			get { return instanceTrace; }
 		}
 		
-		public PerformanceCommon Performance {
+		public Performance Performance {
 			get { return performance; }
 			set { performance = value; }
 		}

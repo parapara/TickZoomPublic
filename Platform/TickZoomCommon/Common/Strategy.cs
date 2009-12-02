@@ -34,20 +34,17 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	/// <summary>
-	/// Description of StrategySupport.
-	/// </summary>
-	public class StrategyCommon : ModelCommon, StrategyInterface 
+	public class Strategy : Model, StrategyInterface 
 	{
-		Position position;
+		PositionInterface position;
 
 		[Browsable(false)]
-		public Position Position {
+		public PositionInterface Position {
 			get { return position; }
 			set { position = value; }
 		}
 		
-		private static readonly Log log = Factory.Log.GetLogger(typeof(StrategyCommon));
+		private static readonly Log log = Factory.Log.GetLogger(typeof(Strategy));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly bool trace = log.IsTraceEnabled;
 		private readonly Log instanceLog;
@@ -61,7 +58,7 @@ namespace TickZoom.Common
 		Chain positionSizeChain;
 		Chain performanceChain;
 
-		public StrategyCommon()
+		public Strategy()
 		{
 			instanceLog = Factory.Log.GetLogger(this.GetType()+"."+Name);
 			instanceDebug = instanceLog.IsDebugEnabled;
@@ -77,11 +74,11 @@ namespace TickZoom.Common
 			Chain.Dependencies.Add(exit.Chain);
 			enter = new EnterCommon(true,true,this);
 			Chain.Dependencies.Add(enter.Chain);
-			ModelCommon exitStrategy = new ExitStrategyCommon(this);
+			Model exitStrategy = new ExitStrategy(this);
 			exitStrategyChain = Chain.InsertBefore(exitStrategy.Chain);
-			ModelCommon positionSizeStrategy = new PositionSizeCommon(this);
+			Model positionSizeStrategy = new PositionSize(this);
 			positionSizeChain = exitStrategy.Chain.InsertBefore(positionSizeStrategy.Chain);
-			ModelCommon performance = new PerformanceCommon(this);
+			Model performance = new Performance(this);
 			performanceChain = performance.Chain;
 			positionSizeStrategy.Chain.InsertBefore(performance.Chain);
 			log.Outdent();
@@ -148,7 +145,7 @@ namespace TickZoom.Common
 		
 		public override bool OnWriteReport(string folder)
 		{
-			PerformanceCommon performance = (PerformanceCommon) performanceChain.Model;
+			Performance performance = (Performance) performanceChain.Model;
 			return performance.WriteReport(Name,folder);
 		}
 
@@ -164,13 +161,13 @@ namespace TickZoom.Common
 		}
 		
 		[Browsable(false)]
-		public StrategyCommon Next {
-			get { return Chain.Next.Model as StrategyCommon; }
+		public Strategy Next {
+			get { return Chain.Next.Model as Strategy; }
 		}
 		
 		[Browsable(false)]
-		public StrategyCommon Previous {
-			get { return Chain.Previous.Model as StrategyCommon; }
+		public Strategy Previous {
+			get { return Chain.Previous.Model as Strategy; }
 		}
 		
 		[Browsable(false)]
@@ -193,24 +190,24 @@ namespace TickZoom.Common
 		}
 		
 		[Category("Strategy Settings")]
-		public ExitStrategyCommon ExitStrategy {
-			get { return (ExitStrategyCommon) exitStrategyChain.Model; }
+		public ExitStrategy ExitStrategy {
+			get { return (ExitStrategy) exitStrategyChain.Model; }
 			set { if( trace) log.Trace( FullName+" Exits - Replacing " + exitStrategyChain.Model.FullName + " with " + value.FullName);
 				  exitStrategyChain = exitStrategyChain.Replace(value.Chain);
 			}
 		}
 		
 		[Category("Strategy Settings")]
-		public PositionSizeCommon PositionSize {
-			get { return (PositionSizeCommon) positionSizeChain.Model; }
+		public PositionSize PositionSize {
+			get { return (PositionSize) positionSizeChain.Model; }
 			set { if( trace) log.Trace( FullName+" PositionSize - Replacing " + positionSizeChain.Model.FullName + " with " + value.FullName);
 				  positionSizeChain = positionSizeChain.Replace(value.Chain);
 			}
 		}
 
 		[Category("Strategy Settings")]
-		public PerformanceCommon Performance {
-			get { return (PerformanceCommon) performanceChain.Model; }
+		public Performance Performance {
+			get { return (Performance) performanceChain.Model; }
 			set { if( trace) log.Trace( FullName+" Performance - Replacing " + performanceChain.Model.FullName + " with " + value.FullName);
 				  Performance.RemoveChildren();
 				  performanceChain = performanceChain.Replace(value.Chain);
@@ -250,6 +247,11 @@ namespace TickZoom.Common
 		public virtual void OnExitTrade() {
 			
 		}
+		
+	}
+	
+	[Obsolete("Please user Strategy instead.",true)]
+	public class StrategyCommon : Strategy {
 		
 	}
 }

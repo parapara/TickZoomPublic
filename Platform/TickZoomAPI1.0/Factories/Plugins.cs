@@ -66,10 +66,10 @@ namespace TickZoom.Api
        		LoadAssemblies( PluginFolder);
 		}
 		
-		public ModelLoader GetLoader( string name) {
+		public ModelLoaderInterface GetLoader( string name) {
 			for( int i=0; i<modelLoaders.Count; i++) {
 				Type type = modelLoaders[i];
-				ModelLoader loader = (ModelLoader)Activator.CreateInstance(type);
+				ModelLoaderInterface loader = (ModelLoaderInterface)Activator.CreateInstance(type);
 				if( loader.Name.Equals(name)) {
 					return loader;
 				}
@@ -113,10 +113,10 @@ namespace TickZoom.Api
 		            {
 		            	t2 = t;
 		            	if (t.IsClass && !t.IsAbstract) {
-		            		if( t.GetInterface("ModelLoader") != null)
+		            		if( t.GetInterface("ModelLoaderInterface") != null)
 			                {
 		            			try {
-		            				ModelLoader loader = (ModelLoader)Activator.CreateInstance(t);
+		            				ModelLoaderInterface loader = (ModelLoaderInterface)Activator.CreateInstance(t);
 			                		modelLoaders.Add(t);
 		            			} catch( MissingMethodException) {
 		            				errorCount++;
@@ -155,10 +155,10 @@ namespace TickZoom.Api
 			get { return errorCount; }
 		}
 		
-		public List<ModelLoader> GetLoaders() {
-			List<ModelLoader> loaders = new List<ModelLoader>();
+		public List<ModelLoaderInterface> GetLoaders() {
+			List<ModelLoaderInterface> loaders = new List<ModelLoaderInterface>();
 			for( int i=0; i<modelLoaders.Count; i++) {
-				loaders.Add((ModelLoader)Activator.CreateInstance(modelLoaders[i]));
+				loaders.Add((ModelLoaderInterface)Activator.CreateInstance(modelLoaders[i]));
 			}
 			return loaders;
 		}

@@ -32,11 +32,11 @@ namespace TickZoom.Common
 	/// </summary>
 	public class Formula
 	{
-		ModelCommon model;
+		Model model;
 		Elapsed fridayClose = new Elapsed(16,0,0);
 		Elapsed sundayOpen = new Elapsed(17,0,0);
 		
-		public Formula( ModelCommon model) {
+		public Formula( Model model) {
 			this.model = model;
 		}
 		

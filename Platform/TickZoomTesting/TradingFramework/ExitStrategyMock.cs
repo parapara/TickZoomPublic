@@ -37,7 +37,7 @@ using TickZoom.Common;
 #if TESTING
 namespace TickZoom.TradingFramework
 {
-	public class ExitStrategyMock : ExitStrategyCommon {
+	public class ExitStrategyMock : ExitStrategy {
 		private static readonly Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		private static readonly bool trace = log.IsTraceEnabled;
 		public List<TimeStamp> signalChanges = new List<TimeStamp>();
@@ -45,7 +45,7 @@ namespace TickZoom.TradingFramework
 		double prevSignal = 0;
 		public TradeSignalTest tradeSignalTest;
 		
-		public ExitStrategyMock(StrategyCommon strategy) : base(strategy) {
+		public ExitStrategyMock(Strategy strategy) : base(strategy) {
 		}
 		
 		public override void OnInitialize()

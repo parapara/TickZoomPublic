@@ -174,7 +174,7 @@ namespace TickZoom
 			string modelName = obj.GetType().FullName;
 	    	PropertyTable properties = obj as PropertyTable;
 	    	if( properties != null) {
-	    		if( typeof(Indicator).IsAssignableFrom(properties.Value.GetType())) {
+	    		if( typeof(IndicatorInterface).IsAssignableFrom(properties.Value.GetType())) {
 			    	writer.WriteStartElement("indicator");
 	    		} else if( typeof(StrategySupportInterface).IsAssignableFrom(properties.Value.GetType())) {
 			    	writer.WriteStartElement("strategy");

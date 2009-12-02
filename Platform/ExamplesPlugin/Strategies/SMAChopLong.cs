@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class SMAChopLong : StrategyCommon
+	public class SMAChopLong : Strategy
 	{
 		int slow = 14;
 		int lowTrigger = 220;

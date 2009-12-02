@@ -42,8 +42,8 @@ namespace TickZoom.EngineTests
 		bool isStrategy = false;
 		bool isIndicator = false;
 		Interval intervalDefault = Intervals.Default;
-		Position position;
-		Drawing drawing;
+		PositionInterface position;
+		DrawingInterface drawing;
 
 		List<Interval> updateIntervals = new List<Interval>();
 		Data data;
@@ -87,7 +87,7 @@ namespace TickZoom.EngineTests
 			set { intervalDefault = value; }
 		}
 		
-		public void AddIndicator( ModelCommon model) {
+		public void AddIndicator( Model model) {
 			chain.Dependencies.Add(model.Chain);
 		}
 
@@ -328,12 +328,12 @@ namespace TickZoom.EngineTests
 			indicator.Clear();
 		}
 		
-		public Position Position {
+		public PositionInterface Position {
 			get { return position; }
 			set { position = value; }
 		}
 		
-		public Drawing Drawing {
+		public DrawingInterface Drawing {
 			get { return drawing; }
 			set { drawing = value; }
 		}
@@ -353,22 +353,6 @@ namespace TickZoom.EngineTests
 		public string ToStatistics()
 		{
 			return "";
-		}
-		
-		public void GotOrder(Order order) {
-			throw new NotImplementedException();
-		}
-		
-		public void GotFill(Trade fill) {
-			throw new NotImplementedException();
-		}
-		
-		public void GotOrderCancel(uint orderid) {
-			throw new NotImplementedException();
-		}
-		
-		public void GotPosition(Position pos) {
-			throw new NotImplementedException();
 		}
 		
 		public void OnProperties(ModelProperties properties)

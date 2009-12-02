@@ -34,7 +34,7 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of Signal.
 	/// </summary>
-	public class PositionCommon : Position
+	public class PositionCommon : PositionInterface
 	{
 		protected Color signalColor = Color.Blue;
 		protected double signal = 0;

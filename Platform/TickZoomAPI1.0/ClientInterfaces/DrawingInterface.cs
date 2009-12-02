@@ -22,24 +22,60 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 
 namespace TickZoom.Api
 {
-	public interface Security
-	{
-	    string Symbol { get; set; }
-	    string Name { get; set; }
-	    string DestEx { get; set; }
-	    SecurityType Type { get; set; }
-	    bool isValid { get; }
-	    bool hasDest { get; }
-	    string FullName { get; }
-	    Security Parse(string msg);
-	    Security Parse(string msg, int date);
-	    int SecurityID(string type);
-	    int Date { get; }
-	    bool hasHistorical { get; }
-	    Tick NextTick { get; }
-	    Security FromFile(string filename);
+	[Obsolete("Please use DrawingInterface instead.",true)]
+	public interface Drawing : DrawingInterface {
+		
+	}
+	public interface DrawingInterface {
+		Color Color {
+			get;
+			set;
+		}
+		
+		string GroupName {
+			get;
+			set;
+		}
+		
+		int ColorIndex {
+			get;
+			set;
+		}
+		
+		bool IsVisible {
+			get;
+			set;
+		}
+		
+		GraphType GraphType {
+			get;
+			set;
+		}
+		
+		PaneType PaneType {
+			get;
+			set;
+		}
+		
+		double ScaleMax {
+			get;
+			set;
+		}
+		
+		double ScaleMin {
+			get;
+			set;
+		}
+		
+		bool AlreadyDrawn {
+			get;
+			set;
+		}
 	}
 }

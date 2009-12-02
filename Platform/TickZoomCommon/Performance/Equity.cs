@@ -50,13 +50,13 @@ namespace TickZoom.Common
 		double closedEquity = 0;
 		double openEquity = 0;
 		StrategySupportInterface next;
-		StrategyCommon strategy;
+		Strategy strategy;
 		double startingEquity = 10000;
 		bool graphEquity = false;
 		IndicatorCommon equity;
 		ProfitLoss equityProfitLoss;
 
-		public Equity(StrategyCommon strategy) : base(strategy)
+		public Equity(Strategy strategy) : base(strategy)
 		{
 			this.strategy = strategy;
 			equityProfitLoss = new TradeProfitLoss(strategy);

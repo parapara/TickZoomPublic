@@ -30,7 +30,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class InverseFischerDemo : StrategyCommon
+	public class InverseFischerDemo : Strategy
 	{
 		InverseFisherTransform ifsh;
 		public InverseFischerDemo() {

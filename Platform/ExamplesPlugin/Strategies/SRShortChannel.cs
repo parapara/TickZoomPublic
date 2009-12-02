@@ -42,7 +42,7 @@ namespace TickZoom
 	/// And it has a stop loss.
 	/// 
 	/// 	/// </summary>
-	public class SRShortChannel : StrategyCommon
+	public class SRShortChannel : Strategy
 	{
 		int profitTarget = 1000;
 		IndicatorCommon weekHigh;

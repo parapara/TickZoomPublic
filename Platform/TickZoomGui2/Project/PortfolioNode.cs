@@ -59,7 +59,7 @@ namespace TickZoom
 		
 		private void LoadIndicators(ModelInterface model) {
 			for( int i=0; i<model.Chain.Dependencies.Count; i++) {
-				Indicator indicator = model.Chain.Dependencies[i].Model as Indicator;
+				IndicatorInterface indicator = model.Chain.Dependencies[i].Model as IndicatorInterface;
 				if( indicator != null) {
 					Add( indicator.GetType().Name);
 				}

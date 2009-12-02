@@ -54,7 +54,7 @@ namespace TickZoom
 			fourTicks.SymbolDefault = properties.Starter.SymbolInfo[1].Symbol;
 			AddDependency("PortfolioCommon","FullTicksData");
 			AddDependency("PortfolioCommon","FourTicksData");
-			StrategyCommon strategy = GetStrategy("PortfolioCommon");
+			Strategy strategy = GetStrategy("PortfolioCommon");
 			strategy.Performance.GraphTrades = false;
 			TopModel = strategy;
 		}

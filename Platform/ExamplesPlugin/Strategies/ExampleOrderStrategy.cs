@@ -33,7 +33,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class ExampleOrderStrategy : StrategyCommon
+	public class ExampleOrderStrategy : Strategy
 	{
 		
 		public ExampleOrderStrategy() {

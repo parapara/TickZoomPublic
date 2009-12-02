@@ -33,7 +33,7 @@ namespace TickZoom
 	/// <summary>
 	/// Description of RandomStrategy.
 	/// </summary>
-	public class SRShortIntraday : StrategyCommon
+	public class SRShortIntraday : Strategy
 	{
 		int range = 80;
 		List<IndicatorCommon> lines;

@@ -33,7 +33,7 @@ namespace TickZoom.TradingFramework
 	{
 		protected BaseStats baseStats;
 		protected int maxCount = 200000;
-		ExitStrategyCommon exits;
+		ExitStrategy exits;
 		RandomCommon random;
 		Starter  starter;
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);

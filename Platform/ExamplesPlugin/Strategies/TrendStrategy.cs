@@ -31,7 +31,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class TrendStrategy : StrategyCommon
+	public class TrendStrategy : Strategy
 	{
 		bool isActivated = false;
 		DynamicSR sr;

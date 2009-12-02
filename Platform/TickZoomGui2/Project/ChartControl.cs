@@ -54,7 +54,7 @@ namespace TickZoom
 	    TimeStamp firstTime;
 		StockPointList spl;
 		List<PointPairList> lineList;
-		List<Indicator> indicators; 
+		List<IndicatorInterface> indicators; 
 		object chartLocker = new Object();
 		bool showPriceGraph = true;
 		static Interval initialInterval;
@@ -81,7 +81,7 @@ namespace TickZoom
 			InitializeComponent();
 		    spl = new StockPointList();
 		    lineList = new List<PointPairList>();
-		    indicators = new List<Indicator>();
+		    indicators = new List<IndicatorInterface>();
 	    }
 	    
 		void ChartControlLoad(object sender, EventArgs e)
@@ -271,7 +271,7 @@ namespace TickZoom
 		}
 	
 		[Browsable(false)]
-		public List<Indicator> Indicators {
+		public List<IndicatorInterface> Indicators {
 			get { return indicators; }
 		}
 		
@@ -436,7 +436,7 @@ namespace TickZoom
 			
 			    // Update lines for all indicators.
 			    for( int j = 0; j < indicators.Count; j++) {
-	    			Indicator indicator = indicators[j];
+	    			IndicatorInterface indicator = indicators[j];
 	    			if( lineList.Count <= j) {
 						lineList.Add( new PointPairList());
 	    			}

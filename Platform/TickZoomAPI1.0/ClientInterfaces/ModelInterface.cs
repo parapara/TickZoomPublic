@@ -40,7 +40,7 @@ namespace TickZoom.Api
 			set;
 		}
 		
-		Drawing Drawing {
+		DrawingInterface Drawing {
 			get;
 			set;
 		}

@@ -30,7 +30,7 @@ using TickZoom.Common;
 
 namespace TickZoom
 {
-	public class SRLongHourly : StrategyCommon
+	public class SRLongHourly : Strategy
 	{
 		IndicatorCommon retrace;
 		IndicatorCommon reboundPercent;
