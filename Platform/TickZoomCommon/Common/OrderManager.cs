@@ -42,7 +42,7 @@ namespace TickZoom.Common
 		
 		public OrderManager(Strategy strategy) : base(strategy) {
 		}
-		
+
 		public void Add(LogicalOrder order)
 		{
 			orders.Add(order);
@@ -51,6 +51,25 @@ namespace TickZoom.Common
 		public void Remove(LogicalOrder order)
 		{
 			orders.Remove(order);
+		}
+		
+		public override bool OnIntervalOpen()
+		{
+			foreach( LogicalOrder order in orders) {
+				if( order.IsNextBar) {
+					order.IsNextBar = false;
+					order.IsActive = true;
+				}
+			}
+			return true;
+		}
+		
+		public sealed override bool OnProcessTick(Tick tick)
+		{
+			if( IsTrace) Log.Trace("OnProcessTick()");
+			Strategy.Orders.Enter.ActiveNow.OnProcessOrders(tick);
+			Strategy.Orders.Exit.ActiveNow.OnProcessOrders(tick);
+			return true;
 		}
 		
 	 	public IList<LogicalOrder> Orders {

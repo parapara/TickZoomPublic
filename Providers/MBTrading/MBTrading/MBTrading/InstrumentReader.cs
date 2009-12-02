@@ -621,21 +621,6 @@ namespace TickZoom.MBTrading
 			get { return lastChangeTime; }
 		}
 		
-		public void SendOrder(Order order)
-		{
-			throw new NotImplementedException();
-		}
-		
-		public void SendCancel(uint orderid)
-		{
-			throw new NotImplementedException();
-		}
-		
-		public void Reset()
-		{
-			throw new NotImplementedException();
-		}
-		
 		public override string ToString()
 		{
 			return "InstrumentReader for " + instrument.Symbol;

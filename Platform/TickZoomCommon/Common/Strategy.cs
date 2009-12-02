@@ -53,8 +53,10 @@ namespace TickZoom.Common
 		
 		OrderManager orderManager;
 		Orders orders;
-		ExitCommon exit;
-		EnterCommon enter;
+		ExitCommon exitNow;
+		EnterCommon enterNow;
+		ExitCommon exitNextBar;
+		EnterCommon enterNextBar;
 		Chain exitStrategyChain;
 		Chain positionSizeChain;
 		Chain performanceChain;
@@ -71,11 +73,19 @@ namespace TickZoom.Common
 			isStrategy = true;
 			orderManager = new OrderManager(this);
 			Chain.InsertAfter(orderManager.Chain);
-			exit = new ExitCommon(this);
-			Chain.Dependencies.Add(exit.Chain);
-			enter = new EnterCommon(true,true,this);
-			Chain.Dependencies.Add(enter.Chain);
-			orders = new Orders(enter,exit);
+			exitNow = new ExitCommon(this);
+			Chain.Dependencies.Add(exitNow.Chain);
+			enterNow = new EnterCommon(this);
+			Chain.Dependencies.Add(enterNow.Chain);
+			exitNextBar = new ExitCommon(this);
+			exitNextBar.Orders = exitNow.Orders;
+			exitNextBar.IsNextBar = true;
+			Chain.Dependencies.Add(exitNextBar.Chain);
+			enterNextBar = new EnterCommon(this);
+			enterNextBar.Orders = enterNow.Orders;
+			enterNextBar.IsNextBar = true;
+			Chain.Dependencies.Add(enterNextBar.Chain);
+			orders = new Orders(enterNow,enterNextBar,exitNow,exitNextBar);
 			Model exitStrategy = new ExitStrategy(this);
 			exitStrategyChain = Chain.InsertBefore(exitStrategy.Chain);
 			Model positionSizeStrategy = new PositionSize(this);
@@ -97,11 +107,11 @@ namespace TickZoom.Common
 			if( positionSizeChain != null) {
 				positionSizeChain.Model.Name = Name;
 			}
-			if( exit != null) {
-				exit.Chain.Model.Name = Name;
+			if( exitNow != null) {
+				exitNow.Chain.Model.Name = Name;
 			}
-			if( enter != null) {
-				enter.Chain.Model.Name = Name;
+			if( enterNow != null) {
+				enterNow.Chain.Model.Name = Name;
 			}
 		}
 		
@@ -183,13 +193,13 @@ namespace TickZoom.Common
 		}
 		
 		[Obsolete("Please user Orders.Exit instead.",true)]
-		public ExitCommon Exit {
-			get { return exit; }
+		public ExitCommon ExitNow {
+			get { return exitNow; }
 		}
 		
 		[Obsolete("Please user Orders.Enter instead.",true)]
-		public EnterCommon Enter {
-			get { return enter; }
+		public EnterCommon EnterNow {
+			get { return enterNow; }
 		}
 		
 		[Category("Strategy Settings")]

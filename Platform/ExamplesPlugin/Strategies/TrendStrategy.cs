@@ -95,10 +95,10 @@ namespace TickZoom
 		public override bool OnProcessTick(Tick tick)
 		{ 	
 			if( Position.IsLong && LongExitSignal) {
-				Orders.Exit.Now.GoFlat();
+				Orders.Exit.ActiveNow.GoFlat();
 			}
 			if( Position.IsShort && ShortExitSignal) {
-				Orders.Exit.Now.GoFlat();
+				Orders.Exit.ActiveNow.GoFlat();
 			}
 			if( isActivated) {
 //				if( TradeSignal.IsFlat && tick.Ask > Highest( Bars.High, 2)) {
@@ -147,7 +147,7 @@ namespace TickZoom
 				isActivated = true;
 				
 				if( stopTradingToday ) {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 					logString = "Stop Trading Today";
 					isActivated = false;
 				} else {
@@ -170,12 +170,12 @@ namespace TickZoom
 				if( isActivated && IsValidWeekDay) {
 					if( sr.Trend == Trend.Up) {
 						if( Position.IsFlat && !LongExitSignal) {
-							Orders.Enter.Now.BuyMarket();
+							Orders.Enter.ActiveNow.BuyMarket();
 							Log.Notice(Ticks[0].Time + ", bar=" + Chart.DisplayBars.CurrentBar + ", Long");
 						}
 					} else if( sr.Trend == Trend.Down) {
 						if( Position.IsFlat && !ShortExitSignal) {
-							Orders.Enter.Now.SellMarket();
+							Orders.Enter.ActiveNow.SellMarket();
 							Log.Notice(Ticks[0].Time + ", bar=" + Chart.DisplayBars.CurrentBar + ", Short");
 						}
 					}

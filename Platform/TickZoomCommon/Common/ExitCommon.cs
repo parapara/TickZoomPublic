@@ -35,14 +35,19 @@ namespace TickZoom.Common
 	/// </summary>
 	public class ExitCommon : StrategySupport
 	{
-		private LogicalOrder buyMarket;
-		private LogicalOrder sellMarket;
-		private LogicalOrder buyStop;
-		private LogicalOrder sellStop;
-		private LogicalOrder buyLimit;
-		private LogicalOrder sellLimit;
+		public class InternalOrders {
+			public LogicalOrder buyMarket;
+			public LogicalOrder sellMarket;
+			public LogicalOrder buyStop;
+			public LogicalOrder sellStop;
+			public LogicalOrder buyLimit;
+			public LogicalOrder sellLimit;
+		}
 		private PositionInterface position;
+		private InternalOrders orders = new InternalOrders();
+		
 		private bool enableWrongSideOrders = false;
+		private bool isNextBar = false;
 		
 		public ExitCommon(Strategy strategy) : base(strategy) {
 		}
@@ -51,48 +56,48 @@ namespace TickZoom.Common
 		{
 			if( IsTrace) Log.Trace(FullName+".Initialize()");
 			Drawing.Color = Color.Black;
-			buyMarket = Data.CreateOrder(this);
-			buyMarket.Type = OrderType.BuyMarket;
-			sellMarket = Data.CreateOrder(this);
-			sellMarket.Type = OrderType.SellMarket;
-			buyStop = Data.CreateOrder(this);
-			buyStop.Type = OrderType.BuyStop;
-			buyStop.TradeDirection = TradeDirection.Exit;
-			sellStop = Data.CreateOrder(this);
-			sellStop.Type = OrderType.SellStop;
-			sellStop.TradeDirection = TradeDirection.Exit;
-			buyLimit = Data.CreateOrder(this);
-			buyLimit.Type = OrderType.BuyLimit;
-			buyLimit.TradeDirection = TradeDirection.Exit;
-			sellLimit = Data.CreateOrder(this);
-			sellLimit.Type = OrderType.SellLimit;
-			sellLimit.TradeDirection = TradeDirection.Exit;
-			Strategy.OrderManager.Add( buyStop);
-			Strategy.OrderManager.Add( sellStop);
-			Strategy.OrderManager.Add( buyLimit);
-			Strategy.OrderManager.Add( sellLimit);
+			orders.buyMarket = Data.CreateOrder(this);
+			orders.buyMarket.Type = OrderType.BuyMarket;
+			orders.sellMarket = Data.CreateOrder(this);
+			orders.sellMarket.Type = OrderType.SellMarket;
+			orders.buyStop = Data.CreateOrder(this);
+			orders.buyStop.Type = OrderType.BuyStop;
+			orders.buyStop.TradeDirection = TradeDirection.Exit;
+			orders.sellStop = Data.CreateOrder(this);
+			orders.sellStop.Type = OrderType.SellStop;
+			orders.sellStop.TradeDirection = TradeDirection.Exit;
+			orders.buyLimit = Data.CreateOrder(this);
+			orders.buyLimit.Type = OrderType.BuyLimit;
+			orders.buyLimit.TradeDirection = TradeDirection.Exit;
+			orders.sellLimit = Data.CreateOrder(this);
+			orders.sellLimit.Type = OrderType.SellLimit;
+			orders.sellLimit.TradeDirection = TradeDirection.Exit;
+			Strategy.OrderManager.Add( orders.buyMarket);
+			Strategy.OrderManager.Add( orders.sellMarket);
+			Strategy.OrderManager.Add( orders.buyStop);
+			Strategy.OrderManager.Add( orders.sellStop);
+			Strategy.OrderManager.Add( orders.buyLimit);
+			Strategy.OrderManager.Add( orders.sellLimit);
 			position = Strategy.Position;
 		}
-	
-		public sealed override bool OnProcessTick(Tick tick)
-		{
-			if( IsTrace) Log.Trace("OnProcessTick() Model="+Strategy+" Signal="+Strategy.Position.Signal);
+
+		public void OnProcessOrders(Tick tick) {
+			if( IsTrace) Log.Trace("OnProcessOrders() Model.Signal="+Strategy.Position.Signal);
 			if( position.IsLong) {
-				buyStop.IsActive = false;
-				buyLimit.IsActive = false;
+				orders.buyStop.IsActive = false;
+				orders.buyLimit.IsActive = false;
 			}
 			if( position.IsShort) {
-				sellLimit.IsActive = false;
-				sellStop.IsActive = false;
+				orders.sellLimit.IsActive = false;
+				orders.sellStop.IsActive = false;
 			}
 			if( position.HasPosition ) {
 				// copy signal in case of increased position size
-				if( buyStop.IsActive ) ProcessBuyStop(tick);
-				if( sellStop.IsActive ) ProcessSellStop(tick);
-				if( buyLimit.IsActive ) ProcessBuyLimit(tick);
-				if( sellLimit.IsActive ) ProcessSellLimit(tick);
+				if( orders.buyStop.IsActive ) ProcessBuyStop(tick);
+				if( orders.sellStop.IsActive ) ProcessSellStop(tick);
+				if( orders.buyLimit.IsActive ) ProcessBuyLimit(tick);
+				if( orders.sellLimit.IsActive ) ProcessSellLimit(tick);
 			}
-			return true;
 		}
 		
 		private void FlattenSignal() {
@@ -101,37 +106,37 @@ namespace TickZoom.Common
 		}
 	
 		public void CancelOrders() {
-			buyStop.IsActive = false;
-			sellStop.IsActive = false;
-			buyLimit.IsActive = false;
-			sellLimit.IsActive = false;
+			orders.buyStop.IsActive = false;
+			orders.sellStop.IsActive = false;
+			orders.buyLimit.IsActive = false;
+			orders.sellLimit.IsActive = false;
 		}
 		
 		private void ProcessBuyStop(Tick tick) {
-			if( buyStop.IsActive &&
+			if( orders.buyStop.IsActive &&
 			    Strategy.Position.IsShort &&
-			    tick.Ask >= buyStop.Price) {
+			    tick.Ask >= orders.buyStop.Price) {
 				LogExit("Buy Stop Exit at " + tick);
 				FlattenSignal();
 				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(buyStop,tick.Ask,Strategy.Position.Signal);
+	                Strategy.Chart.DrawTrade(orders.buyStop,tick.Ask,Strategy.Position.Signal);
 				}
 				CancelOrders();
 			} 
 		}
 		
 		private void ProcessBuyLimit(Tick tick) {
-			if( buyLimit.IsActive && 
+			if( orders.buyLimit.IsActive && 
 			    Strategy.Position.IsShort)
             {
-                if (tick.Ask <= buyLimit.Price || 
-				    (tick.IsTrade && tick.Price < buyLimit.Price))
+                if (tick.Ask <= orders.buyLimit.Price || 
+				    (tick.IsTrade && tick.Price < orders.buyLimit.Price))
                 {
                     LogExit("Buy Limit Exit at " + tick);
                     FlattenSignal();
                     if (Strategy.Performance.GraphTrades)
                     {
-                        Strategy.Chart.DrawTrade(buyLimit, tick.Ask, Strategy.Position.Signal);
+                        Strategy.Chart.DrawTrade(orders.buyLimit, tick.Ask, Strategy.Position.Signal);
                     }
                     CancelOrders();
                 }
@@ -139,30 +144,30 @@ namespace TickZoom.Common
 		}
 		
 		private void ProcessSellStop(Tick tick) {
-			if( sellStop.IsActive &&
+			if( orders.sellStop.IsActive &&
 			    Strategy.Position.IsLong &&
-			    tick.Bid <= sellStop.Price) {
+			    tick.Bid <= orders.sellStop.Price) {
 				LogExit("Sell Stop Exit at " + tick);
 				FlattenSignal();
 				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(sellStop,tick.Ask,Strategy.Position.Signal);
+	                Strategy.Chart.DrawTrade(orders.sellStop,tick.Ask,Strategy.Position.Signal);
 				}
 				CancelOrders();
 			}
 		}
 		
 		private void ProcessSellLimit(Tick tick) {
-			if( sellLimit.IsActive &&
+			if( orders.sellLimit.IsActive &&
 			    Strategy.Position.IsLong)
             {
-                if (tick.Bid >= sellLimit.Price || 
-				    (tick.IsTrade && tick.Price > sellLimit.Price))
+                if (tick.Bid >= orders.sellLimit.Price || 
+				    (tick.IsTrade && tick.Price > orders.sellLimit.Price))
                 {
                     LogExit("Sell Stop Limit at " + tick);
                     FlattenSignal();
                     if (Strategy.Performance.GraphTrades)
                     {
-                        Strategy.Chart.DrawTrade(sellLimit, tick.Bid, Strategy.Position.Signal);
+                        Strategy.Chart.DrawTrade(orders.sellLimit, tick.Bid, Strategy.Position.Signal);
                     }
                     CancelOrders();
                 }
@@ -184,19 +189,27 @@ namespace TickZoom.Common
         		throw new TickZoomException("Strategy must have a position before attempting to go flat.");
         	}
         	if( Strategy.Position.IsLong) {
-	        	sellMarket.Price = 0;
-	        	sellMarket.Positions = Strategy.Position.Size;
-	        	sellMarket.IsActive = true;
+	        	orders.sellMarket.Price = 0;
+	        	orders.sellMarket.Positions = Strategy.Position.Size;
+	        	if( isNextBar) {
+	    	    	orders.sellMarket.IsNextBar = true;
+		       	} else {
+		        	orders.sellMarket.IsActive = true;
+	        	}
 				if( Strategy.Performance.GraphTrades) {
-	        		Strategy.Chart.DrawTrade(sellMarket,Ticks[0].Bid,Strategy.Position.Signal);
+	        		Strategy.Chart.DrawTrade(orders.sellMarket,Ticks[0].Bid,Strategy.Position.Signal);
 				}
         	}
         	if( Strategy.Position.IsShort) {
-	        	buyMarket.Price = 0;
-	        	buyMarket.Positions = Strategy.Position.Size;
-	        	buyMarket.IsActive = true;
+	        	orders.buyMarket.Price = 0;
+	        	orders.buyMarket.Positions = Strategy.Position.Size;
+	        	if( isNextBar) {
+	    	    	orders.buyMarket.IsNextBar = true;
+		       	} else {
+		        	orders.buyMarket.IsActive = true;
+	        	}
 				if( Strategy.Performance.GraphTrades) {
-	        		Strategy.Chart.DrawTrade(buyMarket,Ticks[0].Ask,Strategy.Position.Signal);
+	        		Strategy.Chart.DrawTrade(orders.buyMarket,Ticks[0].Ask,Strategy.Position.Signal);
 				}
         	}
         	LogExit("GoFlat");
@@ -207,23 +220,15 @@ namespace TickZoom.Common
         	if( Strategy.Position.IsLong) {
         		throw new TickZoomException("Strategy must be short or flat before setting a buy stop to exit.");
         	} else if( Strategy.Position.IsFlat) {
-        		if(!Strategy.Orders.Enter.Now.HasSellOrder) {
+        		if(!Strategy.Orders.Enter.ActiveNow.HasSellOrder) {
         			throw new TickZoomException("When flat, a sell order must be active before creating a buy order to exit.");
         		}
 			}
-        	double bid = Ticks[0].Bid;
-   			if( Strategy.Position.HasPosition && price <= bid) {
-        		if( enableWrongSideOrders ) {
-        			GoFlat();
-        			buyStop.IsActive = false;
-        			return;
-       			} else {
-        			int bar = Chart.ChartBars.BarCount;
-        			throw new TickZoomException("Exit Buy Stop price " + price + " was less than or equal to the current bid price " + bid + " at bar " + bar);
-        	    }
-        	} else {
-        		buyStop.Price = price;
-        		buyStop.IsActive = true;
+    		orders.buyStop.Price = price;
+        	if( isNextBar) {
+    	    	orders.buyStop.IsNextBar = true;
+	       	} else {
+	        	orders.buyStop.IsActive = true;
         	}
         }
 	
@@ -231,72 +236,48 @@ namespace TickZoom.Common
         	if( Strategy.Position.IsShort) {
         		throw new TickZoomException("Strategy must be long or flat before setting a sell stop to exit.");
         	} else if( Strategy.Position.IsFlat) {
-        		if(!Strategy.Orders.Enter.Now.HasBuyOrder) {
+        		if(!Strategy.Orders.Enter.ActiveNow.HasBuyOrder) {
         			throw new TickZoomException("When flat, a buy order must be active before creating a sell order to exit.");
         		}
         	}
-        	double ask = Ticks[0].Ask;
-   			if( Strategy.Position.HasPosition && price >= ask) {
-        		if( enableWrongSideOrders ) {
-        			GoFlat();
-        			sellStop.IsActive = false;
-        			return;
-        		} else {
-        			int bar = Chart.ChartBars.BarCount;
-        			throw new TickZoomException("Exit Sell Stop price " + price + " was greater than or equal to the current ask price " + ask + " at bar " + bar);
-        		}
-			} else {
-				sellStop.Price = price;
-				sellStop.IsActive = true;
-			}
+			orders.sellStop.Price = price;
+        	if( isNextBar) {
+    	    	orders.sellStop.IsNextBar = true;
+	       	} else {
+	        	orders.sellStop.IsActive = true;
+        	}
 		}
         
         public void BuyLimit(double price) {
         	if( Strategy.Position.IsLong) {
         		throw new TickZoomException("Strategy must be short or flat before setting a buy limit to exit.");
         	} else if( Strategy.Position.IsFlat) {
-        		if(!Strategy.Orders.Enter.Now.HasSellOrder) {
+        		if(!Strategy.Orders.Enter.ActiveNow.HasSellOrder) {
         			throw new TickZoomException("When flat, a sell order must be active before creating a buy order to exit.");
         		}
 			}
-        	double ask = Ticks[0].Ask;
-   			if( Strategy.Position.HasPosition && price >= ask) {
-        		if( enableWrongSideOrders ) {
-       				GoFlat();
-        			buyLimit.IsActive = false;
-        			return;
-        		} else {
-        			int bar = Chart.ChartBars.BarCount;
-        			throw new TickZoomException("Exit Buy Limit price " + price + " was greater than or equal to the current ask price " + ask + " at bar " + bar);
-        		}
-			} else {
-        		buyLimit.Price = price;
-        		buyLimit.IsActive = true;
-			}
+    		orders.buyLimit.Price = price;
+        	if( isNextBar) {
+    	    	orders.buyLimit.IsNextBar = true;
+	       	} else {
+	        	orders.buyLimit.IsActive = true;
+        	}
 		}
 	
         public void SellLimit( double price) {
         	if( Strategy.Position.IsShort) {
         		throw new TickZoomException("Strategy must be long or flat before setting a sell limit to exit.");
         	} else if( Strategy.Position.IsFlat) {
-        		if(!Strategy.Orders.Enter.Now.HasBuyOrder) {
+        		if(!Strategy.Orders.Enter.ActiveNow.HasBuyOrder) {
         			throw new TickZoomException("When flat, a buy order must be active before creating a sell order to exit.");
         		}
 			}
-        	double bid = Ticks[0].Bid;
-   			if( Strategy.Position.HasPosition && price <= bid) {
-        		if( enableWrongSideOrders ) {
-        			GoFlat();
-        			sellLimit.IsActive = false;
-        			return;
-        		} else {
-        			int bar = Chart.ChartBars.BarCount;
-        			throw new TickZoomException("Exit Sell limit price " + price + " was less than or equal to the current bid price " + bid + " at bar " + bar);
-        		}
-			} else {
-				sellLimit.Price = price;
-    	    	sellLimit.IsActive = true;
-			}
+			orders.sellLimit.Price = price;
+        	if( isNextBar) {
+    	    	orders.sellLimit.IsNextBar = true;
+	       	} else {
+	        	orders.sellLimit.IsActive = true;
+        	}
 		}
         
 		#endregion
@@ -317,6 +298,16 @@ namespace TickZoom.Common
 		public bool EnableWrongSideOrders {
 			get { return enableWrongSideOrders; }
 			set { enableWrongSideOrders = value; }
+		}
+		
+		internal bool IsNextBar {
+			get { return isNextBar; }
+			set { isNextBar = value; }
+		}
+		
+		internal InternalOrders Orders {
+			get { return orders; }
+			set { orders = value; }
 		}
 	}
 }

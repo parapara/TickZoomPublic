@@ -58,10 +58,10 @@ namespace TickZoom
 			//Log.Info( "close: " + Ticks[0] + " " + Minutes.Close[0] + " " + Minutes.Time[0]);
 			
 			if( !Position.IsLong && Bars.Close[0] > Bars.High[1]) {
-				Orders.Enter.Now.BuyMarket();
+				Orders.Enter.ActiveNow.BuyMarket();
 			}
 			if( !Position.IsShort && Bars.Close[0] < Bars.Low[1]) {
-				Orders.Enter.Now.SellMarket();
+				Orders.Enter.ActiveNow.SellMarket();
 			}
 			return true;
 		}

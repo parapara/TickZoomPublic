@@ -61,6 +61,11 @@ namespace TickZoom.Api
 			set;
 		}
 		
+		bool IsNextBar {
+			get;
+			set;
+		}
+		
 		string Tag {
 			get;
 			set;

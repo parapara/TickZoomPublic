@@ -60,16 +60,16 @@ namespace TickZoom
 			if( Weeks.Low.Count < 2) return true;
 			if( timeFrame.Equals(Intervals.Month1)) {
 				if( Position.HasPosition) {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 				}
 			}			
 			
 			if( timeFrame.Equals(Intervals.Minute1)) {
 				if( Position.IsFlat && Formula.CrossesUnder( Bars.Typical,1,Weeks.Low[1])) {
-					Orders.Enter.Now.SellMarket();
+					Orders.Enter.ActiveNow.SellMarket();
 				}
 				if( Position.HasPosition && Formula.CrossesOver( Bars.Typical,1, Weeks.High[1])) {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 				}
 			}
 			return true;

@@ -50,8 +50,8 @@ namespace TickZoom
 			// Example log message.
 			//Log.WriteLine( "close: " + Ticks[0] + " " + Minutes.Close[0] + " " + Minutes.Time[0]);
 			
-			Orders.Enter.Now.BuyLimit(Bars.High[0]);
-			Orders.Enter.Now.SellLimit(Bars.Low[0]);
+			Orders.Enter.ActiveNow.BuyLimit(Bars.High[0]);
+			Orders.Enter.ActiveNow.SellLimit(Bars.Low[0]);
 			return true;
 		}
 	}

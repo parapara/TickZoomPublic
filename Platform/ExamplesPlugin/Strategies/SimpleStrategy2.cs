@@ -96,10 +96,10 @@ namespace TickZoom
 				mean = (int) average[0];
 
 				if( !Position.IsShort && tick.Bid >= mean + digression) {
-					Orders.Enter.Now.SellMarket();
+					Orders.Enter.ActiveNow.SellMarket();
 				}
 				if( !Position.IsLong && tick.Ask <= mean - digression) {
-					Orders.Enter.Now.BuyMarket();
+					Orders.Enter.ActiveNow.BuyMarket();
 				}
 			}
 			return true;

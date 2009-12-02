@@ -62,9 +62,9 @@ namespace TickZoom
 				TimeStamp time = Days.Time[0];
 				if( entrySma.Count > 0 && tema.Count > 0) {
 					if( tema[0] > entrySma[0]) {
-						Orders.Exit.Now.GoFlat();
+						Orders.Exit.ActiveNow.GoFlat();
 					} else {
-						Orders.Exit.Now.GoFlat();
+						Orders.Exit.ActiveNow.GoFlat();
 					}
 				}
 			}

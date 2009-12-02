@@ -74,8 +74,13 @@ namespace TickZoom.Common
 				} else if( symbolMap.Count == strategies.Count) {
 					portfolioType = PortfolioType.MultiSymbol;
 				} else {
-					// Remove all dependencies.
-					Chain.Dependencies.Clear();
+					// Remove all dependencies which have more than one obect.
+					for( int i=Chain.Dependencies.Count-1; i>=0; i--) {
+						Chain chain = Chain.Dependencies[i];
+						if( chain.Root != chain.Tail) {
+							Chain.Dependencies.RemoveAt(i);
+						}
+					}
 					// There is a mixture of multi symbols and multi strategies per symbol.
 					// Insert additional Portfolios for each symbol.
 					foreach( var kvp in symbolMap) {

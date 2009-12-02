@@ -59,7 +59,7 @@ namespace TickZoom
 			if( fastTema.Count>0 && slowTema.Count>0) {
 				Position.Signal = fastTema[0] > slowTema[0] ? -1 : 1;
 			} else {
-				Orders.Exit.Now.GoFlat();
+				Orders.Exit.ActiveNow.GoFlat();
 			}
 			return true;
 		}

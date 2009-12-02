@@ -58,12 +58,12 @@ namespace TickZoom
 			if( timeFrame.Equals(Intervals.Minute1)) {
 				
 				if( Formula.CrossesUnder(Minutes.High,(int) Support[0])) {
-					Orders.Enter.Now.SellMarket();
+					Orders.Enter.ActiveNow.SellMarket();
 				}
 				
 				if( Position.IsShort ) {
 					if( Minutes.High[0] > Resistance[1]) {
-						Orders.Exit.Now.GoFlat();
+						Orders.Exit.ActiveNow.GoFlat();
 					}
 				}
 			}

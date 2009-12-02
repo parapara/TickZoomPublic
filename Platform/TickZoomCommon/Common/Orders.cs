@@ -39,10 +39,10 @@ namespace TickZoom.Common
 		EnterTiming enter;
 		ExitTiming exit;
 		
-		public Orders(EnterCommon enter, ExitCommon exit)
+		public Orders(EnterCommon enterNow, EnterCommon enterNextBar, ExitCommon exitNow, ExitCommon exitNextBar)
 		{
-			this.enter = new EnterTiming(enter);
-			this.exit = new ExitTiming(exit);
+			this.enter = new EnterTiming(enterNow,enterNextBar);
+			this.exit = new ExitTiming(exitNow,exitNextBar);
 		}
 		
 		public EnterTiming Enter {
@@ -54,17 +54,16 @@ namespace TickZoom.Common
 		}
 		
 		public class EnterTiming {
-			EnterCommon now;
+			EnterCommon activeNow;
 			EnterCommon nextBar;
 			
-			public EnterTiming( EnterCommon enter) {
-				this.now = enter;
-				this.nextBar = enter;
-				nextBar.orders = now.orders;
+			public EnterTiming( EnterCommon now, EnterCommon nextBar) {
+				this.activeNow = now;
+				this.nextBar = nextBar;
 			}
 			
-			public EnterCommon Now {
-				get { return now; }
+			public EnterCommon ActiveNow {
+				get { return activeNow; }
 			}
 			
 			public EnterCommon NextBar {
@@ -73,16 +72,16 @@ namespace TickZoom.Common
 		}
 		
 		public class ExitTiming {
-			ExitCommon now;
+			ExitCommon activeNow;
 			ExitCommon nextBar;
 			
-			public ExitTiming( ExitCommon exit) {
-				this.now = exit;
-				this.nextBar = exit;
+			public ExitTiming( ExitCommon now, ExitCommon nextBar) {
+				this.activeNow = now;
+				this.nextBar = nextBar;
 			}
 			
-			public ExitCommon Now {
-				get { return now; }
+			public ExitCommon ActiveNow {
+				get { return activeNow; }
 			}
 			
 			public ExitCommon NextBar {

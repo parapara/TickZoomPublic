@@ -54,7 +54,7 @@ namespace TickZoom
 		public override bool OnIntervalClose() {
 			if( Bars.Count > 1) {
 				if( Position.IsShort && Bars.Typical[1] > Formula.Highest(Bars.High,breakoutLength,2)) {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 				}
 			}
 			return true;
@@ -64,7 +64,7 @@ namespace TickZoom
 			if( timeFrame.Equals(Intervals.Hour1) && Bars.Count > 1 ) {
 				if( Position.IsFlat) {
 					if( Hours.Typical[1] < sma[0]) {
-						Orders.Enter.Now.SellMarket();
+						Orders.Enter.ActiveNow.SellMarket();
 					}
 				}
 			}

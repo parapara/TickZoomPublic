@@ -59,11 +59,11 @@ namespace MiscTest
         {
             if (Bars.EndTime[0] == firstTime)
             {
-                Orders.Enter.Now.BuyLimit(127.92);
+                Orders.Enter.ActiveNow.BuyLimit(127.92);
             }
             if (Bars.EndTime[0] == secondTime)
             {
-                Orders.Exit.Now.SellStop(127.63);
+                Orders.Exit.ActiveNow.SellStop(127.63);
             }
 
             return true;

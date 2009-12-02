@@ -62,7 +62,7 @@ namespace TickZoom
 		public override bool OnIntervalClose(Interval timeFrame) {
 			if( timeFrame.Equals(Intervals.Day1)) {
 				// Exit at the end of the day.
-				Orders.Exit.Now.GoFlat();
+				Orders.Exit.ActiveNow.GoFlat();
 			}
 			if( timeFrame.Equals(IntervalDefault)) {
 				dayHigh[0] = Days.High[1];
@@ -70,15 +70,15 @@ namespace TickZoom
 				// Do we have a setup?
 				if( Next.Position.HasPosition ) {
 					if( Formula.CrossesUnder( Bars.Typical, Days.Low[1])) {
-						Orders.Enter.Now.SellMarket();
+						Orders.Enter.ActiveNow.SellMarket();
 						entryLevel = Bars.Close[0];
 					}
 				} else {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 				}
 				// Look for profit target!
 				if( Position.HasPosition && Formula.CrossesUnder( Minutes.Low, entryLevel - profitTarget)) {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 				}
 			}
 			return true;

@@ -70,7 +70,7 @@ namespace TickZoom
 				if( average[0] > slowAvg[0]) {
 //					trend = Trend.Up;	
 					if( !Position.IsLong) { 
-						Orders.Enter.Now.BuyMarket();
+						Orders.Enter.ActiveNow.BuyMarket();
 						ExitStrategy.StopLoss = 300;
 						ExitStrategy.DailyMaxLoss = 600;
 						ExitStrategy.WeeklyMaxLoss = 1200;
@@ -79,7 +79,7 @@ namespace TickZoom
 				} else if ( average[0] < slowAvg[0]) {
 //					trend = Trend.Down;
 					if( !Position.IsShort) {
-						Orders.Enter.Now.SellMarket();
+						Orders.Enter.ActiveNow.SellMarket();
 						ExitStrategy.StopLoss = 300;
 						ExitStrategy.DailyMaxLoss = 600;
 						ExitStrategy.WeeklyMaxLoss = 1000;

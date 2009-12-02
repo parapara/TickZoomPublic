@@ -87,6 +87,7 @@ namespace Loaders
 	    		fourTicksPerBar = simulatedLoader.TopModel as ExampleOrderStrategy;
 			} catch( Exception ex) {
 				Console.Out.WriteLine(ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
+				throw;
 			}
     		
 		}

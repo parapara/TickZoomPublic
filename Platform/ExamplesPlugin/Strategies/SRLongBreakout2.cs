@@ -49,16 +49,16 @@ namespace TickZoom
 				// Long Trend
 				if( LongTrend ) {
 					if( Formula.CrossesOver(Minutes.High,Resistance[0])) {
-						Orders.Enter.Now.BuyMarket();
+						Orders.Enter.ActiveNow.BuyMarket();
 					}
 				} else {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 				}
 
 				if( Position.IsLong) {
 					//Low Exit
 					if( Minutes.Low[0] < Support[0]) {
-						Orders.Exit.Now.GoFlat();
+						Orders.Exit.ActiveNow.GoFlat();
 					}
 				}
 				

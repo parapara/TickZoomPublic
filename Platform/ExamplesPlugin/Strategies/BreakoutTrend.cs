@@ -49,33 +49,33 @@ namespace TickZoom
 		
 		public override bool OnIntervalClose() {
 			if( Bars.High[0] > Formula.Highest(Bars.High,length)) {
-				Orders.Enter.Now.SellMarket();
+				Orders.Enter.ActiveNow.SellMarket();
 				lastBreakOut = Bars.CurrentBar;
 			} else if( Bars.Low[0] < Formula.Lowest(Bars.Low,length)) {
-				Orders.Enter.Now.BuyMarket();
+				Orders.Enter.ActiveNow.BuyMarket();
 				lastBreakOut = Bars.CurrentBar;
 			}
 			double median = (Bars.High[0] + Bars.Low[0])/2;
 			if( Position.IsLong) {
 				if( median < Position.SignalPrice) {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 				}
 			}
 			if( Position.IsShort) {
 				if( median > Position.SignalPrice) {
-					Orders.Exit.Now.GoFlat();
+					Orders.Exit.ActiveNow.GoFlat();
 				}
 			}
 		
 			// If too long since last break out, go flat.
 			if( Bars.CurrentBar - lastBreakOut >= trendStrength ) {
-				Orders.Exit.Now.GoFlat();
+				Orders.Exit.ActiveNow.GoFlat();
 			}
 			
 			
 //			// If child strategy, make sure signal direction matches.
 			if( Next != null && Next.Position.Signal != Position.Signal) {
-				Orders.Exit.Now.GoFlat();
+				Orders.Exit.ActiveNow.GoFlat();
 			}
 			return true;
 		}

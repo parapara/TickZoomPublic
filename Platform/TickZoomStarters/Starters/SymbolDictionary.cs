@@ -289,6 +289,7 @@ namespace TickZoom.Common
       <symbol name=""Mock4Ticks"" />
       <symbol name=""Mock4Sim"" />
       <symbol name=""Daily4Sim"" />
+      <symbol name=""Daily4Test"" />
       <symbol name=""TXF"" />
       <symbol name=""spyTestBars"" />
     </category>
