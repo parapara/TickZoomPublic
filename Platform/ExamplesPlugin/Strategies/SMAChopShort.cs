@@ -64,13 +64,13 @@ namespace TickZoom
 			if( Next.Position.IsShort || Next.Position.IsFlat) {
 				diff[0] = Bars.Typical[0] - slowAvg[0];
 				if( diff[0] > highTrigger) {
-					Enter.SellMarket();
+					Orders.Enter.Now.SellMarket();
 				}
 				if( diff[0] < -lowTrigger) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			} else {
-				Exit.GoFlat();
+				Orders.Exit.Now.GoFlat();
 			}
 			return true;
 		}

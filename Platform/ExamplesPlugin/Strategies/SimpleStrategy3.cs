@@ -94,20 +94,20 @@ namespace TickZoom
 				switch( trend) {
 					case Trend.Up:
 						if( !Position.IsLong && tick.Bid < mean) {
-							Enter.BuyMarket();
+							Orders.Enter.Now.BuyMarket();
 						}
 						break;
 					case Trend.Down:
 						if( !Position.IsShort && tick.Ask > mean) {
-							Enter.SellMarket();
+							Orders.Enter.Now.SellMarket();
 						}
 						break;
 				}
 				if( Position.IsShort && mean > mediumAvg[0]) {
-				    Exit.GoFlat();
+				    Orders.Exit.Now.GoFlat();
 				}
 				if( Position.IsLong && mean < mediumAvg[0]) {
-				    Exit.GoFlat();
+				    Orders.Exit.Now.GoFlat();
 				}
 			}
 			return true;

@@ -207,7 +207,7 @@ namespace TickZoom.Common
         	if( Strategy.Position.IsLong) {
         		throw new TickZoomException("Strategy must be short or flat before setting a buy stop to exit.");
         	} else if( Strategy.Position.IsFlat) {
-        		if(!Strategy.Enter.HasSellOrder) {
+        		if(!Strategy.Orders.Enter.Now.HasSellOrder) {
         			throw new TickZoomException("When flat, a sell order must be active before creating a buy order to exit.");
         		}
 			}
@@ -231,7 +231,7 @@ namespace TickZoom.Common
         	if( Strategy.Position.IsShort) {
         		throw new TickZoomException("Strategy must be long or flat before setting a sell stop to exit.");
         	} else if( Strategy.Position.IsFlat) {
-        		if(!Strategy.Enter.HasBuyOrder) {
+        		if(!Strategy.Orders.Enter.Now.HasBuyOrder) {
         			throw new TickZoomException("When flat, a buy order must be active before creating a sell order to exit.");
         		}
         	}
@@ -255,7 +255,7 @@ namespace TickZoom.Common
         	if( Strategy.Position.IsLong) {
         		throw new TickZoomException("Strategy must be short or flat before setting a buy limit to exit.");
         	} else if( Strategy.Position.IsFlat) {
-        		if(!Strategy.Enter.HasSellOrder) {
+        		if(!Strategy.Orders.Enter.Now.HasSellOrder) {
         			throw new TickZoomException("When flat, a sell order must be active before creating a buy order to exit.");
         		}
 			}
@@ -279,7 +279,7 @@ namespace TickZoom.Common
         	if( Strategy.Position.IsShort) {
         		throw new TickZoomException("Strategy must be long or flat before setting a sell limit to exit.");
         	} else if( Strategy.Position.IsFlat) {
-        		if(!Strategy.Enter.HasBuyOrder) {
+        		if(!Strategy.Orders.Enter.Now.HasBuyOrder) {
         			throw new TickZoomException("When flat, a buy order must be active before creating a sell order to exit.");
         		}
 			}

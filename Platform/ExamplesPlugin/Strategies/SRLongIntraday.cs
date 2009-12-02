@@ -69,13 +69,13 @@ namespace TickZoom
 				// Only play if trend is flat.
 				if( Next.Position.Signal == 0) {
 					if( Position.IsFlat && Formula.CrossesOver( Bars.High, Weeks.High[1])) {
-						Enter.SellMarket();
+						Orders.Enter.Now.SellMarket();
 					}
 					if(  Position.IsFlat && Bars.Low[0] < Days.Low[1]) {
-						Exit.GoFlat();
+						Orders.Exit.Now.GoFlat();
 					}
 				} else {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			}
 			return true;

@@ -66,17 +66,17 @@ namespace TickZoom
 			if( Next.Position.IsFlat || Next.Position.IsLong) {
 				diff[0] = Bars.Typical[0] - slowAvg[0];
 				if( diff[0] < -lowTrigger) {
-					Enter.BuyMarket();
+					Orders.Enter.Now.BuyMarket();
 				}
 				if( diff[0] > highTrigger) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 				Elapsed span = Position.SignalTime - Bars.Time[0];
 				if( span.TotalHours > maxHours) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			} else {
-				Exit.GoFlat();
+				Orders.Exit.Now.GoFlat();
 			}
 			return true;
 		}

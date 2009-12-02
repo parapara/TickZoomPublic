@@ -64,11 +64,11 @@ namespace TickZoom
 				pivotDiff[0] = pivotHigh.PivotHighs[0] - pivotLow.PivotLows[0];
 				if( pivotDiff[0] < maxPivotDiff) {
 					if( (Position.IsShort| Position.IsFlat) && Formula.CrossesOver(Hours.High,(int)pivotHigh[1])) {
-						Enter.BuyMarket();
+						Orders.Enter.Now.BuyMarket();
 					}
 				}
 				if( (Position.IsLong| Position.IsFlat) && Formula.CrossesUnder(Hours.Low,(int)pivotLow[1])) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			}
 			return true;

@@ -108,31 +108,31 @@ namespace TickZoom
 				int reboundThreshold = Math.Max(0,45 - Math.Max(0,stretch-stretchFloor)/stretchDivisor*5);
 				
 				if( stretch > maximumStretch) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 					reset();
 					return true;
 				}
 
 				if( Minutes.Close[0] < retrace[0]) {
 					if( positionsize > maxSize) {
-						Enter.BuyMarket( Position.Size+1);
+						Orders.Enter.Now.BuyMarket( Position.Size+1);
 						maxSize = positionsize;
 					}
 				} 
 				if( Position.IsLong && reboundPercent[0] > reboundThreshold) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 					reset();
 					return true;
 				}
 				
 				if( Minutes.Close[0] > retrace[0]) {
 					if( positionsize > maxSize) {
-						Enter.SellMarket( Position.Size+1);
+						Orders.Enter.Now.SellMarket( Position.Size+1);
 						maxSize = positionsize;
 					}
 				} 
 				if( Position.IsShort && reboundPercent[0] > reboundThreshold) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 					reset();
 					return true;
 				}

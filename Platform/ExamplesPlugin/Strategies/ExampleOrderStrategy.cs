@@ -57,25 +57,25 @@ namespace TickZoom
 			double close = Bars.Close[0];
 			if( Bars.Close[0] > Bars.Open[0]) {
 				if( Position.IsFlat) {
-					Enter.BuyStop(Bars.Close[0] + 0.10);
-					Exit.SellStop(Bars.Close[0] - 0.10);
+					Orders.Enter.Now.BuyStop(Bars.Close[0] + 0.10);
+					Orders.Exit.Now.SellStop(Bars.Close[0] - 0.10);
 				}
 				if( Position.IsShort) {
-					Exit.BuyLimit(Bars.Close[0] - 0.03);
+					Orders.Exit.Now.BuyLimit(Bars.Close[0] - 0.03);
 				}
 			}
 			if( Position.IsLong) {
-				Exit.SellStop(Bars.Close[0] - 0.10);
+				Orders.Exit.Now.SellStop(Bars.Close[0] - 0.10);
 			}
 			if( Bars.Close[0] < Bars.Open[0]) {
 				if( Position.IsFlat) {
-					Enter.SellLimit(Bars.Close[0] + 0.30);
+					Orders.Enter.Now.SellLimit(Bars.Close[0] + 0.30);
 					ExitStrategy.StopLoss = 0.45;
 				}
 			}
 			if( Bars.Close[0] < Bars.Open[0] && Bars.Open[0] < Bars.Close[1]) {
 				if( Position.IsFlat) {
-					Enter.SellMarket();
+					Orders.Enter.Now.SellMarket();
 					ExitStrategy.StopLoss = 0.15;
 				}
 			}

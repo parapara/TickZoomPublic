@@ -63,12 +63,12 @@ namespace TickZoom
 		public override bool OnIntervalClose(Interval timeFrame) {
 			if( timeFrame.Equals(Intervals.Minute1)) {
 				if( (Position.IsShort| Position.IsFlat) && Formula.CrossesOver(Hours.High,(int)pivotHigh.PivotHighs[0])) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 				pivotDiff[0] = pivotHigh.PivotHighs[0] - pivotLow.PivotLows[0];
 				if( pivotDiff[0] < maxPivotDiff) {
 					if( (Position.IsLong| Position.IsFlat) && Formula.CrossesUnder(Hours.Typical,(int)pivotLow.PivotLows[0])) {
-						Enter.SellMarket();
+						Orders.Enter.Now.SellMarket();
 					}
 				}
 			}

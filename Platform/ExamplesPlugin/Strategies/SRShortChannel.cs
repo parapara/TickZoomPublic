@@ -72,10 +72,10 @@ namespace TickZoom
 			if( timeFrame.Equals(Intervals.Minute1)) {
 				if( Position.IsFlat && Hours.High[length] < weekHigh[length] &&
 				    Formula.CrossesUnder( Hours.High, 1, Weeks.High[1])) {
-					Enter.SellMarket();
+					Orders.Enter.Now.SellMarket();
 				}
 				if( Position.HasPosition && Formula.CrossesUnder( Minutes.Low, 1, Weeks.Low[1])) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			}
 			return true;

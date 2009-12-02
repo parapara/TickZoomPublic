@@ -53,14 +53,14 @@ namespace TickZoom
 			if( Position.IsLong && !barFlag) {
 				if( Performance.ComboTrades.CurrentProfitLoss > 0) {
 					if(Position.Size>1) {
-						Enter.BuyMarket(); // Reduce TradeSignal.Positions.
+						Orders.Enter.Now.BuyMarket(); // Reduce TradeSignal.Positions.
 					}
 					if(Ticks[0].Bid < low) {
-						Enter.SellMarket();
+						Orders.Enter.Now.SellMarket();
 					}
 				} else {
 					if( Ticks[0].Ask > high && Ticks[0].Ask < Position.SignalPrice - 100) {
-						Enter.BuyMarket(Position.Size*1.5);
+						Orders.Enter.Now.BuyMarket(Position.Size*1.5);
 						barFlag = true;
 					}
 				}
@@ -68,24 +68,24 @@ namespace TickZoom
 			if( Position.IsShort && !barFlag) {
 				if( Performance.ComboTrades.CurrentProfitLoss > 0) {
 					if(Position.Size>1) {
-						Enter.SellMarket(); // Reduce TradeSignal.Positions.
+						Orders.Enter.Now.SellMarket(); // Reduce TradeSignal.Positions.
 					}
 					if( Bars.High[0] > high) {
-						Enter.BuyMarket();
+						Orders.Enter.Now.BuyMarket();
 					}
 				} else {
 					if( Ticks[0].Bid < low && Ticks[0].Bid > Position.SignalPrice + 100) {
-						Enter.SellMarket(Position.Size*1.5);
+						Orders.Enter.Now.SellMarket(Position.Size*1.5);
 						barFlag = true;
 					}
 				}
 			}
 			if( Position.IsFlat) {
 				if( Ticks[0].Ask > high) {
-					Enter.BuyMarket();
+					Orders.Enter.Now.BuyMarket();
 				}
 				if( Ticks[0].Bid < low) {
-					Enter.SellMarket();
+					Orders.Enter.Now.SellMarket();
 				}
 			}
 			return true;
@@ -97,11 +97,11 @@ namespace TickZoom
 			if( timeFrame.Equals(Intervals.Week1)) {
 				if( Position.IsShort) {
 				    holdPositions = -Position.Size;
-				    Enter.SellMarket(); // Reduce weekend risk.
+				    Orders.Enter.Now.SellMarket(); // Reduce weekend risk.
 				}
 				if( Position.IsLong) {
 				    holdPositions = Position.Size;
-				    Enter.BuyMarket(); // Reduce weekend risk.
+				    Orders.Enter.Now.BuyMarket(); // Reduce weekend risk.
 				}
 			}
 			return true;
@@ -111,10 +111,10 @@ namespace TickZoom
 		{
 			if( timeFrame.Equals(Intervals.Week1)) {
 				if( Position.IsShort) {
-				    Enter.SellMarket(holdPositions); // Return to pre-weekend TradeSignal.Positions.
+				    Orders.Enter.Now.SellMarket(holdPositions); // Return to pre-weekend TradeSignal.Positions.
 				}
 				if( Position.IsLong) {
-				    Enter.BuyMarket(holdPositions); // return to pre-weekend TradeSignal.Positions.
+				    Orders.Enter.Now.BuyMarket(holdPositions); // return to pre-weekend TradeSignal.Positions.
 				}
 			}
 			holdPositions = 0;

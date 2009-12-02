@@ -42,13 +42,13 @@ namespace TickZoom.TradingFramework
 		public double ShortStop = 0;
 		public override bool OnProcessTick(Tick tick)
 		{
-			Exit.EnableWrongSideOrders = true;
+			Orders.Exit.Now.EnableWrongSideOrders = true;
 	//			log.WriteFile( Position.Signal + ": " + tick.ToString());
 			if( Position.IsShort) {
-				Exit.BuyStop( LongStop);
+				Orders.Exit.Now.BuyStop( LongStop);
 			}
 			if( Position.IsLong) {
-				Exit.SellStop( ShortStop);
+				Orders.Exit.Now.SellStop( ShortStop);
 			}
 			base.OnProcessTick(tick);
 			return true;

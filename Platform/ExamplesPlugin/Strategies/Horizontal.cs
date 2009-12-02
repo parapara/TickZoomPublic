@@ -77,11 +77,11 @@ namespace TickZoom
 		{
 			if( !Position.IsLong && Bars.Close[0] > Days.Open[0]+200 &&
 				Bars.Close[1] < Days.Open[0]+200 ) {
-				Enter.SellMarket();
+				Orders.Enter.Now.SellMarket();
 			}
 			if( !Position.IsShort && Bars.Close[0] < Days.Open[0]+200 &&
 			   Bars.Close[1] > Days.Open[0]+200 ) {
-				Enter.BuyMarket();
+				Orders.Enter.Now.BuyMarket();
 			}
 			return true;
 		}

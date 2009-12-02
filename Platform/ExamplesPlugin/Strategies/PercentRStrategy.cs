@@ -72,10 +72,10 @@ namespace TickZoom
 					percentR[0] = 50;
 				}
 				if( Next.Position.Signal == 0) { 
-					if( percentR[0] > 100 - threshhold) { Enter.SellMarket(); }
-					if( percentR[0] < threshhold) { Enter.BuyMarket(); }
+					if( percentR[0] > 100 - threshhold) { Orders.Enter.Now.SellMarket(); }
+					if( percentR[0] < threshhold) { Orders.Enter.Now.BuyMarket(); }
 				} else {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			}
 			return true;

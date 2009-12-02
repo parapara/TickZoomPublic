@@ -59,7 +59,7 @@ namespace TickZoom
 				if( Position.IsFlat && Bars.Typical[1] > Formula.Highest(Bars.High,breakoutLength,2)) {
 //					risk < riskLimit &&	risk > 0) {
 					
-					Enter.BuyMarket();
+					Orders.Enter.Now.BuyMarket();
 					entryPrice = Ticks[0].Bid;
 				}
 				
@@ -71,7 +71,7 @@ namespace TickZoom
 			if( timeFrame.BarUnit == BarUnit.Hour && timeFrame.Period == 1 && Bars.Count > 1 ) {
 				if( Position.IsLong) {
 					if( Hours.Typical[1] < sma[0] - stopLoss) {
-						Exit.GoFlat();
+						Orders.Exit.Now.GoFlat();
 					}
 				}
 			}

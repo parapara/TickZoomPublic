@@ -58,17 +58,17 @@ namespace TickZoom
 				// Do we have a setup?
 				if( Next.Position.IsFlat || Next.Position.IsShort ) {
 					if( Formula.CrossesOver( Minutes.Low, 1, Weeks.Low[1] + 100)) {
-						Enter.BuyMarket();
+						Orders.Enter.Now.BuyMarket();
 					}
 				} else {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			}
 			if( timeFrame.Equals(Intervals.Minute1)) {
 				// Look for profit target!
 				double high = Weeks.High[1] - 50;
 				if( Position.HasPosition && Formula.CrossesOver( Minutes.High, high)) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			}
 			return true;

@@ -58,13 +58,13 @@ namespace MiscTest
             if ((((DateTime)Bars.EndTime[0]).ToString("yyyyMMdd") == "20080908") &&
                 (Bars.EndTime[0].TimeOfDay == new Elapsed(9, 42, 0)))          
             {
-                Enter.BuyLimit(127.64);
+                Orders.Enter.Now.BuyLimit(127.64);
                 if (Bars.High[0] != Bars.Low[0]) {};
             }
             if ((((DateTime)Bars.EndTime[0]).ToString("yyyyMMdd") == "20080908") &&
                 (Bars.EndTime[0].TimeOfDay == new Elapsed(9, 43, 0)))
             {
-                Exit.SellStop(127.09);
+                Orders.Exit.Now.SellStop(127.09);
                 if (Bars.High[0] != Bars.Low[0]) { };
             }
 

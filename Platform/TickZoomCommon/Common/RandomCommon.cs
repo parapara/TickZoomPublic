@@ -94,7 +94,7 @@ namespace TickZoom.Common
 		public override bool OnIntervalClose(Interval timeFrame) {
 			switch( timeFrame.BarUnit) {
 			case BarUnit.Session:
-				Exit.GoFlat();
+				Orders.Exit.Now.GoFlat();
 				break;
 			}
 			return true;

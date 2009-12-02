@@ -76,14 +76,14 @@ namespace TickZoom
 		void HandleEntry() {
 			double resistance = Formula.Highest(Bars.High,breakoutLength,displace+1);
 			if( Bars.Typical[1] > resistance && Ticks[0].Bid > resistance ) {
-				Enter.BuyMarket();
+				Orders.Enter.Now.BuyMarket();
 			}
 		}
 		
 		void HandleExit() {
 			if( Position.IsLong) {
 				if( Hours.Typical[0] < sma[0]) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 			}
 		}

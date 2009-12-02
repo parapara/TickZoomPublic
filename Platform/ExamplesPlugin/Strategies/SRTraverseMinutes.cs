@@ -101,7 +101,7 @@ namespace TickZoom
 		}
 		
 		protected void ProcessOrders(Tick tick) {
-			if( Bars.Count==1) { Exit.GoFlat(); Reset(); return; }
+			if( Bars.Count==1) { Orders.Exit.Now.GoFlat(); Reset(); return; }
 //			if( tick.AskDepth + tick.BidDepth < 3000) {
 //			 TradeSignal.GoFlat();
 //				Reset();
@@ -116,20 +116,20 @@ namespace TickZoom
 			double profitInPosition = Position.HasPosition ? Performance.ComboTrades.ProfitInPosition(current,Performance.Equity.CurrentEquity) : 0;
 			if( trendUp) {
 				if( Position.IsShort) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 				if( Position.IsLong && positionsize == 0 && profitInPosition > profitTarget) {
 					if( velocity[0] < -20) {
-						Exit.GoFlat();
+						Orders.Exit.Now.GoFlat();
 					}
 				}
 				if( positionsize > Position.Size && velocity[0] > 10) {
 					int newPositions = (int) (Position.Size+contractSize);
-					Enter.BuyMarket(newPositions);
+					Orders.Enter.Now.BuyMarket(newPositions);
 				} 
 			} else {
 				if( Position.IsLong && velocity[0] < -20) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 				}
 //				if( positionsize > TradeSignal.Positions) {
 //					int newPositions = (int) (TradeSignal.Positions+contractSize);
@@ -265,9 +265,9 @@ namespace TickZoom
 				case 26:
 				case 19:
 				case 16:
-					Enter.SellMarket(); break;
+					Orders.Enter.Now.SellMarket(); break;
 				default:
-					Exit.GoFlat(); break;
+					Orders.Exit.Now.GoFlat(); break;
 			}
 		}
 		

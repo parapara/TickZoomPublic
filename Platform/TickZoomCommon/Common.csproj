@@ -4,7 +4,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <OutputType>Library</OutputType>
-    <RootNamespace>PluginCommon</RootNamespace>
+    <RootNamespace>TickZoom</RootNamespace>
     <AssemblyName>TickZoomPluginCommon</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -67,6 +67,7 @@
     <Compile Include="Common\Model.cs" />
     <Compile Include="Common\ModelLoaderCommon.cs" />
     <Compile Include="Common\OrderManager.cs" />
+    <Compile Include="Common\Orders.cs" />
     <Compile Include="Common\Portfolio.cs" />
     <Compile Include="Common\PositionSize.cs" />
     <Compile Include="Common\ProjectFileLoader.cs" />

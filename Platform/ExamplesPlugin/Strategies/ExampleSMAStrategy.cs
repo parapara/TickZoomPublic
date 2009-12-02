@@ -65,10 +65,10 @@ namespace TickZoom
 		public override bool OnIntervalClose()
 		{
 			if( Bars.Close[0] > sma[0]) {
-				Enter.BuyMarket();
+				Orders.Enter.Now.BuyMarket();
 			}
 			if( Bars.Close[0] < sma[0]) {
-				Enter.SellMarket();
+				Orders.Enter.Now.SellMarket();
 			}
 			equity[0] = Performance.Equity.CurrentEquity;
 			return true;

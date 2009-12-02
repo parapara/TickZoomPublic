@@ -57,10 +57,10 @@ namespace TickZoom.StarterTest
 			//Log.WriteLine( "close: " + Ticks[0] + " " + Minutes.Close[0] + " " + Minutes.Time[0]);
 			
 			if( Bars.Close[0] > Bars.High[1]) {
-				Enter.BuyMarket();
+				Orders.Enter.Now.BuyMarket();
 			}
 			if( Bars.Close[0] < Bars.Low[1]) {
-				Enter.SellMarket();
+				Orders.Enter.Now.SellMarket();
 			}
 			return true;
 		}

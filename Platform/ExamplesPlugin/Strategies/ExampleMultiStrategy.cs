@@ -59,15 +59,15 @@ namespace TickZoom
 			//Log.WriteLine( "close: " + Ticks[0] + " " + Minutes.Close[0] + " " + Minutes.Time[0]);
 			
 			if( !Position.IsLong && Bars.Close[0] > Bars.High[1]) {
-				Strategies[0].Enter.BuyMarket();
+				Strategies[0].Orders.Enter.Now.BuyMarket();
 				if( Strategies[1].Position.HasPosition) {
-					Strategies[1].Exit.GoFlat();
+					Strategies[1].Orders.Exit.Now.GoFlat();
 				}
 			}
 			if( !Position.IsShort && Bars.Close[0] < Bars.Low[1]) {
-				Strategies[1].Enter.SellMarket();
+				Strategies[1].Orders.Enter.Now.SellMarket();
 				if( Strategies[0].Position.HasPosition) {
-					Strategies[0].Exit.GoFlat();
+					Strategies[0].Orders.Exit.Now.GoFlat();
 				}
 			}
 			equity[0] = Performance.Equity.CurrentEquity;

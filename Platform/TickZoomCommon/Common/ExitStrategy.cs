@@ -203,7 +203,7 @@ namespace TickZoom.Common
 			Position.Signal = 0;
 			CancelOrders();
 			if( controlStrategy) {
-				Strategy.Exit.GoFlat();
+				Strategy.Orders.Exit.Now.GoFlat();
 				strategySignal = 0;
 			}
 		}

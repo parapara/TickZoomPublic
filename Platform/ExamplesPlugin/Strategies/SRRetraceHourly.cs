@@ -71,12 +71,12 @@ namespace TickZoom
 		double newPositions;
 		public override bool OnProcessTick(Tick tick)
 		{
-			if( Hours.Count==1) { Exit.GoFlat(); Reset(); return true; }
+			if( Hours.Count==1) { Orders.Exit.Now.GoFlat(); Reset(); return true; }
 			if( Position.HasPosition) {
 				// TODO: Handle commission costs correctly inside Trade object.
 				int profitTarget = (int) (100 + Position.Size*contractSize*10); // *2 to double cost of commission.
 				if( Performance.ComboTrades.CurrentProfitLoss >= profitTarget) {
-					Exit.GoFlat();
+					Orders.Exit.Now.GoFlat();
 					Reset();
 					return true;
 				}
@@ -97,11 +97,11 @@ namespace TickZoom
 			}
 			
 			if(  (Position.IsFlat||Position.IsLong) && Ticks[0].Bid < retrace[0]) {
-				Enter.BuyMarket( newPositions);
+				Orders.Enter.Now.BuyMarket( newPositions);
 			} 
 			
 			if(  (Position.IsFlat||Position.IsShort) && Ticks[0].Ask > retrace[0]) {
-				Enter.SellMarket( newPositions);
+				Orders.Enter.Now.SellMarket( newPositions);
 			}
 			return true;
 		}

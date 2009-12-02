@@ -54,16 +54,16 @@ namespace TickZoom
 			
 			for( int i=0; i<Markets.Count; i++) {
 				if( Markets[i].Position.HasPosition) {
-					Markets[i].Exit.GoFlat();
+					Markets[i].Orders.Exit.Now.GoFlat();
 				}
 				if( Markets[i].Position.IsFlat) {
 					double close = Markets[i].Bars.Close[0];
 					double high = Markets[i].Bars.High[1];
 					if( Markets[i].Bars.Close[0] > Markets[i].Bars.High[1]) {
-						Markets[i].Enter.BuyMarket();
+						Markets[i].Orders.Enter.Now.BuyMarket();
 					}
 					if( Markets[i].Bars.Close[0] < Markets[i].Bars.Low[1]) {
-						Markets[i].Enter.SellMarket();
+						Markets[i].Orders.Enter.Now.SellMarket();
 					}
 				}
 			}

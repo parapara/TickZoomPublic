@@ -69,7 +69,7 @@ namespace TickZoom
 		}
 		
 		public override bool OnIntervalClose(Interval timeFrame) {
-			Exit.GoFlat();
+			Orders.Exit.Now.GoFlat();
 			return true;
 		}
 	}

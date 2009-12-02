@@ -129,7 +129,6 @@
     <Compile Include="Strategies\SRShortBreakout2.cs" />
     <Compile Include="Strategies\SRShortChannel.cs" />
     <Compile Include="Strategies\SRShortDayLow.cs" />
-    <Compile Include="Strategies\SRShortHourly.cs" />
     <Compile Include="Strategies\SRShortIntraday.cs" />
     <Compile Include="Strategies\SRTraverseMinutes.cs" />
     <Compile Include="Strategies\TEMACounterDaily.cs" />

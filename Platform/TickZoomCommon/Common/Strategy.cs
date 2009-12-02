@@ -52,6 +52,7 @@ namespace TickZoom.Common
 		private readonly bool instanceTrace;
 		
 		OrderManager orderManager;
+		Orders orders;
 		ExitCommon exit;
 		EnterCommon enter;
 		Chain exitStrategyChain;
@@ -74,6 +75,7 @@ namespace TickZoom.Common
 			Chain.Dependencies.Add(exit.Chain);
 			enter = new EnterCommon(true,true,this);
 			Chain.Dependencies.Add(enter.Chain);
+			orders = new Orders(enter,exit);
 			Model exitStrategy = new ExitStrategy(this);
 			exitStrategyChain = Chain.InsertBefore(exitStrategy.Chain);
 			Model positionSizeStrategy = new PositionSize(this);
@@ -175,18 +177,19 @@ namespace TickZoom.Common
 			get { return base.Name; }
 			set { base.Name = value; }
 		}
+
+		public Orders Orders {
+			get { return orders; }
+		}
 		
-		[Browsable(false)]
+		[Obsolete("Please user Orders.Exit instead.",true)]
 		public ExitCommon Exit {
 			get { return exit; }
 		}
 		
-		[Browsable(false)]
+		[Obsolete("Please user Orders.Enter instead.",true)]
 		public EnterCommon Enter {
 			get { return enter; }
-			set { if( trace) log.Trace( FullName+" Performance - Replacing " + performanceChain.Model.FullName + " with " + value.FullName);
-				  performanceChain = performanceChain.Replace(value.Chain);
-			}
 		}
 		
 		[Category("Strategy Settings")]
