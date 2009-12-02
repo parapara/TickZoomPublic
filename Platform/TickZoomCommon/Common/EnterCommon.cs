@@ -454,13 +454,13 @@ namespace TickZoom.Common
 
 		public bool HasBuyOrder {
 			get {
-				return buyStop.IsActive || buyLimit.IsActive;
+				return buyStop.IsActive || buyLimit.IsActive || buyMarket.IsActive;
 			}
 		}
 		
 		public bool HasSellOrder {
 			get {
-				return sellStop.IsActive || sellLimit.IsActive;
+				return sellStop.IsActive || sellLimit.IsActive || sellMarket.IsActive;
 			}
 		}
 	}
