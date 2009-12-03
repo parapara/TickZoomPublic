@@ -28,9 +28,6 @@
 #endregion
 
 using System;
-using System.Collections.Specialized;
-using System.Configuration;
-using System.Threading;
 
 namespace TickZoom.Api
 {

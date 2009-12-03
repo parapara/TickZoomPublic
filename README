@@ -5,8 +5,8 @@ a secure user key is required. You may request a 2 week FREE demo at http://www.
 
 Installation of TickZoom
 
-These steps will setup your development environment so you start working on your own automated
-trading portfolio, get updates to TickZoom releases, and contribute any changes to TickZoom.
+These steps will setup your development environment so you start can create your own automated
+trading portfolio, get updates to TickZoom releases, and contribute any changes that you wish.
 
 Setting Up Git With GitHub
 
@@ -14,24 +14,24 @@ If this is your first time to use Git or GitHub, follow these steps.
 
 1. Install Git http://cloud.github.com/downloads/tickzoom/TickZoomPublic/Git-1.6.5.1-preview20091022.exe
 
-2. Install TortoiseGit http://cloud.github.com/downloads/tickzoom/TickZoomPublic/Git-1.6.5.1-preview20091022.exe
+2. Install TortoiseGit http://cloud.github.com/downloads/tickzoom/TickZoomPublic/TortoiseGit-1.2.1.0-32bit.msi
 
 3. Click "Signup" on the upper right corner of the GitHub site. It's free to create an account.
 
 4. Next you need to setup a secure public key with your GitHub account to avoid entering a
-   password every time you use Git or TortoiseGit. Follow these steps:
+   password every time you access Git or TortoiseGit. Follow these steps:
    
    a. Open a Git Bash prompt by right clicking on any folder in Windows Explorer and click "Git Bash Here".
    
-   b. At the prompt enter the following command:
+   b. At the prompt enter the following command after replacing with your own email address:
    
         ssh-keygen -t rsa -C "your@email.address"
         (Please enter 3 times for default file name, and empty pass phrase.)
         
    c. Now, use Windows Explorer to find your C:\Documents and Setting\[User Name]\.ssh folder.
-      Inside it, open the id_rsa.pub file in Notepad.
+      Inside that folder you can select and open the id_rsa.pub file in Notepad.
    
-   d. Copy everything in the id_rsa.pub file to the clipboard. You need to paste that into your GitHub account.
+   d. Copy everything in the id_rsa.pub file to the copy/paste clipboard.
    
    e. Now in a browser, open your GitHub account page. In the SSH Public Keys section click
       "add another public key", then paste your key into the key field. If you leave the title
@@ -49,8 +49,8 @@ Setting Up Your Copy of the Source for TickZoom
    2 url links on that page to "clone" your project. Copy the "Your Clone URL" which you can do easily by
    clicking the small arrow to the right of it.
 
-3. Select or create a folder in Windows Explorer where you would like to keep your TickZoomPublic source project.
-   Right click on that folder in Windows Explorer and click "Git Bash Here" to open a Git Bash prompt.
+3. Select or create a folder in Windows Explorer where you want to keep your TickZoomPublic source project.
+   Right-click on that folder in Windows Explorer and select "Git Bash Here" to open a Git Bash prompt.
    
 4. At the prompt enter: git clone [paste Your Clone URL]
    To paste your URL you need to click on upper left corner of the prompt window and select Edit then Paste.
@@ -59,10 +59,11 @@ Setting Up Your Copy of the Source for TickZoom
 
 Setting Up To Run TickZoom and Write Your Own Strategies
 
-1. You need an IDE. Either SharpDevelop or Visual Studio. Installation for those are below. 
+1. You need an IDE if you don't have one. Either SharpDevelop or Visual Studio will work.
+   You can find installation tips for those further below, after this section.
 
 2. Once you complete installation of SharpDevelop or Visual Studio, then you can navigate to the TickZoomPublic
-   folder in Windows Explorer, then the Platform/TickZoom.sln file and open it in either SharpDevelop or Visual
+   folder in Windows Explorer, then find the Platform/TickZoom.sln file and open it in either SharpDevelop or Visual
    Studio. 
    
 3. Right click on the GUI project and select "Set as StartUp Project" in SharpDevelop or similar in Visual Studio.
@@ -75,16 +76,24 @@ Setting Up To Run TickZoom and Write Your Own Strategies
 6. If the app never finds a TickZoom folder, then it will select your disk drive with the largest amount of free
    space and create the folder on that drive.
    
-7. You then need to get a user key and download a ZIP file with some sample data to get started. Contact TickZOOM
-   to get your Sample data.
+7. Next download the Sample data and extract it into your TickZoom folder. If you don't know where it is, you 
+   can find it at the top of your largest disk drive. For example: C:\TickZoom or E:\TickZoom
+   
+   http://cloud.github.com/downloads/tickzoom/TickZoomPublic/TickZoomData.zip
    
 Setting Up SharpDevelop for TickZoom
 
-1. For Sharp Develop new need to install both SharpDevelop 3.1 and the Windows 7 SDK which works for Vista and XP also.
+1. Install both SharpDevelop 3.1
 
+   http://cloud.github.com/downloads/tickzoom/TickZoomPublic/SharpDevelop_3.1.0.4977_Setup.msi
+
+2. Get Windows 7 SDK which works for Vista and XP also. You can download the Windows 7 SDK from:
+
+   Web Install: http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505
+   
 Setting Up Visual Studio
 
-1. You need to install a version of Visual Studio which support .NET 3.5. That install should include the Windows SDK.
+1. You will need a version of Visual Studio which supports .NET 3.5. The install typically includes the Windows SDK.
 
 2. In Visual Studio, you must disable the feature that pops up dialog boxs for unhandled exceptions because of a defect
    in Visual Studio where it intercepts ordinary exceptions passed between DLLs. Otherwise, you will continually get

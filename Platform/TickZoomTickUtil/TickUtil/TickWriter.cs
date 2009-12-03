@@ -22,11 +22,8 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.IO;
-using System.Text;
 using System.Threading;
 
 using TickZoom.Api;
