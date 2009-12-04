@@ -40,12 +40,18 @@ namespace TickZoom.Common
 		double scaleMin = Double.NaN;
 		int colorIndex = 0;
 		bool isVisible = false;
-		
+        int weight = 1;
 		public DrawingCommon(ModelInterface model)
 		{
 			this.model = model;
 		}
-		
+
+        public int Weight
+        {
+            get { return weight; }
+            set { weight = value; }
+        }
+
 		public Color Color {
 			get { return color; }
 			set { color = value; }

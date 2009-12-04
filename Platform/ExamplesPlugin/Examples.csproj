@@ -68,7 +68,6 @@
     <Compile Include="Indicators\SCT.cs" />
     <Compile Include="Indicators\SRHigh.cs" />
     <Compile Include="Indicators\SRLow.cs" />
-    <Compile Include="Indicators\MQ_ValueChart.cs" />
     <Compile Include="Indicators\Traversal.cs" />
     <Compile Include="Indicators\TwelveMonthHigh.cs" />
     <Compile Include="Indicators\TwelveMonthLow.cs" />
@@ -140,9 +139,6 @@
     <None Include="COPYING.txt" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Indicators" />
-    <Folder Include="Loaders" />
-    <Folder Include="Strategies" />
     <ProjectReference Include="..\TickZoomAPI1.0\API1.0.csproj">
       <Project>{27D6C88D-52B6-432C-820B-CD38A299830C}</Project>
       <Name>API1.0</Name>

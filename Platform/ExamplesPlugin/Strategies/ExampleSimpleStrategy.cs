@@ -28,7 +28,6 @@ using System.Drawing;
 
 using TickZoom.Api;
 using TickZoom.Common;
-using TickZoom.Examples.Indicators;
 
 #endregion
 

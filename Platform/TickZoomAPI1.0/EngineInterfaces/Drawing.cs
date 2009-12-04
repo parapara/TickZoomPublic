@@ -73,5 +73,11 @@ namespace TickZoom.Api
 			get;
 			set;
 		}
+
+        int Weight
+        {
+            get;
+            set;
+        }
 	}
 }
