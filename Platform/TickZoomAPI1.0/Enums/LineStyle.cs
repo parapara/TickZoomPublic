@@ -30,6 +30,8 @@ namespace TickZoom.Api
 	public enum LineStyle {
 		Dashed,
 		Dotted,
-		Solid
+		Solid,
+        DashDot,
+        DashDotDot
 	}
 }

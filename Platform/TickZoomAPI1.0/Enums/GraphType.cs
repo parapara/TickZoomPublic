@@ -32,6 +32,12 @@ namespace TickZoom.Api
 		Histogram,
 		PaintBar,
 		FilledLine,
-		ShowMe
+		ShowMe,
+        Point,
+        Cross,
+        BarHigh,
+        BarLow,
+        LeftTic,
+        RightTic
 	}
 }
