@@ -47,7 +47,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
   <ItemGroup>
     <Reference Include="log4net">
-      <HintPath>..\..\..\..\..\..\TickZoom\Tools\1.0\log4net\log4net.dll</HintPath>
+      <HintPath>Lib\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
