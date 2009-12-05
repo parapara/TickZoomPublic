@@ -84,12 +84,20 @@ namespace TickZoom.Api
 			long maxSpace = 0;
 			DriveInfo maxDrive = null;
 			foreach( DriveInfo drive in DriveInfo.GetDrives()) {
-				if( drive.AvailableFreeSpace > maxSpace) {
-					maxDrive = drive;
-					maxSpace = drive.AvailableFreeSpace;
+				try {
+					if( drive.AvailableFreeSpace > maxSpace) {
+						maxDrive = drive;
+						maxSpace = drive.AvailableFreeSpace;
+					}
+				} catch( IOException) {
+					// Ignore. Try another drive.
 				}
 			}
-			return maxDrive + "TickZoom";
+			if( maxDrive != null) {
+				return maxDrive + "TickZoom";
+			} else {
+				return null;
+			}
 		}
 		
 		private const string defaultName = "TickZoom";
