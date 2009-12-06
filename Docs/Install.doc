@@ -1,0 +1,118 @@
+
+/*
+ * Copyright 2008 M. Wayne Walter
+ * Software: TickZoom Trading Platform
+ * User: Wayne Walter
+ * 
+ * You can use and modify this software under the terms of the
+ * TickZOOM General Public License Version 1.0 or (at your option)
+ * any later version.
+ * 
+ * Businesses are restricted to 30 days of use.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * TickZOOM General Public License for more details.
+ *
+ * You should have received a copy of the TickZOOM General Public
+ * License along with this program.  If not, see
+ * 
+ * 
+ *
+ * User: Wayne Walter
+ * Date: 12/6/2009
+ * Time: 1:48 AM
+ * <http://www.tickzoom.org/wiki/Licenses>.
+ */
+
+/*! @page install Installation
+
+@addindex install
+
+You can use these steps to setup your TickZoom development environment so you can start creating your own automated
+trading portfolio, get updates to TickZoom releases, and contribute changes.
+
+@note The TickZoom open source application auto downloads the TickZoom data engine for which
+a secure user key is required. You may request a 2 week FREE demo at http://www.tickzoom.com
+
+-# @ref setup_git_sect 
+-# @ref setup_clone_sect 
+-# @ref setup_run_sect 
+-# @ref sharpd_setup 
+-# @ref vs_setup 
+
+@section setup_git_sect Setup Git With GitHub
+
+If this is your first time to use Git or GitHub, follow these steps.
+
+   -# Install Git version 1.6.5.1<BR>
+   http://cloud.github.com/downloads/tickzoom/TickZoomPublic/Git-1.6.5.1-preview20091022.exe
+   -# Install TortoiseGit version 1.2.1.0-32bit and select SSH (instead of PLink) when asked.<BR>
+   http://cloud.github.com/downloads/tickzoom/TickZoomPublic/TortoiseGit-1.2.1.0-32bit.msi
+   -# Click "Signup" on the upper right corner of the GitHub site. It’s free to create an account.
+   -# Next you need to setup a secure public key with your GitHub account to avoid entering a password every time you access Git or TortoiseGit. Follow these steps:
+         -# Open a Git Bash prompt by right clicking on any folder in Windows Explorer and click "Git Bash Here".
+         -# At the prompt enter the following command after replacing with your own email address:
+            @verbatim ssh-keygen -t rsa -C "your email address" @endverbatim
+            (Press enter 3 times for default file name, and empty pass phrase.)
+         -# Now, use Windows Explorer to find your C:\\Documents and Settings\\[User Name]\\.ssh folder. Inside that folder, select and open the id_rsa.pub file in Notepad.
+         -# Copy everything in the id_rsa.pub file to the copy/paste clipboard.
+         -# Now in a browser, open your GitHub account page. In the SSH Public Keys section click "add another public key", then paste your key into the key field. If you leave the title blank the key comment (your email) will be used for the title.
+
+You have completed setup and install of Git with GitHub. Now proceed with setup of TickZooom.
+
+@section setup_clone_sect Setup Your Clone of the Source for TickZoom
+
+   -# You need to "Fork" the TickZoomPublic project on GitHub by clicking the "fork" button on the github site for TickZoomPublic.
+      This gives you a personal copy of the project to which you can push changes.
+      Then a developer can "pull" your changes back into the original TickZOOM project.
+   -# After forking you will be on the home page of your "fork" of the TickZoomPublic project.
+      You will find 2 url links on that page to "clone" your project.
+      Copy the "Your Clone URL" which you can do easily by clicking the small arrow to the right of it.
+   -# Select or create a folder in Windows Explorer where you want to keep your TickZoomPublic source project.
+   -# Right-click on that folder in Windows Explorer and select "Git Bash Here" to open a Git Bash prompt.
+   -# At the prompt enter:
+      @verbatim git clone [paste Your Clone URL] @endverbatim
+      To paste your URL, click on upper left corner of the prompt window and select Edit then Paste.
+   -# You will see the progress as it creates the TickZoomPublic folder. It only takes several seconds.
+   -# Next cd into the TickZoomPublic folder created by git clone.
+      @verbatim cd TickZoomPublic @endverbatim
+   -# Set "git pull" to automatically use rebase instead of merge when pulling from from remote repositories.
+      @verbatim git config branch.autosetuprebase remote @endverbatim
+      Using "rebase" instead of merge treats the remote TickZoomPublic repository as the official version to automatically resolve merge conflicts.
+      That eliminates hassels when you need to update to another version of TickZoom.
+      @note Using rebase is required when you want to contribute any fixes or enhancements to the TickZoom public code. That's because when you do a 
+      pull with automatic rebase prior to pushing your new code, it also eliminates merge conflicts for the committers.
+   -# Identify yourself for git commits.
+      @verbatim git config user.name "Your Name" 
+git config user.email "Your email address" @endverbatim
+      @note If you name and email are inaccurate or unrecognizable by the TickZoom committers, your contribution will be rejected.
+   -# Setup a shortcut to use when you update to another version of TickZoom.
+      @verbatim git remote add upstream git://github.com/tickzoom/TickZoomPublic.git @endverbatim
+
+@section setup_run_sect Setup To Run TickZoom and Write Your Own Strategies
+
+   -# You need an IDE if you don’t have one. Either SharpDevelop or Visual Studio will work. You can find installation tips for those further below, after this section.
+   -# Once you complete installation of SharpDevelop or Visual Studio, then you can navigate to the TickZoomPublic folder in Windows Explorer, then find the Platform\\TickZoom.sln file and open it in either SharpDevelop or Visual Studio.
+   -# Right click on the GUI project and select "Set as StartUp Project" in SharpDevelop or similar in Visual Studio.
+   -# Run the application using the big green arrow at the stop of SharpDevelop or similar in Visual Studio.
+   -# If you already have a TickZoom folder with subfolders of DataCache, AutoUpdate, etc, TickZoom will "self configure" by finding it on any disk drive and attach to it and run.
+   -# If the app never finds a TickZoom folder, then it will select your disk drive with the largest amount of free space and create the folder on that drive.
+   -# Next download the Sample data and extract it into your TickZoom folder. If you don’t know where it is, you can find it at the top of your largest disk drive. For example: C:\\TickZoom or E:\\TickZoom<BR>
+      http://cloud.github.com/downloads/tickzoom/TickZoomPublic/TickZoomData.zip
+
+@section sharpd_setup Setup SharpDevelop for TickZoom
+
+   -# Install both SharpDevelop 3.1<BR>
+      http://cloud.github.com/downloads/tickzoom/TickZoomPublic/SharpDevelop_3.1.0.4977_Setup.msi
+   -# Get Windows 7 SDK which works for Vista and XP also. You can download the Windows 7 SDK from:<BR>
+      Web Install: http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505
+
+@section vs_setup Setup Visual Studio for TickZoom
+
+   -# You will need a version of Visual Studio which supports .NET 3.5. The install typically includes the Windows SDK.
+   -# In Visual Studio, you must disable the feature that pops up dialog boxs for unhandled exceptions because of a defect in Visual Studio where it intercepts ordinary exceptions passed between DLLs. Otherwise, you will continually get these dialog boxes popping up when using Visual Studio.
+
+The members only site for questions, tickets, and forums is at www.tickzoom.com
+*/

@@ -1,0 +1,63 @@
+/*
+ * Copyright 2008 M. Wayne Walter
+ * Software: TickZoom Trading Platform
+ * User: Wayne Walter
+ * 
+ * You can use and modify this software under the terms of the
+ * TickZOOM General Public License Version 1.0 or (at your option)
+ * any later version.
+ * 
+ * Businesses are restricted to 30 days of use.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * TickZOOM General Public License for more details.
+ *
+ * You should have received a copy of the TickZOOM General Public
+ * License along with this program.  If not, see
+ * 
+ * 
+ *
+ * User: Wayne Walter
+ * Date: 12/6/2009
+ * Time: 1:48 AM
+ * <http://www.tickzoom.org/wiki/Licenses>.
+ */
+
+/*! @page update How to Update From GitHub
+
+@addindex update
+
+You can use these steps to update your local TickZoomPublic clone to another, usually, the latest
+version of TickZoom.
+
+@note Before you update, you need to make certain that you already followed all the steps
+to setup your clone. Specifically, make sure you setup auto rebase remote and configured
+your user name and email. You will find the latest instructions at @ref setup_clone_sect
+
+To update you need to open a Git Bash prompt on the folder that holds you local clone of the TickZoomPublic project
+and then enter these commands:
+
+@verbatim 
+git stash
+git pull upstream integrate
+git push
+git stash apply
+@endverbatim
+
+Here's the explanation of each of these commands:
+
+-# git stash - "Stashes" any of your uncommitted changes which means that it extracts them
+from the code and stores them in a separate buffer so you can re-apply them later.
+-# git pull upstream - Pulls the latest version of code from the upstream repository. "integrate" may
+be replaced by another available branch such as "stable" or "master".
+-# git push - Pushes the update into your fork project on GitHub so that it
+remains current. it also pushes up any code which you have committed to make it available for others
+to includes in their projects and for committers to include in the official TickZoomPublic.
+-# git stash apply This recalls your changes that you previously stashed and merges them into the updated
+code. At this point you may find "conflicts" which are easiest to resolve using the TortoiseGit features
+called "Check for Modifications" and double click on the file that has conflicts to fix it using a 
+graphical side-by-side diff.
+
+*/
