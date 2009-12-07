@@ -268,6 +268,9 @@ namespace TickZoom.TickUtil
 		} catch( ObjectDisposedException) {
 			FinishTask();
 			return false;
+		} catch( Exception ex) {
+			log.Warn( "Exception thrown in Reader class", ex);
+			throw;
 		}
 	    return true;
 	}
