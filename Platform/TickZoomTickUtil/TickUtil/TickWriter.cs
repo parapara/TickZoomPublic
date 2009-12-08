@@ -22,6 +22,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
@@ -72,7 +73,10 @@ namespace TickZoom.TickUtil
        		if( storageFolder == null) {
        			throw new ApplicationException( "Must set AppDataFolder property in app.config");
        		}
-       		char[] invalidChars = Path.GetInvalidPathChars();
+       		
+       		List<char> invalidChars = new List<char>(Path.GetInvalidPathChars());
+       		invalidChars.Add('\\');
+       		invalidChars.Add('/');
        		string symbolStr = _symbol.Symbol;
        		foreach( char invalid in invalidChars) {
        			symbolStr = symbolStr.Replace(new string(invalid,1),"");
