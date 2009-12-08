@@ -64,13 +64,13 @@ namespace TickZoom.Api
 				if( file.ToLower().EndsWith(".zip")) {
 				   	compareFile = file.Substring(0,file.Length-4);
 				}
-				string compareChecksum = GetMD5HashFromFile(compareFile);
+				string compareChecksum = GetMD5Hash(compareFile);
 				if( checksum != compareChecksum && 
 				    DownloadFile(file)) {
 					if( file.ToLower().EndsWith(".zip")) {
 						UnzipFile(file);
 					}
-					compareChecksum = GetMD5HashFromFile(compareFile);
+					compareChecksum = GetMD5Hash(compareFile);
 					if( checksum != compareChecksum) {
 						log.Warn("Checksum match failed for " + compareFile + ". Possibly corrupted or infected.");
 					}
@@ -86,10 +86,14 @@ namespace TickZoom.Api
 			return retVal;
 		}
 		
-		private string GetMD5HashFromFile(string fileName)
+		private string GetMD5Hash(string fileName)
 		{
+			string path = DownloadDirectory + Path.DirectorySeparatorChar + fileName;
+			return GetMD5HashFromFile(path);
+		}
+			
+		public string GetMD5HashFromFile(string path) {
 			try { 
-				string path = DownloadDirectory + Path.DirectorySeparatorChar + fileName;
 				FileStream file = new FileStream(path, FileMode.Open);
 				MD5 md5 = new MD5CryptoServiceProvider();
 				byte[] retVal = md5.ComputeHash(file);

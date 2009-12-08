@@ -220,7 +220,7 @@ namespace TickZoom
             }
         }
         
-        public void btnStartRun_Click(object sender, System.EventArgs e)
+        public void HistoricalButtonClick(object sender, System.EventArgs e)
         {
         	RunCommand(1);
         }

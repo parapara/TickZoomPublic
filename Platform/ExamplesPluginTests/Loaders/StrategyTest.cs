@@ -160,8 +160,7 @@ namespace Loaders
     		Assert.AreEqual(expectedCount,pane.CurveList[0].Points.Count,"Chart Curve");
 		}
    		
-		public void CompareChart(StrategyCommon strategy) {
-			ChartControl chart = GetChart(strategy.SymbolDefault);
+		public static void CompareChart(StrategyCommon strategy, ChartControl chart) {
      		GraphPane pane = chart.DataGraph.MasterPane.PaneList[0];
     		Assert.IsNotNull(pane.CurveList);
     		Assert.Greater(pane.CurveList.Count,0);

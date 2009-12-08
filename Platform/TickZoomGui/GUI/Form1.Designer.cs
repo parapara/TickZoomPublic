@@ -149,7 +149,7 @@ namespace TickZoom
         	this.btnRun.TabIndex = 5;
         	this.btnRun.Text = "Start Run";
         	this.btnRun.UseVisualStyleBackColor = true;
-        	this.btnRun.Click += new System.EventHandler(this.btnStartRun_Click);
+        	this.btnRun.Click += new System.EventHandler(this.HistoricalButtonClick);
         	// 
         	// startTimePicker
         	// 

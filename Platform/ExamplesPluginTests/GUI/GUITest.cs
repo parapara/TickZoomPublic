@@ -31,11 +31,13 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 
 using NUnit.Framework;
 using TickZoom;
+using TickZoom.Api;
 
 namespace MiscTest
 {
@@ -63,6 +65,7 @@ namespace MiscTest
 		private void WaitComplete(int seconds) {
 			WaitComplete(seconds,null);
 		}
+		
 		private void WaitComplete(int seconds, Func<bool> onCompleteCallback) {
 			long end = Environment.TickCount + (seconds * 1000);
 			long current;
@@ -82,7 +85,7 @@ namespace MiscTest
 			form.TxtSymbol.Text = "USD/JPY";
 			form.DefaultBox.Text = "1";
 			form.DefaultCombo.Text = "Hour";
-			form.btnStartRun_Click(null,null);
+			form.HistoricalButtonClick(null,null);
 			WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
 			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
 			Assert.AreEqual(form.PortfolioDocs.Count,1,"Charts");
@@ -124,6 +127,43 @@ namespace MiscTest
 			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
 			
 			Assert.Greater(form.LogOutput.Lines.Length,2,"number of log lines");
+		}
+
+		private void DeleteFiles() {
+			while( true) {
+				try {
+					string appData = Factory.Settings["AppDataFolder"];
+		 			File.Delete( appData + @"\TestServerCache\ESZ9_Tick.tck");
+					break;
+				} catch( Exception) {
+				}
+			}
+		}
+		[Test]
+		public void TestCapturedDataMatchesChart()
+		{
+			DeleteFiles();
+			form.TxtSymbol.Text = "/ESZ9";
+			form.DefaultBox.Text = "1";
+			form.DefaultCombo.Text = "Minute";
+			form.EndTime = DateTime.Now;
+			form.RealTimeButtonClick(null,null);
+//			form.HistoricalButtonClick(null,null);
+			WaitComplete(30, () => { return form.PortfolioDocs.Count == 1; } );
+			Assert.AreEqual(1,form.PortfolioDocs.Count,"Charts");
+			WaitComplete(10, () => { return false; } );
+			form.btnStop_Click(null,null);
+			WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
+			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
+			Assert.Greater(form.LogOutput.Lines.Length,2,"number of log lines");
+			string appData = Factory.Settings["AppDataFolder"];
+			string compareFile1 = appData + @"\MockProviderData\ESZ9_Tick.tck";
+			string compareFile2 = appData + @"\TestServerCache\ESZ9_Tick.tck";
+			AutoUpdate auto = new AutoUpdate();
+			string hash1 = auto.GetMD5HashFromFile(compareFile1);
+			string hash2 = auto.GetMD5HashFromFile(compareFile2);
+			Assert.AreEqual(hash1,hash2,"Tick data files");
+			DeleteFiles();
 		}
 	}
 }

@@ -108,6 +108,7 @@ namespace TickZoom.TickUtil
 			string baseName = Path.GetFileNameWithoutExtension(fileName);
 	        appendThread = new Thread(AppendDataLoop);
 	        appendThread.Name = baseName + " writer";
+	        appendThread.IsBackground = true;
 	        appendThread.Start();
 		}
 		

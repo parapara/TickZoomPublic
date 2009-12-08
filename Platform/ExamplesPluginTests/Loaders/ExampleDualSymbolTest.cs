@@ -143,12 +143,12 @@ namespace Loaders
 		
 		[Test]
 		public void CompareBars0() {
-			CompareChart(fullTickData);
+			CompareChart(fullTickData,GetChart(fullTickData.SymbolDefault));
 		}
 		
 		[Test]
 		public void CompareBars1() {
-			CompareChart(fourTicksPerBar);
+			CompareChart(fourTicksPerBar,GetChart(fourTicksPerBar.SymbolDefault));
 		}
 		
 		public string Symbols {

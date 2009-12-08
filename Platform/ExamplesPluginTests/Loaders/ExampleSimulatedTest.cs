@@ -120,7 +120,7 @@ namespace Loaders
 		
 		[Test]
 		public void CompareBars() {
-			CompareChart(strategy);
+			CompareChart(strategy,GetChart(strategy.SymbolDefault));
 		}
 	}
 }
