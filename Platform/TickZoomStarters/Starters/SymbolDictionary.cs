@@ -277,6 +277,8 @@ namespace TickZoom.Common
     <property name=""Level2Increment"" value=""0.10"" />
     <property name=""FullPointValue"" value=""1"" />
     <property name=""MinimumTick"" value=""0.01"" />
+   	<property name=""SessionStart"" value=""08:00:00"" />
+   	<property name=""SessionEnd"" value=""16:30:00"" />
     <symbol name=""MSFT"" />
     <symbol name=""IBM"" />
     <category name=""Testing"">
@@ -318,8 +320,11 @@ namespace TickZoom.Common
     <category name=""2 Pip"">
       <symbol name=""USD/JPY"" />
       <category name=""Testing"">
-        <symbol name=""USD_JPY"" />
-        <symbol name=""USD_JPY_YEARS"" />
+        <symbol name=""USD_JPY"">
+	    	<property name=""SessionStart"" value=""06:00:00"" />
+	    	<property name=""SessionEnd"" value=""15:00:00.000"" />
+		</symbol>
+		<symbol name=""USD_JPY_YEARS"" />
         <symbol name=""USD_JPY_Volume"" />
         <symbol name=""TST_TST"" />
         <symbol name=""TST_VR2"" />

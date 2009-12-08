@@ -55,10 +55,9 @@ namespace TickZoom
 		public override bool OnIntervalClose()
 		{
 			// Example log message.
-			//Log.WriteLine( "close: " + Ticks[0] + " " + Minutes.Close[0] + " " + Minutes.Time[0]);
+			//Log.Info( "close: " + Ticks[0] + " " + Minutes.Close[0] + " " + Minutes.Time[0]);
 			
 			if( !Position.IsLong && Bars.Close[0] > Bars.High[1]) {
-	        	Log.Info("BuyMarket tick = " + Ticks[0]);
 				Enter.BuyMarket();
 			}
 			if( !Position.IsShort && Bars.Close[0] < Bars.Low[1]) {
