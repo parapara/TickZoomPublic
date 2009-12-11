@@ -729,7 +729,7 @@ namespace TickZoom
 				} else {
 					time = stockPointList[stockPointList.Count-1].X;
 				}
-				double yHeight = Math.Min(yScale.Max - yScale.Min, 800);
+				double yHeight = Math.Max(Math.Abs(yScale.Max - price),Math.Abs(yScale.Min - price))*2;
 				double xWidth = ClusterWidth * 40;
 				
 				yScale.Max = price + yHeight/2;
