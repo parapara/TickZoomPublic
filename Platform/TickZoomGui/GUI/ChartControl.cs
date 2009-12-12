@@ -153,10 +153,11 @@ namespace TickZoom
 		    {
 		        // This is the UI thread so perform the task.
 		        logTextBox.Text += text + Environment.NewLine;
-	                logTextBox.SelectionStart = logTextBox.Text.Length;
-	                logTextBox.ScrollToCaret();
+	            logTextBox.SelectionStart = logTextBox.Text.Length;
+	            logTextBox.ScrollToCaret();
 		    }		
 		}
+		
 		public void AudioNotify(Audio clip) {
 			if( isAudioNotify) {
 				string fileName = "";
@@ -187,7 +188,7 @@ namespace TickZoom
 			dataGraph.IsEnableVZoom = false;
 			
 			// Fill background
-			master.Fill = new Fill( Color.White, Color.FromArgb( 220, 220, 255 ), 45.0f );
+			master.Fill = new Fill( Color.FromArgb( 220, 220, 255 ));
 			// Clear out the initial GraphPane
 			master.PaneList.Clear();
 			
@@ -539,6 +540,8 @@ namespace TickZoom
 		int lastColorValue = 2;
 		public void AddBar( Bars updateSeries, Bars displaySeries) {
 			lock( chartLocker) {
+//				dataGraph.PartialErase();
+				
 	    		if( firstTime == TimeStamp.MinValue) {
 	    			firstTime = updateSeries.Time[0];
 	    		}
@@ -687,7 +690,7 @@ namespace TickZoom
        	    {
 			    InitializeChart( );
 				if( isDynamicUpdate && !priceGraphPane.XAxis.Scale.IsAnyOrdinal) {
-			    	ZoomToLast( dataGraph.GraphPane);
+			    	AutoZoom( dataGraph.GraphPane);
 				}
        		}), null);
 		}
@@ -697,31 +700,67 @@ namespace TickZoom
 			if ( dataGraph.MasterPane != null )
 			{
 				GraphPane pane = dataGraph.MasterPane.FindPane( _menuClickPt );
-				ZoomToLast( dataGraph.GraphPane);
+				AutoZoom( dataGraph.GraphPane);
 			}
 		}
 		
-		public void ZoomToLast( GraphPane primaryPane)
+		public void AutoZoom( GraphPane primaryPane)
 		{
+			AutoZoomY( primaryPane);
+			AutoZoomX( primaryPane);
+		}
+		
+		public void AutoZoomY( GraphPane primaryPane) {
 			if ( primaryPane != null )
 			{
-				primaryPane.IsBoundedRanges = false;
-				primaryPane.YAxis.Scale.MaxAuto = true;
-				primaryPane.YAxis.Scale.MinAuto = true;
-				primaryPane.XAxis.Scale.MaxAuto = true;
-				primaryPane.XAxis.Scale.MinAuto = true;
-				
 				
 				if( stockPointList == null || stockPointList.Count == 0) {
-					dataGraph.RestoreScale( primaryPane);
+					ZoomDefault(primaryPane);
 					return;
 				}
-				
-				primaryPane.AxisChange();
 				
 				primaryPane.IsBoundedRanges = true;
 				Scale yScale = primaryPane.YAxis.Scale;
 				double price = stockPointList[stockPointList.Count-1].Y;
+				double yMax = double.MinValue;
+				double yMin = double.MaxValue;
+				for( int i=stockPointList.Count-1; i>=0 && i>=stockPointList.Count-40; i--) {
+					yMax = Math.Max(yMax,stockPointList[i].Y);
+					yMin = Math.Min(yMin,stockPointList[i].LowValue);
+				}
+				double yMaxHeight = Math.Abs(yMax - price);
+				double yMinHeight = Math.Abs(yMin - price);
+				double yHeight = Math.Max(yMaxHeight,yMinHeight);
+				
+				if( yHeight == 0) {
+					yHeight = symbol.MinimumTick * 4;
+				}
+				yScale.Max = price + yHeight + symbol.MinimumTick;
+				yScale.Min = price - yHeight - symbol.MinimumTick;
+				
+				primaryPane.AxisChange();
+			}
+		}
+		
+		private void ZoomDefault(GraphPane primaryPane) {
+			primaryPane.IsBoundedRanges = false;
+			primaryPane.YAxis.Scale.MaxAuto = true;
+			primaryPane.YAxis.Scale.MinAuto = true;
+			primaryPane.XAxis.Scale.MaxAuto = true;
+			primaryPane.XAxis.Scale.MinAuto = true;
+			dataGraph.RestoreScale( primaryPane);
+		}
+		
+		public void AutoZoomX( GraphPane primaryPane) {
+			if ( primaryPane != null )
+			{
+				
+				if( stockPointList == null || stockPointList.Count == 0) {
+					ZoomDefault(primaryPane);
+					return;
+				}
+				
+				primaryPane.IsBoundedRanges = true;
 				Scale xScale = primaryPane.XAxis.Scale;
 				double time;
 				if( xScale.IsAnyOrdinal) {
@@ -729,80 +768,77 @@ namespace TickZoom
 				} else {
 					time = stockPointList[stockPointList.Count-1].X;
 				}
-				double yHeight = Math.Max(Math.Abs(yScale.Max - price),Math.Abs(yScale.Min - price))*2;
 				double xWidth = ClusterWidth * 40;
-				
-				yScale.Max = price + yHeight/2;
-				yScale.Min = price - yHeight/2;
 				
 				xScale.Max = time + xWidth * .30;
 				xScale.Min = time - xWidth * .70;
+				
+				primaryPane.AxisChange();
 			}
 		}
 		
-//		void SetDefaultScale(object sender, EventArgs e) {
-//			SetDefaultScale( spl[spl.Count-1].Y, spl[spl.Count-1].X);
-//		}
-		
-//		private void SetDefaultScale(double price, double time) {
-//			double yHeight = 800;
-//			Scale yScale = priceGraphPane.YAxis.Scale;
-//			yScale.Max = price + yHeight/2;
-//			yScale.Min = price - yHeight/2;
-//			double xWidth = ClusterWidth * 40;
-//			Scale xScale = priceGraphPane.XAxis.Scale;
-//			xScale.Max = time + xWidth * .30;
-//			xScale.Min = time - xWidth * .70;
-//			SetCommonXScale( xScale.Min, xScale.Max);
-//			dataGraph.AxisChange();
-//			dataGraph.Invalidate();
-//		}
-		
+		double lastClose;
 		double lastHigh;
 		double lastLow;
 		double lastTime;
 		double lastBar;
 		
 		void UpdateScaleCheck(Bars series) {
+			lastClose = series.Close[0];
 			lastHigh = series.High[0];
 			lastLow = series.Low[0];
 			lastTime = (double) series.Time[0];
 			lastBar = series.CurrentBar;	
 		}
-	
+		
+		int prevStockPointCount = 0;
+		double prevLastClose = 0;
 		bool KeepWithinScale() {
 			Scale yScale = priceGraphPane.YAxis.Scale;
-			if( stockPointList != null && (
-				stockPointList.Count == 2 ||
-				stockPointList.Count == 4 ||
-				stockPointList.Count == 8 ||
-				stockPointList.Count == 16 ||
-				stockPointList.Count == 32 ) ) {
-				ZoomToLast(dataGraph.GraphPane);
+			if( stockPointList != null && 
+			    stockPointList.Count != prevStockPointCount ) {
+				if( prevStockPointCount == 0) {
+					AutoZoomX(dataGraph.GraphPane);
+					AutoZoomY(dataGraph.GraphPane);
+				}
+				prevStockPointCount = stockPointList.Count;
 			}
 			double yHeight = yScale.Max - yScale.Min;
-			double yUpperLimit = yScale.Max - yHeight/4;
-			double yLowerLimit = yScale.Min + yHeight/4;
+			double yUpperLimit = yScale.Max - yHeight/6;
+			double yLowerLimit = yScale.Min + yHeight/6;
 			bool reset = false;
-			if( lastHigh > yUpperLimit ) {
-				resetYScale = -1;
-			} else if( lastLow < yLowerLimit ) {
-				resetYScale = 1;
-			} else {
-				resetYScale = 0;
+			if( lastClose != prevLastClose) {
+				prevLastClose = lastClose;
+				reset = true;
 			}
-			if( resetYScale != 0 ) {
-				if( lastHigh > yScale.Max || lastLow < yScale.Min ) {
-					ZoomToLast(dataGraph.GraphPane);
+			if( lastHigh > yUpperLimit ) {
+				if( lastHigh > yScale.Max - symbol.MinimumTick) {
+					// Major jump in market, rapidly scale to fit it on the chart!
+					yScale.Max = lastHigh + symbol.MinimumTick;
+				} else {
+					// Market is moving, smoothly scroll it.
+					float resetYScale = -1;
+					double yMax = MoveByPixels(yScale,yScale.Max,resetYScaleSpeed*resetYScale);
+					if( !double.IsNaN(yMax)) {
+						yScale.Max = yMax;
+					}
 				}
-				double yMax = MoveByPixels(yScale,yScale.Max,resetYScaleSpeed*resetYScale);
-				double yMin = MoveByPixels(yScale,yScale.Min,resetYScaleSpeed*resetYScale);
-				if( !double.IsNaN(yMax) && !double.IsNaN(yMin)) {
-					yScale.Max = yMax;
-					yScale.Min = yMin;
-					reset = true;
+				reset = true;
+			}
+			
+			if( lastLow < yLowerLimit) {
+				if( lastLow < yScale.Min - symbol.MinimumTick) {
+					yScale.Min = lastLow - symbol.MinimumTick;
+				} else {
+					float resetYScale = 1;
+					double yMin = MoveByPixels(yScale,yScale.Min,resetYScaleSpeed*resetYScale);
+					if( !double.IsNaN(yMin)) {
+						yScale.Min = yMin;
+					}
 				}
-	        }
+				reset = true;
+			}
+			
 			Scale xScale = priceGraphPane.XAxis.Scale;
 			double xCurrent;
 			if( priceGraphPane.XAxis.Scale.IsAnyOrdinal) {
@@ -818,14 +854,12 @@ namespace TickZoom
 			}
 			if( resetXScale && xCurrent > xLowerLimit) {
 				if( xCurrent > xScale.Max) {
-					ZoomToLast(dataGraph.GraphPane);
+					AutoZoom(dataGraph.GraphPane);
 					resetXScaleSpeed *= 1.5f;
 					log.Debug("resetXScaleSpeed = " + resetXScaleSpeed);
 				}
 				xScale.Min = MoveByPixels(xScale,xScale.Min,resetXScaleSpeed);
 				xScale.Max = MoveByPixels(xScale,xScale.Max,resetXScaleSpeed);
-//				xScale.Min = MoveByPixels(xScale,xScale.Min,1);
-//				xScale.Max = MoveByPixels(xScale,xScale.Max,1);
 				reset = true;
 			} else {
 				resetXScale = false;
@@ -839,24 +873,31 @@ namespace TickZoom
 			return scale.ReverseTransform(currPixels+movePixels);
 		}
 		
-		void SetCommonXScale() {
+		bool SetCommonXScale() {
 			Scale xScale = priceGraphPane.XAxis.Scale;
 			double min = xScale.Min;
 			double max = xScale.Max;
+			bool reset = false;
 			if( !double.IsNaN(max) && !double.IsNaN(min) ) {
-				if(  dataGraph != null && dataGraph.MasterPane != null) {
+				if( dataGraph != null && dataGraph.MasterPane != null) {
 					PaneList list = dataGraph.MasterPane.PaneList;
 					for( int i=0; i<list.Count; i++) {
-						list[i].XAxis.Scale.Max = max;
-						list[i].XAxis.Scale.Min = min;
+						if( list[i].XAxis.Scale.Max != max) {
+							list[i].XAxis.Scale.Max = max;
+							reset = true;
+						}
+						if( list[i].XAxis.Scale.Min != min) {
+							list[i].XAxis.Scale.Min = min;
+							reset = true;
+						}
 					}
 				}
 			}
+			return reset;
 		}
 		
 		bool resetXScale = false;
 		float resetXScaleSpeed = 1;
-		int resetYScale = 0;
 		float resetYScaleSpeed = 1;
 	
 		public bool IsValid {
@@ -891,7 +932,7 @@ namespace TickZoom
 					}
 					
 					if( isDynamicUpdate) {
-						ZoomToLast(dataGraph.GraphPane);
+						AutoZoom(dataGraph.GraphPane);
 					}
 					
 					setLayout();
@@ -1098,21 +1139,16 @@ namespace TickZoom
 							layoutChange = false;
 						}
 						if( stockPointList.Count > 0 && isDynamicUpdate ) {
-							if( isAutoScroll ) {
-								bool refresh = false;
-//								for( int i=0; i<resetXScaleSpeed; i++) {
-									if( KeepWithinScale()) {
-										timer.Interval = 20;
-										SetCommonXScale();
-										dataGraph.AxisChange();
-										dataGraph.Refresh();
-										refresh = true;
-									} else {
-										timer.Interval = 20;
-									}
-//								}
-								if( !refresh) {
-									SetCommonXScale();
+							if( !isScrolling && isAutoScroll ) {
+								timer.Interval = 20;
+								bool reset = false;
+								if( KeepWithinScale()) {
+									reset = true;	
+								}
+								if( SetCommonXScale()) {
+									reset = true;
+								}
+								if( reset ) {
 									dataGraph.AxisChange();
 									dataGraph.Refresh();
 								}
@@ -1328,5 +1364,17 @@ namespace TickZoom
 		public StockPointList StockPointList {
 			get { return stockPointList; }
 		}
+
+		bool isScrolling = false;
+		void DataGraphScrollEvent(object sender, ScrollEventArgs e)
+		{
+//			log.Notice("ScrollEvent " + e.Type);
+			if( e.Type == ScrollEventType.EndScroll) {
+				isScrolling = false;
+			} else {
+				isScrolling = true;
+			}
+		}
+		
 	}
 }

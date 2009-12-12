@@ -45,6 +45,7 @@ namespace ZedGraph
 	[Serializable]
 	public class MasterPane : PaneBase, ICloneable, ISerializable, IDeserializationCallback
 	{
+		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 	#region Fields
 
@@ -571,135 +572,90 @@ namespace ZedGraph
 		/// A graphic device object to be drawn into.  This is normally e.Graphics from the
 		/// PaintEventArgs argument to the Paint() method.
 		/// </param>
+		
 		public override void Draw( Graphics g )
 		{
-			Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-			int benchCount = 1;
-			int benchConversion = 1000;
 			// Save current AntiAlias mode
 			SmoothingMode sModeSave = g.SmoothingMode;
 			TextRenderingHint sHintSave = g.TextRenderingHint;
 			CompositingQuality sCompQual = g.CompositingQuality;
 			InterpolationMode sInterpMode = g.InterpolationMode;
 
-			int start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				SetAntiAliasMode( g, _isAntiAlias );
-			}
-			int average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("SetAntiAlias = " + average);
+			SetAntiAliasMode( g, _isAntiAlias );
 
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Draw the pane border & background fill, the title, and the GraphObj objects that lie at
-				// ZOrder.GBehindAll
-				base.Draw( g );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("base.Draw = " + average);
+			// Draw the pane border & background fill, the title, and the GraphObj objects that lie at
+			// ZOrder.GBehindAll
+//			Handled by DrawBackGround now.		
+//			base.Draw( g );
 
 			if ( _rect.Width <= 1 || _rect.Height <= 1 )
 				return;
 
-			start = Environment.TickCount;
-			float scaleFactor = 0;
-			for( int i=0; i<benchCount; i++) {
-				scaleFactor = CalcScaleFactor();
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("CalcScaleFactor = " + average);
+			float scaleFactor = CalcScaleFactor();
 
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Clip everything to the rect
-				g.SetClip( _rect );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("SetClip = " + average);
+			// Clip everything to the rect
+			g.SetClip( _rect );
 
 			// For the MasterPane, All GraphItems go behind the GraphPanes, except those that
 			// are explicity declared as ZOrder.AInFront
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				_graphObjList.Draw( g, this, scaleFactor, ZOrder.G_BehindChartFill );
-				_graphObjList.Draw( g, this, scaleFactor, ZOrder.E_BehindCurves );
-				_graphObjList.Draw( g, this, scaleFactor, ZOrder.D_BehindAxis );
-				_graphObjList.Draw( g, this, scaleFactor, ZOrder.C_BehindChartBorder );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("GraphPane Obj List = " + average);
+			_graphObjList.Draw( g, this, scaleFactor, ZOrder.G_BehindChartFill );
+			_graphObjList.Draw( g, this, scaleFactor, ZOrder.E_BehindCurves );
+			_graphObjList.Draw( g, this, scaleFactor, ZOrder.D_BehindAxis );
+			_graphObjList.Draw( g, this, scaleFactor, ZOrder.C_BehindChartBorder );
 
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Reset the clipping
-				g.ResetClip();
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("ResetClip = " + average);
+			// Reset the clipping
+			g.ResetClip();
 
 			foreach ( GraphPane pane in _paneList ) {
-				if( benchCount > 1) log.Debug("Drawing Pane");
-				if( benchCount > 1) log.Indent();
 				pane.Draw( g );
-				if( benchCount > 1) log.Outdent();
 			}
 
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Clip everything to the rect
-				g.SetClip( _rect );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("SetClip = " + average);
+			// Clip everything to the rect
+			g.SetClip( _rect );
 
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				_graphObjList.Draw( g, this, scaleFactor, ZOrder.B_BehindLegend );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("graphObjList.Draw = " + average);
+			_graphObjList.Draw( g, this, scaleFactor, ZOrder.B_BehindLegend );
 			
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Recalculate the legend rect, just in case it has not yet been done
-				// innerRect is the area for the GraphPane's
-				RectangleF innerRect = CalcClientRect( g, scaleFactor );
-				_legend.CalcRect( g, this, scaleFactor, ref innerRect );
-				//this.legend.SetLocation( this, 
-				
-				_legend.Draw( g, this, scaleFactor );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("Legend = " + average);
-
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				_graphObjList.Draw( g, this, scaleFactor, ZOrder.A_InFront );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("graphObjList.Draw = " + average);
+			// Recalculate the legend rect, just in case it has not yet been done
+			// innerRect is the area for the GraphPane's
+			RectangleF innerRect = CalcClientRect( g, scaleFactor );
+			_legend.CalcRect( g, this, scaleFactor, ref innerRect );
+			//this.legend.SetLocation( this, 
 			
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Reset the clipping
-				g.ResetClip();
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("ResetClip = " + average);
+			_legend.Draw( g, this, scaleFactor );
 
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Restore original anti-alias mode
-				g.SmoothingMode = sModeSave;
-				g.TextRenderingHint = sHintSave;
-				g.CompositingQuality = sCompQual;
-				g.InterpolationMode = sInterpMode;
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("Final Settings = " + average);
+			_graphObjList.Draw( g, this, scaleFactor, ZOrder.A_InFront );
+			
+			// Reset the clipping
+			g.ResetClip();
+
+			// Restore original anti-alias mode
+			g.SmoothingMode = sModeSave;
+			g.TextRenderingHint = sHintSave;
+			g.CompositingQuality = sCompQual;
+			g.InterpolationMode = sInterpMode;
 
 		}
 
+		public override void DrawBackground( Graphics g )
+		{
+			Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+			// Save current AntiAlias mode
+			SmoothingMode sModeSave = g.SmoothingMode;
+			TextRenderingHint sHintSave = g.TextRenderingHint;
+			CompositingQuality sCompQual = g.CompositingQuality;
+			InterpolationMode sInterpMode = g.InterpolationMode;
+
+			SetAntiAliasMode( g, _isAntiAlias );
+
+			// Draw the pane border & background fill, the title, and the GraphObj objects that lie at
+			// ZOrder.GBehindAll
+			base.Draw( g );
+
+			foreach ( GraphPane pane in _paneList ) {
+				pane.DrawBackground( g );
+			}
+		}
+		
 		/// <summary>
 		/// Find the pane and the object within that pane that lies closest to the specified
 		/// mouse (screen) point.

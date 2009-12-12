@@ -1,6 +1,6 @@
-//============================================================================
+﻿//============================================================================
 //ZedGraph Class Library - A Flexible Line Graph/Bar Graph Library in C#
-//Copyright � 2004  John Champion
+//Copyright © 2004  John Champion
 //
 //This library is free software; you can redistribute it and/or
 //modify it under the terms of the GNU Lesser General Public
@@ -573,6 +573,8 @@ namespace ZedGraph
 
 			_zoomState = null;
 			_zoomStateStack = new ZoomStateStack();
+			
+			_backBuffer=new Bitmap(this.ClientSize.Width,this.ClientSize.Height);
 		}
 
 		/// <summary>
@@ -787,6 +789,8 @@ namespace ZedGraph
 	
 	#region Methods
     	private Bitmap _backBuffer;
+    	private Bitmap _backBufferCopy;
+    	private Rectangle _backBufferClip;
 		/// <summary>
 		/// Called by the system to update the control on-screen
 		/// </summary>
@@ -802,6 +806,82 @@ namespace ZedGraph
 			bitmap.Save(dir + @"\"+paintCount+name+".jpg",System.Drawing.Imaging.ImageFormat.Jpeg);
 		}
 		
+		private void EnsureBitmapSize() {
+			if(this.ClientSize.Width > _backBuffer.Width || this.ClientSize.Height > _backBuffer.Height)
+			{
+				_backBuffer=new Bitmap(this.ClientSize.Width,this.ClientSize.Height);
+				_backBufferCopy=new Bitmap(this.ClientSize.Width,this.ClientSize.Height);
+			}
+		}
+		
+		private void EnsureClipSize() {
+			if( this.ClientSize.Width != _backBufferClip.Width ||
+			   this.ClientSize.Height != _backBufferClip.Height) {
+				_backBufferClip.Width = this.ClientSize.Width;
+				_backBufferClip.Height = this.ClientSize.Height;
+				using( Graphics g=Graphics.FromImage(_backBuffer)) {
+					// Add a try/catch pair since the users of the control can't catch this one
+					try {
+						_masterPane.DrawBackground( g );
+					}
+					catch( Exception ex) {
+						if( debug) log.Debug(ex.ToString());
+					}
+				}
+			}
+		}
+		
+		private void CopyBackBuffer() {
+			using( Graphics g = Graphics.FromImage(_backBufferCopy)) {
+		
+			    // Draw the specified section of the source bitmap to the new one
+			    g.DrawImageUnscaled(_backBuffer, 0, 0);
+			
+			}
+		}
+		
+		private void Timer( Action action) {
+			int start = Environment.TickCount;
+			int benchCount = 1000;
+			for( int i=0; i<benchCount; i++) {
+				action();
+			}
+			int elapsed = Environment.TickCount - start;
+			elapsed = elapsed * 1000 / benchCount;
+			log.Notice("Took " + elapsed + "μs");
+		}
+
+		private void CopyBitMaps( Bitmap src, Bitmap dst) {
+			PixelFormat format = src.PixelFormat;
+			PixelFormat dest = dst.PixelFormat;
+			BitmapData Src1Data = src.LockBits(new Rectangle(0, 0, src.Width, src.Height), ImageLockMode.ReadOnly, src.PixelFormat);
+			BitmapData DestData = dst.LockBits(new Rectangle(0, 0, dst.Width, dst.Height), ImageLockMode.WriteOnly, src.PixelFormat);
+
+
+			unsafe
+			{
+				int stride = Src1Data.Stride;
+				int hMax = src.Height - 1;
+				int wMax = src.Width - 1;
+				byte *srcRow = (byte *)Src1Data.Scan0;
+				byte *dstRow = (byte *)DestData.Scan0;
+	
+				for (int row = 0; row < hMax; row++)
+				{
+					for (int col = 0; col < stride; col++)
+					{
+						*dstRow = *srcRow;
+						dstRow++;
+						srcRow++;
+					}
+				}
+			}
+
+			dst.UnlockBits(DestData);
+			src.UnlockBits(Src1Data);
+		}
+
+		
 		protected override void OnPaint( PaintEventArgs e )
 		{
 			lock ( this )
@@ -816,20 +896,15 @@ namespace ZedGraph
 					SetScroll( vScrollBar1, this.GraphPane.YAxis, _yScrollRangeList[0].Min,
 						_yScrollRangeList[0].Max );
 				}
-
-				if(_backBuffer==null)
-				{
-					_backBuffer=new Bitmap(this.ClientSize.Width,this.ClientSize.Height);
-				}
+				
+				EnsureBitmapSize();
+				
+				EnsureClipSize();
+				
+				CopyBitMaps(_backBuffer,_backBufferCopy);
+				
 				using( Graphics g=Graphics.FromImage(_backBuffer)) {
 					// Add a try/catch pair since the users of the control can't catch this one
-//					_masterPane.Fill.IsVisible = false;
-//					for( int i=0; i<_masterPane.PaneList.Count; i++) {
-//						GraphPane pane = _masterPane.PaneList[i];
-//						pane.Fill.IsVisible = false;
-//						pane.Chart.Fill.IsVisible = false;
-//						pane.Legend.Fill.IsVisible = false;
-//					}
 					try {
 						_masterPane.Draw( g );
 					}
@@ -837,9 +912,14 @@ namespace ZedGraph
 						if( debug) log.Debug(ex.ToString());
 					}
 				}
-//				ZedGraphControl.Gaussian( _backBuffer);
 				//Copy the back buffer to the screen
 				e.Graphics.DrawImageUnscaled(_backBuffer,0,0);
+				
+				// Flip the pages.
+				Bitmap temp = _backBuffer;
+				_backBuffer = _backBufferCopy;
+				_backBufferCopy = temp;
+				
 				paintCount ++;
 			}
 
@@ -904,11 +984,11 @@ namespace ZedGraph
 
 		protected override  void OnSizeChanged(EventArgs e)
 		{
-		  if(_backBuffer!=null)
-		  {
-		    _backBuffer.Dispose();
-		    _backBuffer=null;
-		  }
+//		  if(_backBuffer!=null)
+//		  {
+//		    _backBuffer.Dispose();
+//		    _backBuffer=null;
+//		  }
 		  base.OnSizeChanged (e);
 		}
     	/// <summary>

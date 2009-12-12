@@ -621,6 +621,19 @@ namespace ZedGraph
 			g.ResetClip();
 		}
 
+		public virtual void DrawBackground( Graphics g  )
+		{
+			if ( _rect.Width <= 1 || _rect.Height <= 1 )
+				return;
+
+			// calculate scaleFactor on "normal" pane size (BaseDimension)
+			float scaleFactor = this.CalcScaleFactor();
+
+			// Fill the pane background and draw a border around it			
+			DrawPaneFrame( g, scaleFactor );
+
+		}
+		
 		/// <summary>
 		/// Calculate the client area rectangle based on the <see cref="PaneBase.Rect"/>.
 		/// </summary>

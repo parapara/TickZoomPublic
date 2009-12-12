@@ -54,6 +54,7 @@ namespace ZedGraph
 	[Serializable]
 	public class GraphPane : PaneBase, ICloneable, ISerializable
 	{
+		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
 	#region Events
 
@@ -716,21 +717,15 @@ namespace ZedGraph
 		public override void Draw( Graphics g )
 		{
 			Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-			int benchCount = 1;
-			int benchConversion = 1000; // Microseconds
 			
 			// Calculate the chart rect, deducting the area for the scales, titles, legend, etc.
 			//int		hStack;
 			//float	legendWidth, legendHeight;
 
-			int start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Draw the pane border & background fill, the title, and the GraphObj objects that lie at
-				// ZOrder.G_BehindAll
-				base.Draw( g );
-			}
-			int average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("base.Draw = " + average);
+			// Draw the pane border & background fill, the title, and the GraphObj objects that lie at
+			// ZOrder.G_BehindAll
+//			Handled by DrawBackGround now.		
+//			base.Draw( g );
 
 			if ( _rect.Width <= 1 || _rect.Height <= 1 )
 				return;
@@ -738,36 +733,18 @@ namespace ZedGraph
 			// Clip everything to the rect
 			g.SetClip( _rect );
 
-			start = Environment.TickCount;
-			float scaleFactor = 0;
-			for( int i=0; i<benchCount; i++) {
-				// calculate scaleFactor on "normal" pane size (BaseDimension)
-				scaleFactor = this.CalcScaleFactor();
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("CalcScaleFactor = " + average);
-
+			float scaleFactor = this.CalcScaleFactor();
 
 			// if the size of the ChartRect is determined automatically, then do so
 			// otherwise, calculate the legendrect, scalefactor, hstack, and legendwidth parameters
 			// but leave the ChartRect alone
 			if ( _chart._isRectAuto )
 			{
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					_chart._rect = CalcChartRect( g, scaleFactor );
-					//this.pieRect = PieItem.CalcPieRect( g, this, scaleFactor, this.chartRect );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("CalcChartRect = " + average);
+				_chart._rect = CalcChartRect( g, scaleFactor );
+				//this.pieRect = PieItem.CalcPieRect( g, this, scaleFactor, this.chartRect );
 			}
 			else {
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					CalcChartRect( g, scaleFactor );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("CalcChartRect = " + average);
+				CalcChartRect( g, scaleFactor );
 			}
 
 			// do a sanity check on the ChartRect
@@ -779,167 +756,90 @@ namespace ZedGraph
 			// Go ahead and draw the graph, even without data.  This makes the control
 			// version still look like a graph before it is fully set up
 			bool showGraf = false;
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				showGraf = AxisRangesValid();
+			showGraf = AxisRangesValid();
 				
-				if( showGraf) {
-					_graphObjList.OptimizeDrawing();
-				}
-
-				// Setup the axes for graphing - This setup must be done before
-				// the GraphObj's are drawn so that the Transform functions are
-				// ready.  Also, this should be done before CalcChartRect so that the
-				// Axis.Cross - shift parameter can be calculated.
-				_xAxis.Scale.SetupScaleData( this, _xAxis );
-				_x2Axis.Scale.SetupScaleData( this, _x2Axis );
-				foreach ( Axis axis in _yAxisList )
-					axis.Scale.SetupScaleData( this, axis );
-				foreach ( Axis axis in _y2AxisList )
-					axis.Scale.SetupScaleData( this, axis );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("Check/Optimize/Scale = " + average);
-
-			// Draw the GraphItems that are behind the Axis objects
-			if ( showGraf ) {
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					_graphObjList.Draw( g, this, scaleFactor, ZOrder.G_BehindChartFill );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("graphObjList.Draw = " + average);
+			if( showGraf) {
+				_graphObjList.OptimizeDrawing();
 			}
 
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Fill the axis background
-				_chart.Fill.Draw( g, _chart._rect );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("chart.Fill.Draw = " + average);
+			// Setup the axes for graphing - This setup must be done before
+			// the GraphObj's are drawn so that the Transform functions are
+			// ready.  Also, this should be done before CalcChartRect so that the
+			// Axis.Cross - shift parameter can be calculated.
+			_xAxis.Scale.SetupScaleData( this, _xAxis );
+			_x2Axis.Scale.SetupScaleData( this, _x2Axis );
+			foreach ( Axis axis in _yAxisList )
+				axis.Scale.SetupScaleData( this, axis );
+			foreach ( Axis axis in _y2AxisList )
+				axis.Scale.SetupScaleData( this, axis );
+
+// We can't draw any objects behind the axis when we pre-fab the background
+// for faster rendering.
+//			// Draw the GraphItems that are behind the Axis objects
+//			if ( showGraf ) {
+//				_graphObjList.Draw( g, this, scaleFactor, ZOrder.G_BehindChartFill );
+//			}
+
+			// Fill the axis background
+//			Handled by DrawBackGround now.		
+//			_chart.Fill.Draw( g, _chart._rect );
 
 			if ( showGraf )
 			{
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					// Draw the GraphItems that are behind the Grid
-					_graphObjList.Draw( g, this, scaleFactor, ZOrder.F_BehindGrid );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("graphObjList.Draw = " + average);
+				// Draw the GraphItems that are behind the Grid
+				_graphObjList.Draw( g, this, scaleFactor, ZOrder.F_BehindGrid );
 	
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					DrawGrid( g, scaleFactor );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("DrawGrid.Draw = " + average);
+				DrawGrid( g, scaleFactor );
 	
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					// Draw the GraphItems that are behind the CurveItems
-					_graphObjList.Draw( g, this, scaleFactor, ZOrder.E_BehindCurves );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("graphObjList.Draw = " + average);
+				// Draw the GraphItems that are behind the CurveItems
+				_graphObjList.Draw( g, this, scaleFactor, ZOrder.E_BehindCurves );
 	
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					// Clip the points to the actual plot area
-					g.SetClip( _chart._rect );
-					_curveList.Draw( g, this, scaleFactor );
-					g.SetClip( _rect );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("curveList.Draw = " + average);
+				// Clip the points to the actual plot area
+				g.SetClip( _chart._rect );
+				_curveList.Draw( g, this, scaleFactor );
+				g.SetClip( _rect );
 
 			}
 
 			if ( showGraf )
 			{
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					// Draw the GraphItems that are behind the Axis objects
-					_graphObjList.Draw( g, this, scaleFactor, ZOrder.D_BehindAxis );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("graphObjList.Draw = " + average);
+				// Draw the GraphItems that are behind the Axis objects
+				_graphObjList.Draw( g, this, scaleFactor, ZOrder.D_BehindAxis );
 	
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					// Draw the Axes
-					_xAxis.Draw( g, this, scaleFactor, 0.0f );
-					_x2Axis.Draw( g, this, scaleFactor, 0.0f );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("xAxis.Draw = " + average);
+				// Draw the Axes
+				_xAxis.Draw( g, this, scaleFactor, 0.0f );
+				_x2Axis.Draw( g, this, scaleFactor, 0.0f );
 	
 				float yPos = 0;
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					foreach ( Axis axis in _yAxisList )
-					{
-						axis.Draw( g, this, scaleFactor, yPos );
-						yPos += axis._tmpSpace;
-					}
+				foreach ( Axis axis in _yAxisList )
+				{
+					axis.Draw( g, this, scaleFactor, yPos );
+					yPos += axis._tmpSpace;
 				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("yAxis.Draw = " + average);
 	
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					yPos = 0;
-					foreach ( Axis axis in _y2AxisList )
-					{
-						axis.Draw( g, this, scaleFactor, yPos );
-						yPos += axis._tmpSpace;
-					}
+				yPos = 0;
+				foreach ( Axis axis in _y2AxisList )
+				{
+					axis.Draw( g, this, scaleFactor, yPos );
+					yPos += axis._tmpSpace;
 				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("y2axis.Draw = " + average);
 	
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					// Draw the GraphItems that are behind the Axis border
-					_graphObjList.Draw( g, this, scaleFactor, ZOrder.C_BehindChartBorder );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("graphObjList.Draw = " + average);
+				// Draw the GraphItems that are behind the Axis border
+				_graphObjList.Draw( g, this, scaleFactor, ZOrder.C_BehindChartBorder );
 			}
 
-			start = Environment.TickCount;
-			for( int i=0; i<benchCount; i++) {
-				// Border the axis itself
-				_chart.Border.Draw( g, this, scaleFactor, _chart._rect );
-			}
-			average = (Environment.TickCount - start) * benchConversion / benchCount;
-			if( benchCount > 1) log.Debug("chart.Border.Draw = " + average);
+			// Border the axis itself
+			_chart.Border.Draw( g, this, scaleFactor, _chart._rect );
 
 			if ( showGraf )
 			{
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					// Draw the GraphItems that are behind the Legend object
-					_graphObjList.Draw( g, this, scaleFactor, ZOrder.B_BehindLegend );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("ZOrder.B_BehindLegend = " + average);
+				// Draw the GraphItems that are behind the Legend object
+				_graphObjList.Draw( g, this, scaleFactor, ZOrder.B_BehindLegend );
 	
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					_legend.Draw( g, this, scaleFactor );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("legend.Draw = " + average);
+				_legend.Draw( g, this, scaleFactor );
 	
-				start = Environment.TickCount;
-				for( int i=0; i<benchCount; i++) {
-					// Draw the GraphItems that are in front of all other items
-					_graphObjList.Draw( g, this, scaleFactor, ZOrder.A_InFront );
-				}
-				average = (Environment.TickCount - start) * benchConversion / benchCount;
-				if( benchCount > 1) log.Debug("ZOrder.A_InFront = " + average);
+				// Draw the GraphItems that are in front of all other items
+				_graphObjList.Draw( g, this, scaleFactor, ZOrder.A_InFront );
 			}
 
 			// Reset the clipping
@@ -958,6 +858,72 @@ namespace ZedGraph
 			*/
 		}
 
+		public override void DrawBackground( Graphics g )
+		{
+			
+			if ( _rect.Width <= 1 || _rect.Height <= 1 )
+				return;
+
+			// Calculate the chart rect, deducting the area for the scales, titles, legend, etc.
+			//int		hStack;
+			//float	legendWidth, legendHeight;
+
+			// Draw the pane border & background fill, the title, and the GraphObj objects that lie at
+			// ZOrder.G_BehindAll
+			base.Draw( g );
+
+			// Clip everything to the rect
+			g.SetClip( _rect );
+
+			float scaleFactor = this.CalcScaleFactor();
+
+			// if the size of the ChartRect is determined automatically, then do so
+			// otherwise, calculate the legendrect, scalefactor, hstack, and legendwidth parameters
+			// but leave the ChartRect alone
+			if ( _chart._isRectAuto )
+			{
+				_chart._rect = CalcChartRect( g, scaleFactor );
+				//this.pieRect = PieItem.CalcPieRect( g, this, scaleFactor, this.chartRect );
+			}
+			else {
+				CalcChartRect( g, scaleFactor );
+			}
+
+			// do a sanity check on the ChartRect
+			if ( _chart._rect.Width < 1 || _chart._rect.Height < 1 )
+				return;
+
+			// Draw the graph features only if there is at least one curve with data
+			// if ( _curveList.HasData() &&
+			// Go ahead and draw the graph, even without data.  This makes the control
+			// version still look like a graph before it is fully set up
+			bool showGraf = false;
+			showGraf = AxisRangesValid();
+				
+			// Setup the axes for graphing - This setup must be done before
+			// the GraphObj's are drawn so that the Transform functions are
+			// ready.  Also, this should be done before CalcChartRect so that the
+			// Axis.Cross - shift parameter can be calculated.
+			_xAxis.Scale.SetupScaleData( this, _xAxis );
+			_x2Axis.Scale.SetupScaleData( this, _x2Axis );
+			foreach ( Axis axis in _yAxisList )
+				axis.Scale.SetupScaleData( this, axis );
+			foreach ( Axis axis in _y2AxisList )
+				axis.Scale.SetupScaleData( this, axis );
+
+			
+// We can't draw any objects behind the axis when we pre-fab the background
+// for faster rendering.
+//			// Draw the GraphItems that are behind the Axis objects
+//			if ( showGraf ) {
+//				_graphObjList.Draw( g, this, scaleFactor, ZOrder.G_BehindChartFill );
+//			}
+
+			// Fill the axis background
+			_chart.Fill.Draw( g, _chart._rect );
+
+		}
+		
 		internal void DrawGrid( Graphics g, float scaleFactor )
 		{
 			_xAxis.DrawGrid( g, this, scaleFactor, 0.0f );
