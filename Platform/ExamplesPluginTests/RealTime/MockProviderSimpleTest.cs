@@ -28,10 +28,11 @@
 #endregion
 
 
-using Loaders;
 using System;
 using System.Configuration;
+using Loaders;
 using NUnit.Framework;
+using System.IO;
 using TickZoom;
 using TickZoom.Api;
 using TickZoom.Common;
@@ -53,6 +54,16 @@ namespace RealTime
 			ConfigurationManager.AppSettings.Set("TestProviderCutOff-Daily4Sim","1984-12-31 00:00:00.000");
 			base.Symbols="Mock4Sim";
 			base.RunStrategy();
+		}
+		private void DeleteFiles() {
+			while( true) {
+				try {
+					string appData = Factory.Settings["AppDataFolder"];
+		 			File.Delete( appData + @"\TestServerCache\Mock4Sim.tck");
+					break;
+				} catch( Exception) {
+				}
+			}
 		}
 	}
 #endif

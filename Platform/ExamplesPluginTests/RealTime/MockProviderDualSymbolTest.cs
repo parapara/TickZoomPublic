@@ -28,10 +28,11 @@
 #endregion
 
 
-using Loaders;
 using System;
 using System.Configuration;
+using Loaders;
 using NUnit.Framework;
+using System.IO;
 using TickZoom;
 using TickZoom.Api;
 using TickZoom.Common;
@@ -47,11 +48,25 @@ namespace RealTime
 		{
 			return new RealTimeStarter();
 		}
+		
 		[TestFixtureSetUpAttribute()]
 		public override void RunStrategy()
 		{
+			DeleteFiles();
 			base.Symbols="MockFull,Mock4Sim";
 			base.RunStrategy();
+		}
+		
+		private void DeleteFiles() {
+			while( true) {
+				try {
+					string appData = Factory.Settings["AppDataFolder"];
+		 			File.Delete( appData + @"\TestServerCache\MockFull_Tick.tck");
+		 			File.Delete( appData + @"\TestServerCache\Mock4Sim.tck");
+					break;
+				} catch( Exception) {
+				}
+			}
 		}
 	}
 #endif

@@ -48,6 +48,7 @@ namespace MiscTest
 		
 		[SetUp]
 		public void Setup() {
+			DeleteFiles();
 			Process[] processes = Process.GetProcessesByName("TickZoomProviderMock");
     		foreach( Process proc in processes) {
     			proc.Kill();
@@ -59,6 +60,7 @@ namespace MiscTest
 
 		[TearDown]
 		public void TearDown() {
+			DeleteFiles();
 			form.Close();
 		}
 		
@@ -101,14 +103,14 @@ namespace MiscTest
 		[Test]
 		public void TestRealTimeNoHistorical()
 		{
-			form.TxtSymbol.Text = "IBM,/ESZ9";
+			form.TxtSymbol.Text = "IBM,GBP/USD";
 			form.DefaultBox.Text = "10";
 			form.DefaultCombo.Text = "Tick";
 			form.RealTimeButtonClick(null,null);
-			WaitComplete(30, () => { return form.PortfolioDocs.Count == 2; } );
+			WaitComplete(10, () => { return form.PortfolioDocs.Count == 2; } );
 			Assert.AreEqual(2,form.PortfolioDocs.Count,"Charts");
 			form.btnStop_Click(null,null);
-			WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
+			WaitComplete(10, () => { return !form.ProcessWorker.IsBusy; } );
 			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
 		}
 		
@@ -134,15 +136,16 @@ namespace MiscTest
 				try {
 					string appData = Factory.Settings["AppDataFolder"];
 		 			File.Delete( appData + @"\TestServerCache\ESZ9_Tick.tck");
+		 			File.Delete( appData + @"\TestServerCache\IBM_Tick.tck");
+		 			File.Delete( appData + @"\TestServerCache\GBPUSD_Tick.tck");
 					break;
 				} catch( Exception) {
 				}
 			}
 		}
 		[Test]
-		public void TestCapturedDataMatchesChart()
+		public void TestCapturedDataMatchesProvider()
 		{
-			DeleteFiles();
 			form.TxtSymbol.Text = "/ESZ9";
 			form.DefaultBox.Text = "1";
 			form.DefaultCombo.Text = "Minute";
@@ -163,7 +166,8 @@ namespace MiscTest
 			string hash1 = auto.GetMD5HashFromFile(compareFile1);
 			string hash2 = auto.GetMD5HashFromFile(compareFile2);
 			Assert.AreEqual(hash1,hash2,"Tick data files");
-			DeleteFiles();
+
 		}
 	}
+
 }

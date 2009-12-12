@@ -149,7 +149,13 @@ namespace TickZoom.TickUtil
 	    	}
 	    	// If not a tick
 	    	if( item.ItemType != 0) {
-	    		throw new QueueException( (EntryType) item.ItemType, item.Tick.Symbol.ToSymbol());
+	    		string symbol;
+	    		if( item.Tick.Symbol != 0) {
+	    			symbol = item.Tick.Symbol.ToSymbol();
+	    		} else {
+	    			symbol = "";
+	    		}
+	    		throw new QueueException( (EntryType) item.ItemType, symbol);
 	    	} else {
 	    		tick = item.Tick;
 	    	}

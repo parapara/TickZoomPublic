@@ -51,6 +51,7 @@ namespace TickZoom.TickUtil
 		bool logProgress = false;
 		FileStream fs = null;
 		MemoryStream memory = null;
+		bool isInitialized = false;
 
 		public TickWriter(bool eraseFileToStart)
 		{
@@ -106,6 +107,7 @@ namespace TickZoom.TickUtil
      		if( !CancelPending ) {
 				StartAppendThread();
 			}
+			isInitialized = true;
 		}
 
 		protected virtual void StartAppendThread() {
@@ -207,6 +209,9 @@ namespace TickZoom.TickUtil
 //		}
 
 		public void Add(TickIO tickIO) {
+			if( !isInitialized) {
+				throw new ApplicationException("Please initialized TickWriter first.");
+			}
 			TickBinary tick = tickIO.Extract();
 			writeQueue.EnQueue(ref tick);
 		}
@@ -218,6 +223,9 @@ namespace TickZoom.TickUtil
 		}
 		
 		public virtual void Close() {
+			if( !isInitialized) {
+				throw new ApplicationException("Please initialized TickWriter first.");
+			}
 			if( debug) log.Debug("Entering Close()");
     		if( appendThread != null) {
 				writeQueue.EnQueue(EntryType.Terminate, symbol);
