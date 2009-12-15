@@ -224,7 +224,7 @@ namespace TickZoom.Common
 			expected.EntryTime = new TimeStamp(2005,2,8,11,57,22,429);
 			expected.ExitPrice = 105.670;
 			expected.ExitTime = new TimeStamp(2005,2,8,11,57,51,479);
-			TransactionPairs rts = manager.TransactionPairs;
+			TransactionPairs rts = manager.ComboTrades;
 			Assert.AreEqual(-.014,Math.Round(rts.CalcProfitLoss(0),3),"First Trade PnL");
 		}
 		

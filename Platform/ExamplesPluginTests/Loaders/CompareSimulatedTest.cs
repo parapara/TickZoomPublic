@@ -101,15 +101,15 @@ namespace Loaders
 		
 		[Test]
 		public void CompareTradeCount() {
-			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.TransactionPairs;
-			TransactionPairs fullTicksRTs = fullTickData.Performance.TransactionPairs;
+			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.ComboTrades;
+			TransactionPairs fullTicksRTs = fullTickData.Performance.ComboTrades;
 			Assert.AreEqual(fourTicksRTs.Count,fullTicksRTs.Count, "trade count");
 		}
 			
 		[Test]
 		public void CompareTrades() {
-			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.TransactionPairs;
-			TransactionPairs fullTicksRTs = fullTickData.Performance.TransactionPairs;
+			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.ComboTrades;
+			TransactionPairs fullTicksRTs = fullTickData.Performance.ComboTrades;
 			for( int i=0; i<fourTicksRTs.Count && i<fullTicksRTs.Count; i++) {
 				TransactionPair fourRT = fourTicksRTs[i];
 				TransactionPair fullRT = fullTicksRTs[i];

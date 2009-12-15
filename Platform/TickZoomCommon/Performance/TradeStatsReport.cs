@@ -53,7 +53,7 @@ namespace TickZoom.Common
 	
 		private void WriteReport(string name, StreamWriter writer) {
 			fwriter = writer;
-			StrategyStats stats = new StrategyStats(performance.TransactionPairs,performance.ComboTrades);
+			StrategyStats stats = new StrategyStats(performance.ComboTrades);
 			fwriter.WriteLine("<HTML>");
 			fwriter.WriteLine("<HEAD>");
 			WriteStyle();

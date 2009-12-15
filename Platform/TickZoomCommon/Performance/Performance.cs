@@ -35,9 +35,7 @@ namespace TickZoom.Common
 {
 	public class Performance : StrategySupport
 	{
-		TransactionPairs pairs;
 		TransactionPairs comboTrades;
-		TransactionPairsBinary transactionPairsBinary;
 		TransactionPairsBinary comboTradesBinary;
 		Strategy strategy;
 		bool graphTrades = true;
@@ -53,9 +51,6 @@ namespace TickZoom.Common
 			profitLoss = new TradeProfitLoss(strategy);
 			Model equity = new Equity(strategy);
 			equityChain = Chain.InsertAfter(equity.Chain);
-			transactionPairsBinary  = new TransactionPairsBinary();
-			pairs = new TransactionPairs(profitLoss,transactionPairsBinary);
-			transactionPairsBinary.Name = "Trades";
 			comboTradesBinary  = new TransactionPairsBinary();
 			comboTrades  = new TransactionPairs(profitLoss,comboTradesBinary);
 			comboTradesBinary.Name = "ComboTrades";
@@ -84,10 +79,8 @@ namespace TickZoom.Common
 				if( IsTrace) Log.Trace("ProcessTick() Signal Changed.");
 				if( IsTrace) Log.Indent();
 				if( Position.IsFlat) {
-					EnterTransactionInternal();
 					EnterComboTradeInternal();
 				} else if( next.Position.IsFlat) {
-					ExitTransactionInternal();
 					ExitComboTradeInternal();
 //					if( Position.IsShort && graphTrades) {
 //						Chart.DrawArrow(ArrowDirection.Up,Color.Black,12.5f,Chart.ChartBars.BarCount,Ticks[0].Ask);
@@ -97,21 +90,16 @@ namespace TickZoom.Common
 //					}
 				} else if( (next.Position.IsLong && Position.IsShort) || (next.Position.IsShort && Position.IsLong)) {
 					// The signal must be opposite. Either -1 / 1 or 1 / -1
-					ExitTransactionInternal();
 					ExitComboTradeInternal();
-					EnterTransactionInternal();
 					EnterComboTradeInternal();
 				} else {
 					// Instead it has increased or decreased position size.
-					ExitTransactionInternal();
-					EnterTransactionInternal();
 					ChangeComboSizeInternal();
 				}
 				if( IsTrace) Log.Outdent();
 			} 
 			Position.Change(next.Position.Current);
 			if( Position.HasPosition) {
-				transactionPairsBinary.Current.UpdatePrice(tick);
 				comboTradesBinary.Current.UpdatePrice(tick);
 				double pnl = comboTrades.ProfitInPosition(comboTrades.Current,tick);
 				if( pnl != 0) {
@@ -119,20 +107,6 @@ namespace TickZoom.Common
 				}
 			}
 			return true;
-		}
-		
-		private void EnterTransactionInternal() {
-			if( IsTrace) Log.Trace("EnterTradeInternal()");
-			TransactionPairBinary pair = TransactionPairBinary.Create();
-			pair.Direction = next.Position.Current;
-			if( next.Position.Current > 0) {
-				pair.EntryPrice = Ticks[0].Ask;
-			} else {
-				pair.EntryPrice = Ticks[0].Bid;
-			}
-			pair.EntryTime = Ticks[0].Time;
-			pair.EntryBar = Chart.ChartBars.BarCount;
-			transactionPairsBinary.Add(pair);
 		}
 		
 		private void EnterComboTradeInternal() {
@@ -167,21 +141,6 @@ namespace TickZoom.Common
 			comboTradesBinary.Current = combo;
 		}
 		
-		private void ExitTransactionInternal() {
-			TransactionPairBinary transactionPair = transactionPairsBinary.Current;
-			Tick tick = Ticks[0];
-			if( transactionPair.Direction > 0) {
-				transactionPair.ExitPrice = tick.Bid;
-			} else {
-				transactionPair.ExitPrice = tick.Ask;
-			}
-			transactionPair.ExitTime = tick.Time;
-			transactionPair.ExitBar = Chart.ChartBars.BarCount;
-			transactionPair.Completed = true;
-			transactionPairsBinary.Current = transactionPair;
-			if( IsTrace) Log.Trace(transactionPair);
-		}
-		
 		private void ExitComboTradeInternal() {
 			TransactionPairBinary comboTrade = comboTradesBinary.Current;
 			Tick tick = Ticks[0];
@@ -205,21 +164,6 @@ namespace TickZoom.Common
 			Equity.OnSetOpenEquity(0);
 			Equity.OnChangeClosedEquity( pnl);
 			
-//			Chart.DrawArrow(Color.Black,12.5f,ChartBars.CurrentBar,Ticks[0].Bid+400,ChartBars.CurrentBar,Ticks[0].Bid+300);
-//			Chart.DrawText("EOD",Color.Black,ChartBars.CurrentBar,Ticks[0].Bid+400, TextOrientation.LowerRight);
-//			int comboExitPrice = 0;
-//			Color color;
-//			if( comboDirection > 0) {
-//				color = Color.Blue;
-//				comboExitPrice = Ticks[0].Ask;
-//			} else {
-//				color = Color.Red;
-//				comboExitPrice = Ticks[0].Bid;
-//			}
-//			if( Chart != null) {
-//				Chart.DrawLine(color,comboEntryBar,comboEntryPrice,
-//				               ChartBars.CurrentBar,comboExitPrice, LineStyle.Solid);
-//			}
 			Strategy.OnExitTrade();
 		}
 		
@@ -259,7 +203,7 @@ namespace TickZoom.Common
 			name = name.Replace("/","").Replace(@"\","");
 			TradeStatsReport tradeStats = new TradeStatsReport(this);
 			tradeStats.WriteReport(name, folder);
-			StrategyStats stats = new StrategyStats(TransactionPairs,ComboTrades);
+			StrategyStats stats = new StrategyStats(ComboTrades);
 			Equity.WriteReport(name,folder,stats);
 			IndexForReport index = new IndexForReport(this);
 			index.WriteReport(name, folder);
@@ -293,23 +237,9 @@ namespace TickZoom.Common
 			throw new NotImplementedException();
 		}
 
-		[Obsolete("Please use TransactionPairs instead.",true)]
-    	public TransactionPairs CompletedTrades {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(profitLoss,transactionPairsBinary.GetCompletedList(Ticks[0].Time,Ticks[0].Bid,Bars.BarCount));
-				} else {
-					return new TransactionPairs(profitLoss);
-				}
-			}
-		}
-
+		[Obsolete("Please use ComboTrades instead.",true)]
     	public TransactionPairs TransactionPairs {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(profitLoss,transactionPairsBinary.GetCompletedList(Ticks[0].Time,Ticks[0].Bid,Bars.BarCount));
-				} else {
-					return new TransactionPairs(profitLoss);
-				}
-			}
+			get { return null; }
 		}
 		
 		[Obsolete("Please use Performance.Equity.Daily instead.",true)]
@@ -419,7 +349,7 @@ namespace TickZoom.Common
 		}
 		
 		public StrategyStats CalculateStatistics() {
-			return new StrategyStats(TransactionPairs,ComboTrades);
+			return new StrategyStats(ComboTrades);
 		}
 		
 		[Obsolete("Please use the same property at Performance.Equity.* instead.",true)]

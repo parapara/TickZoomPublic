@@ -75,8 +75,8 @@ namespace Loaders
 		                      string expectedExitTime,
 		                     double expectedExitPrice)
 		{
-			Assert.Greater(strategy.Performance.TransactionPairs.Count, pairNum);
-    		TransactionPairs pairs = strategy.Performance.TransactionPairs;
+			Assert.Greater(strategy.Performance.ComboTrades.Count, pairNum);
+    		TransactionPairs pairs = strategy.Performance.ComboTrades;
     		TransactionPair pair = pairs[pairNum];
     		TimeStamp expEntryTime = new TimeStamp(expectedEntryTime);
     		Assert.AreEqual( expEntryTime, pair.EntryTime, "Pair " + pairNum + " Entry");

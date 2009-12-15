@@ -35,14 +35,14 @@ namespace TickZoom.TradingFramework
 		private EquityStats equityStats;
 		public override void Constructor(TransactionPairs trades)
 		{
-			strategyStats = new StrategyStats(trades,trades);
+			strategyStats = new StrategyStats(trades);
 			equityStats = new EquityStats(trades,trades,trades,trades);
-			baseStats = tradeStats = strategyStats.TransactionPairs;
+			baseStats = tradeStats = strategyStats.ComboTrades;
 		}
 		[Test]
 		public void TransactionPair()
 		{
-			Assert.AreEqual(186,strategyStats.TransactionPairs.Count,"Daily Count");
+			Assert.AreEqual(186,strategyStats.ComboTrades.Count,"Daily Count");
 			Assert.AreEqual(-0.0300,Math.Round(equityStats.Daily.Average,2),"Daily Average");
 		}
 		[Test]

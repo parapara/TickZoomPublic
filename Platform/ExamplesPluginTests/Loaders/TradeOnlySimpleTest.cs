@@ -68,7 +68,7 @@ namespace Loaders
 		
 		[Test]
 		public void CompareTradeCount() {
-			Assert.AreEqual( 21,strategy.Performance.TransactionPairs.Count, "trade count");
+			Assert.AreEqual( 21,strategy.Performance.ComboTrades.Count, "trade count");
 		}
 		
 		[Test]

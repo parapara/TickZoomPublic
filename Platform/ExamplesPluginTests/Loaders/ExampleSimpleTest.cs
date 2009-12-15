@@ -92,7 +92,7 @@ namespace Loaders
 		
 		[Test]
 		public void CompareTradeCount() {
-			Assert.AreEqual( 378,strategy.Performance.TransactionPairs.Count, "trade count");
+			Assert.AreEqual( 378,strategy.Performance.ComboTrades.Count, "trade count");
 		}
 		
 		[Test]
@@ -104,7 +104,7 @@ namespace Loaders
 
 		[Test]
 		public void LastTradeTest() {
-			VerifyPair( strategy, strategy.Performance.Trades.Count-1, "1989-12-29 09:00:00.000", 21.67,
+			VerifyPair( strategy, strategy.Performance.ComboTrades.Count-1, "1989-12-29 09:00:00.000", 21.67,
 			                 "1989-12-29 09:00:00.003",21.82);
 		}
 		

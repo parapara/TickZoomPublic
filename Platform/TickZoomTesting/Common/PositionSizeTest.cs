@@ -219,8 +219,8 @@ namespace TickZoom.Common
 			expected.EntryTime = new TimeStamp("2004-01-02 09:51:51.642");
 			expected.ExitPrice = 106.91;
 			expected.ExitTime = new TimeStamp("2004-01-02 09:52:09.687");
-			Assert.AreEqual(expected,performance.TransactionPairs.GetBinary(0),"First Trade");
-			Assert.AreEqual(.02,Math.Round(performance.TransactionPairs.CalcProfitLoss(0),3),"First Trade PnL");
+			Assert.AreEqual(expected,performance.ComboTrades.GetBinary(0),"First Trade");
+			Assert.AreEqual(.02,Math.Round(performance.ComboTrades.CalcProfitLoss(0),3),"First Trade PnL");
 		}
 		[Test]
 		public void TradeTesting7() {
@@ -231,14 +231,14 @@ namespace TickZoom.Common
 			expected.EntryTime = new TimeStamp("2004-01-05 09:54:02.794");
 			expected.ExitPrice = 106.24;
 			expected.ExitTime = new TimeStamp("2004-01-05 09:55:44.312");
-			Assert.AreEqual(expected,performance.TransactionPairs.GetBinary(7),"Trade 7");
+			Assert.AreEqual(expected,performance.ComboTrades.GetBinary(7),"Trade 7");
 		}
 		[Test]
 		public void TradeTesting8() {
 			Performance performance = TradeTickProcessing(0,0,30000);
 			TransactionPairBinary expected = TransactionPairBinary.Create();
 			expected.SetProperties("2,106.24,2004-01-05 09:55:44.312,106.25,2004-01-05 10:06:27.284");
-			Assert.AreEqual(expected,performance.TransactionPairs.GetBinary(8),"Trade 8");
+			Assert.AreEqual(expected,performance.ComboTrades.GetBinary(8),"Trade 8");
 		}
 		[Test]
 		public void DailyTesting() {

@@ -29,12 +29,10 @@ namespace TickZoom.Common
 {
 	public class StrategyStats
 	{
-		TradeStats transactionPairs;
 		TradeStats comboTrades;
 		
-		public StrategyStats(TransactionPairs transactionPairs, TransactionPairs combo)
+		public StrategyStats(TransactionPairs combo)
 		{
-			this.transactionPairs = new TradeStats( transactionPairs);
 			this.comboTrades = new TradeStats( combo);
 		}
 		
@@ -47,8 +45,9 @@ namespace TickZoom.Common
 			get { return comboTrades; }
 		}
 		
+		[Obsolete("Please use ComboTrades instead.",true)]
 		public TradeStats TransactionPairs {
-			get { return transactionPairs; }
+			get { return null; }
 		}
 
 #region Obsolete

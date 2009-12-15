@@ -57,14 +57,14 @@ namespace TickZoom.TradingFramework
 			starter.ProjectProperties.Starter.Symbols = "USD_JPY";
 			starter.Run(random);
 			
-			Constructor(random.Performance.TransactionPairs);
+			Constructor(random.Performance.ComboTrades);
 			Assert.IsNotNull(baseStats,"MoneyManagerSupport constructor");
-			Assert.Greater(random.Performance.TransactionPairs.Count,0,"Need some trades to do this.");
+			Assert.Greater(random.Performance.ComboTrades.Count,0,"Need some trades to do this.");
 			
 //			Uncomment this loop to log the trades and compare to below
 //			as to what they're supposed to be.
 				
-			TransactionPairs trades = random.Performance.TransactionPairs;
+			TransactionPairs trades = random.Performance.ComboTrades;
 			if( log.IsDebugEnabled) {
 				for( int i=0; i<trades.Count; i++) {
 					log.Debug( i + ": " + trades[i]);
@@ -197,7 +197,7 @@ namespace TickZoom.TradingFramework
 		
 		[Test]
 		public void Count() {
-			Assert.AreEqual(baseStats.Count,random.Performance.TransactionPairs.Count,"Count of Trades");
+			Assert.AreEqual(baseStats.Count,random.Performance.ComboTrades.Count,"Count of Trades");
 			Assert.AreEqual(186,baseStats.Count,"Count of Trades");
 		}
 		

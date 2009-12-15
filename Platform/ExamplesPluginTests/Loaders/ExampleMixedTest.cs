@@ -116,16 +116,16 @@ namespace Loaders
 		
 		[Test]
 		public void CompareTradeCount() {
-			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.TransactionPairs;
-			TransactionPairs fullTicksRTs = fullTickData.Performance.TransactionPairs;
+			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.ComboTrades;
+			TransactionPairs fullTicksRTs = fullTickData.Performance.ComboTrades;
 			Assert.AreEqual(fourTicksRTs.Count,fullTicksRTs.Count, "trade count");
 			Assert.AreEqual(472,fullTicksRTs.Count, "trade count");
 		}
 			
 		[Test]
 		public void CompareAllPairs() {
-			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.TransactionPairs;
-			TransactionPairs fullTicksRTs = fullTickData.Performance.TransactionPairs;
+			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.ComboTrades;
+			TransactionPairs fullTicksRTs = fullTickData.Performance.ComboTrades;
 			for( int i=0; i<fourTicksRTs.Count && i<fullTicksRTs.Count; i++) {
 				TransactionPair fourRT = fourTicksRTs[i];
 				TransactionPair fullRT = fullTicksRTs[i];
@@ -138,8 +138,8 @@ namespace Loaders
 		
 		[Test]
 		public void RoundTurn1() {
-			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.TransactionPairs;
-			TransactionPairs fullTicksRTs = fullTickData.Performance.TransactionPairs;
+			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.ComboTrades;
+			TransactionPairs fullTicksRTs = fullTickData.Performance.ComboTrades;
 			int i=1;
 			TransactionPair fourRT = fourTicksRTs[i];
 			TransactionPair fullRT = fullTicksRTs[i];
@@ -151,8 +151,8 @@ namespace Loaders
 		
 		[Test]
 		public void RoundTurn2() {
-			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.TransactionPairs;
-			TransactionPairs fullTicksRTs = fullTickData.Performance.TransactionPairs;
+			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.ComboTrades;
+			TransactionPairs fullTicksRTs = fullTickData.Performance.ComboTrades;
 			int i=2;
 			TransactionPair fourRT = fourTicksRTs[i];
 			TransactionPair fullRT = fullTicksRTs[i];
@@ -164,8 +164,8 @@ namespace Loaders
 		
 		[Test]
 		public void LastRoundTurn() {
-			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.TransactionPairs;
-			TransactionPairs fullTicksRTs = fullTickData.Performance.TransactionPairs;
+			TransactionPairs fourTicksRTs = fourTicksPerBar.Performance.ComboTrades;
+			TransactionPairs fullTicksRTs = fullTickData.Performance.ComboTrades;
 			int i = fourTicksRTs.Current;
 			TransactionPair fourRT = fourTicksRTs[i];
 			TransactionPair fullRT = fullTicksRTs[i];
