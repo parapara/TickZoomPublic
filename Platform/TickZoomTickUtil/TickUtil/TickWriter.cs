@@ -170,7 +170,7 @@ namespace TickZoom.TickUtil
 			    try { 
 					if( !keepFileOpen) {
 		    			fs = new FileStream(fileName, FileMode.Append);
-			    		log.Debug("!keepFileOpen - Open()");
+		    			if( trace) log.Trace("!keepFileOpen - Open()");
 		    			memory = new MemoryStream();
 					}
 			    	tick.ToWriter(memory);
@@ -180,7 +180,7 @@ namespace TickZoom.TickUtil
 			    	memory.Position = 0;
 					if( !keepFileOpen) {
 			    		fs.Close();
-			    		log.Debug("!keepFileOpen - Close()");
+			    		if( trace) log.Trace("!keepFileOpen - Close()");
 			    		fs = null;
 			    	}
 		    		if( errorCount > 0) {
@@ -191,11 +191,7 @@ namespace TickZoom.TickUtil
 			    } catch(IOException e) { 
 	    			errorCount++;
 			    	log.Debug(symbol + ": " + e.Message + "\nPausing " + currentSleepSeconds + " seconds before retry."); 
-			    	Factory.Parallel.Yield();
-			    	if( currentSleepSeconds < 300) {
-				    	currentSleepSeconds *= 2;
-				    	currentSleepSeconds = Math.Min(currentSleepSeconds,60);
-			    	}
+			    	Factory.Parallel.Sleep(3000);
 			    } 
 				count++;
 			} while( errorCount > 0);
