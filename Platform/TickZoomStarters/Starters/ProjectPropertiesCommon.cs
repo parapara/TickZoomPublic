@@ -101,7 +101,7 @@ namespace TickZoom.Common
 				    		} else if( "chart".Equals(name)) {
 					    		HandleObject(Chart, reader);
 				    		} else if( "data".Equals(name)) {
-					    		HandleObject(Starter.SymbolInfo, reader);
+					    		HandleObject(Starter.SymbolProperties, reader);
 				    		} else if( "engine".Equals(name)) {
 					    		HandleObject(Engine, reader);
 			    			}

@@ -46,16 +46,16 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of SymbolDictionary.
 	/// </summary>
-	public class SymbolDictionary : IEnumerable<SymbolInfoCommon>
+	public class SymbolDictionary : IEnumerable<SymbolProperties>
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(SymbolDictionary));
 		private static object locker = new object();
-		private SymbolInfoCommon @default;
+		private SymbolProperties @default;
 		private List<SymbolCategory> categories = new List<SymbolCategory>();
 		
 		public SymbolDictionary()
 		{
-			@default = new SymbolInfoCommon();
+			@default = new SymbolProperties();
 		}
 
 		public static SymbolDictionary Create(string name, string defaultContents) {
@@ -170,7 +170,7 @@ namespace TickZoom.Common
 			    		} else if( "symbol".Equals(reader.Name)) {
 			    			string name = reader.GetAttribute("name");
 			    			string universal = reader.GetAttribute("universal");
-			    			SymbolInfoCommon symbol = category.Default.Copy();
+			    			SymbolProperties symbol = category.Default.Copy();
 		    				symbol.Symbol = name;
 		    				if( universal != null) {
 //		    					symbol.UniversalSymbol = universal;
@@ -245,8 +245,8 @@ namespace TickZoom.Common
 			throw new ApplicationException(msg + lineStr);
 		}
 		
-		public SymbolInfoCommon Get(string symbol) {
-			foreach( SymbolInfoCommon properties in this) {
+		public SymbolProperties Get(string symbol) {
+			foreach( SymbolProperties properties in this) {
 				if( symbol == properties.Symbol) {
 					return properties;
 				}
@@ -255,10 +255,10 @@ namespace TickZoom.Common
 		}
 		
 		
-		public IEnumerator<SymbolInfoCommon> GetEnumerator()
+		public IEnumerator<SymbolProperties> GetEnumerator()
 		{
 			foreach( SymbolCategory category in categories) {
-				foreach( SymbolInfoCommon properties in category) {
+				foreach( SymbolProperties properties in category) {
 					yield return properties;
 				}
 			}

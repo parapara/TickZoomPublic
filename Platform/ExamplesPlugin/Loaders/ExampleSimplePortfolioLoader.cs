@@ -53,7 +53,7 @@ namespace TickZoom
 			/// </summary>
 			
 			// Okay, adding the simple example
-			for( int i=0; i<properties.Starter.SymbolInfo.Length; i++) {
+			for( int i=0; i<properties.Starter.SymbolProperties.Length; i++) {
 				string symbol = properties.Starter.SymbolInfo[i].Symbol;
 				string strategyName = "ExampleSimpleStrategy";
 				string strategyInstanceName = "ExampleSimpleStrategy-"+symbol;

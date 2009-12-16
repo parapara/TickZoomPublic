@@ -42,7 +42,7 @@ namespace TickZoom
 		}
 	
 		public override void OnLoad(ProjectProperties properties) {
-			foreach( SymbolInfo symbol in properties.Starter.SymbolInfo) {
+			foreach( ISymbolProperties symbol in properties.Starter.SymbolProperties) {
 				string name = symbol.Symbol;				
 				Strategy strategy = CreateStrategy("ExampleSimpleStrategy","ExampleOrder-"+name);
 				strategy.SymbolDefault = name;

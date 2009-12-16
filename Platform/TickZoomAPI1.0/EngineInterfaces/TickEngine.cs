@@ -67,12 +67,6 @@ namespace TickZoom.Api
 			set;
 		}
 		
-		[Obsolete("Please use SymbolInfo instead.")]
-		SymbolProperties[] SymbolProperties {
-			get;
-			set;
-		}
-		
 		SymbolInfo[] SymbolInfo {
 			get;
 			set;

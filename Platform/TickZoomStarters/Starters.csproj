@@ -67,6 +67,7 @@
     <Compile Include="Starters\RealTimeStarter.cs" />
     <Compile Include="Starters\StarterCommon.cs" />
     <Compile Include="Starters\StarterProperties.cs" />
+    <Compile Include="Starters\SymbolProperties.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TickZoomAPI1.0\API1.0.csproj">

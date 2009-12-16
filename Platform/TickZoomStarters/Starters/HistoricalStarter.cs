@@ -88,7 +88,7 @@ namespace TickZoom.Common
 			// Chaining of models.
 			engine.Model = model;
 			engine.ChartProperties = ProjectProperties.Chart;
-			engine.SymbolInfo = ProjectProperties.Starter.SymbolInfo;
+			engine.SymbolInfo = ProjectProperties.Starter.SymbolProperties;
 			
 			engine.IntervalDefault = ProjectProperties.Starter.IntervalDefault;
 //			engine.BreakAtBar = ProjectProperties.Engine.BreakAtBar;

@@ -102,7 +102,7 @@ namespace TickZoom.Common
 		
 		public Provider[] SetupTickReaders(bool quietMode, bool singleLoad) {
 			List<Provider> senderList = new List<Provider>();
-			SymbolInfo[] symbols = ProjectProperties.Starter.SymbolInfo;
+			SymbolInfo[] symbols = ProjectProperties.Starter.SymbolProperties;
 			for(int i=0; i<symbols.Length; i++) {
 	    		TickReader tickReader = new TickReader();
 	    		tickReader.MaxCount = EndCount;	
@@ -125,7 +125,7 @@ namespace TickZoom.Common
 		public Provider[] SetupDataProviders() {
 			try {
 				List<Provider> senderList = new List<Provider>();
-				SymbolInfo[] symbols = ProjectProperties.Starter.SymbolInfo;
+				SymbolInfo[] symbols = ProjectProperties.Starter.SymbolProperties;
 				for(int i=0; i<symbols.Length; i++) {
 					Provider provider = Factory.Provider.RemoteProvider();
 					senderList.Add(provider);
@@ -139,7 +139,7 @@ namespace TickZoom.Common
 		
 		public virtual TickQueue[] SetupTickWriters() {
 			List<TickQueue> queueList = new List<TickQueue>();
-			SymbolInfo[] symbols = ProjectProperties.Starter.SymbolInfo;
+			SymbolInfo[] symbols = ProjectProperties.Starter.SymbolProperties;
 			for(int i=0; i<symbols.Length; i++) {
 	    		TickWriter tickWriter = new TickWriter(false);
 	    		tickWriter.Initialize(DataFolder,symbols[i]);

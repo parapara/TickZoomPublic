@@ -71,7 +71,7 @@ namespace TickZoom
 		Interval intervalChartBar = initialInterval;
 		Interval intervalChartUpdate = initialInterval;
 		string storageFolder;
-		string symbol;
+		SymbolInfo symbol;
 		
 	    public ChartControl()
 		{
@@ -533,10 +533,10 @@ namespace TickZoom
 			}
 		}
 		
-		public void InitializeTick(Tick tick) {
+		public void OnInitialize() {
 		    InitializeChart( );
 			if( !priceGraphPane.XAxis.Scale.IsAnyOrdinal) {
-				SetDefaultScale( tick.Price, (double) tick.Time);
+//				SetDefaultScale( tick.Price, (double) tick.Time);
 			}
 		}
 		
@@ -1082,7 +1082,7 @@ namespace TickZoom
 			set { intervalChartUpdate = value; }
 		}
 		
-		public string Symbol {
+		public SymbolInfo Symbol {
 			get { return symbol; }
 			set { symbol = value; }
 		}

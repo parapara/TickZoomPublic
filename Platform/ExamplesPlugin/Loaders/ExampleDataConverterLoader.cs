@@ -20,7 +20,7 @@ namespace TickZoom
 		
 		public override void OnInitialize(ProjectProperties properties) {
 			// uncomment as needed to convert Ascii into tck
-			SymbolInfo[] symbolProperties = properties.Starter.SymbolInfo;
+			ISymbolProperties[] symbolProperties = properties.Starter.SymbolProperties;
 			for( int i=0; i<symbolProperties.Length; i++) {
 				TSTickConverter tsConverter = new TSTickConverter(symbolProperties[i]);
 				tsConverter.Convert(false);

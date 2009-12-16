@@ -134,7 +134,7 @@ namespace Loaders
    			ChartControl chart;
    			for( int i=0; i<chartThreads.Count; i++) {
 				chart = GetChart(i);
-				if( chart.Symbol == symbol) {
+				if( chart.Symbol.Symbol == symbol) {
 					return chart;
 				}
    			}

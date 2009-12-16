@@ -684,7 +684,7 @@ namespace TickZoom
     		UpdateScaleCheck( displaySeries );
 		}
 		
-		public void InitializeTick(Tick tick) {
+		public void OnInitialize() {
        		context.Send(new SendOrPostCallback(
        		delegate(object state)
        	    {
@@ -1356,9 +1356,9 @@ namespace TickZoom
 			set { intervalChartUpdate = value; }
 		}
         
-		public string Symbol {
-			get { return symbol.Symbol; }
-			set { symbol = Factory.Symbol.LookupSymbol(value); }
+		public SymbolInfo Symbol {
+			get { return symbol; }
+			set { symbol = value; }
 		}
 		
 		public StockPointList StockPointList {

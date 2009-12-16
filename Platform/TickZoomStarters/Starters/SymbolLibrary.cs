@@ -43,21 +43,21 @@ namespace TickZoom.Common
 {
 	public class SymbolLibrary 
 	{
-		Dictionary<string,SymbolInfoCommon> symbolMap;
-		Dictionary<ulong,SymbolInfoCommon> universalMap;
+		Dictionary<string,SymbolProperties> symbolMap;
+		Dictionary<ulong,SymbolProperties> universalMap;
 		public SymbolLibrary() {
-			symbolMap = new Dictionary<string, SymbolInfoCommon>();
+			symbolMap = new Dictionary<string, SymbolProperties>();
 			SymbolDictionary dictionary = SymbolDictionary.Create("universal",SymbolDictionary.UniversalDictionary);
-			IEnumerable<SymbolInfoCommon> enumer = dictionary;
-			foreach( SymbolInfoCommon symbolProperties in dictionary) {
+			IEnumerable<SymbolProperties> enumer = dictionary;
+			foreach( SymbolProperties symbolProperties in dictionary) {
 				symbolMap[symbolProperties.Symbol] = symbolProperties;
 			}
 			dictionary = SymbolDictionary.Create("user",SymbolDictionary.UserDictionary);
-			foreach( SymbolInfoCommon symbolProperties in dictionary) {
+			foreach( SymbolProperties symbolProperties in dictionary) {
 				symbolMap[symbolProperties.Symbol] = symbolProperties;
 			}
 			ulong universalIdentifier = 1;
-			universalMap = new Dictionary<ulong, SymbolInfoCommon>();
+			universalMap = new Dictionary<ulong, SymbolProperties>();
 			foreach( var kvp in symbolMap) {
 				kvp.Value.BinaryIdentifier = universalIdentifier;
 				universalMap.Add(universalIdentifier,kvp.Value);
@@ -65,17 +65,21 @@ namespace TickZoom.Common
 			}
 		}
 		
-		public SymbolInfo LookupSymbol(string symbol) {
-			SymbolInfoCommon symbolProperties;
+		public SymbolProperties GetSymbolProperties(string symbol) {
+			SymbolProperties symbolProperties;
 			if( symbolMap.TryGetValue(symbol.Trim(),out symbolProperties)) {
 				return symbolProperties;
 			} else {
 				throw new ApplicationException( "Sorry, symbol " + symbol + " was not found in any symbol dictionary.");
 			}
 		}
+		
+		public SymbolInfo LookupSymbol(string symbol) {
+			return GetSymbolProperties(symbol);
+		}
 	
 		public SymbolInfo LookupSymbol(ulong universalIdentifier) {
-			SymbolInfoCommon symbolProperties;
+			SymbolProperties symbolProperties;
 			if( universalMap.TryGetValue(universalIdentifier,out symbolProperties)) {
 				return symbolProperties;
 			} else {

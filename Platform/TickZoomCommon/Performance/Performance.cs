@@ -59,7 +59,7 @@ namespace TickZoom.Common
 		public override void OnInitialize()
 		{
 			next = Chain.Next.Model as StrategySupport;
-			profitLoss.FullPointValue = Data.FullPointValue;
+			profitLoss.FullPointValue = Data.SymbolInfo.FullPointValue;
 
 			if( graphAveragePrice) {
 				avgPrice = new IndicatorCommon();

@@ -36,21 +36,21 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of SymbolCategory.
 	/// </summary>
-	public class SymbolCategory : IEnumerable<SymbolInfoCommon>
+	public class SymbolCategory : IEnumerable<SymbolProperties>
 	{
 		string name;
-		SymbolInfoCommon @default;
+		SymbolProperties @default;
 		List<SymbolCategory> categories = new List<SymbolCategory>();
-		List<SymbolInfoCommon> symbols = new List<SymbolInfoCommon>();
+		List<SymbolProperties> symbols = new List<SymbolProperties>();
 		
-		public SymbolCategory(SymbolInfoCommon symbolProperties)
+		public SymbolCategory(SymbolProperties symbolProperties)
 		{
 			@default = symbolProperties;
 		}
 		
 		public SymbolCategory()
 		{
-			@default = new SymbolInfoCommon();
+			@default = new SymbolProperties();
 		}
 		
 		public string Name {
@@ -62,22 +62,22 @@ namespace TickZoom.Common
 			get { return categories; }
 		}
 		
-		public List<SymbolInfoCommon> Symbols {
+		public List<SymbolProperties> Symbols {
 			get { return symbols; }
 		}
 		
-		public SymbolInfoCommon Default {
+		public SymbolProperties Default {
 			get { return @default; }
 			set { @default = value; }
 		}
 		
-		public IEnumerator<SymbolInfoCommon> GetEnumerator()
+		public IEnumerator<SymbolProperties> GetEnumerator()
 		{
-			foreach( SymbolInfoCommon properties in symbols) {
+			foreach( SymbolProperties properties in symbols) {
 				yield return properties;
 			}
 			foreach( SymbolCategory category in categories) {
-				foreach( SymbolInfoCommon properties in category ) {
+				foreach( SymbolProperties properties in category ) {
 					yield return properties;
 				}
 			}

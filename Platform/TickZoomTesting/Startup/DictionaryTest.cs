@@ -43,7 +43,7 @@ namespace TickZoom.StarterTest
 		{
 			string fileName = @"..\..\Platform\TickZoomTesting\Startup\dictionary.tzdict";
 			SymbolDictionary dictionary = SymbolDictionary.Create(new StreamReader(fileName));
-			foreach( SymbolInfoCommon properties in dictionary) {
+			foreach( SymbolProperties properties in dictionary) {
 				InstrumentImpl instrument = InstrumentImpl.Get(properties.Symbol);
 				Assert.AreEqual( instrument.DepthIncrement, properties.Level2Increment);
 				Assert.AreEqual( instrument.LotSize, properties.Level2LotSize);
@@ -55,7 +55,7 @@ namespace TickZoom.StarterTest
 		{
 			string fileName = @"..\..\Platform\TickZoomTesting\Startup\dictionary.tzdict";
 			SymbolDictionary dictionary = SymbolDictionary.Create(new StreamReader(fileName));
-			SymbolInfoCommon properties = dictionary.Get("USD/JPY");
+			SymbolProperties properties = dictionary.Get("USD/JPY");
 			InstrumentImpl instrument = InstrumentImpl.Get("USD/JPY");
 			Assert.AreEqual( instrument.DepthIncrement, properties.Level2Increment);
 			Assert.AreEqual( instrument.LotSize, properties.Level2LotSize);

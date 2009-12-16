@@ -32,14 +32,6 @@ namespace TickZoom.Api
 	/// </summary>
 	public interface Data
 	{
-		double MinimumTick {
-			get;
-		}
-		
-		int PricePrecision {
-			get;
-		}
-		
 		Ticks Ticks {
 			get;
 		}
@@ -51,15 +43,26 @@ namespace TickZoom.Api
 		
 		Bars Get(Interval interval);
 		
-		/// <summary>
-		/// Used to convert profits and losses from points to currency amount.
-		/// The RoundTurn class uses the formula: Point profits or loss times position size times conversion factor.
-		/// </summary>
-		[Obsolete("Please use FullPointValue instead.",true)]
+		SymbolInfo SymbolInfo {
+			get;
+		}
+		
+		[Obsolete("Please use the SymbolInfo property",true)]
+		double MinimumTick {
+			get;
+		}
+		
+		[Obsolete("Please use the SymbolInfo property",true)]
+		int PricePrecision {
+			get;
+		}
+		
+		[Obsolete("Please use the SymbolInfo property",true)]
 		double ConversionFactor {
 			get;
 		}
 		
+		[Obsolete("Please use the SymbolInfo property",true)]
 		double FullPointValue {
 			get;
 		}
@@ -68,11 +71,15 @@ namespace TickZoom.Api
 		bool SimulateTicks {
 			get;
 		}
-		
+		/// <summary>
+		/// Obsolete. Please use SymbolInfo property.
+		/// </summary>
+		[Obsolete("Please use the SymbolInfo property",true)]
 		string Symbol {
 			get;
 		}
 		
+		[Obsolete("Please use the SymbolInfo property",true)]
 		SymbolInfo UniversalSymbol {
 			get;
 		}

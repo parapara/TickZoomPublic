@@ -42,7 +42,7 @@ namespace TickZoom
 		}
 		
 		public override void OnInitialize(ProjectProperties properties) {
-			if( properties.Starter.SymbolInfo.Length < 2) {
+			if( properties.Starter.SymbolProperties.Length < 2) {
 				throw new ApplicationException( "This loader requires at least 2 symbols.");
 			}
 		}

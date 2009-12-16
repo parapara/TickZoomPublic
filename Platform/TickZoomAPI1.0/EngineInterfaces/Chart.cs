@@ -31,7 +31,13 @@ namespace TickZoom.Api
 
 	public interface Chart
 	{
-		void InitializeTick( Tick tick);
+		/// <summary>
+		/// Called by the engine kernel during initialization which is after all
+		/// properties have been set by the loader and engine and prior to feeding
+		/// the chart any data.
+		/// </summary>
+		void OnInitialize();
+		
 		/// <summary>
 		/// DrawTrade allows the Charting implementation to draw the trade on the
 		/// chart using the order information in LogicalOrder. 
@@ -82,16 +88,11 @@ namespace TickZoom.Api
 			set ;
 		}
 		
-		string Symbol {
+		SymbolInfo Symbol {
 			get;
 			set;
 		}
 		
-//		Data Data {
-//			get;
-//			set;
-//		}
-//		
 		Bars UpdateBars {
 			get;
 			set;

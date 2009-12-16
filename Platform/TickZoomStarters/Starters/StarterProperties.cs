@@ -50,7 +50,8 @@ namespace TickZoom.Common
 		TickZoom.Api.TimeStamp endTime;
 		ChartProperties chartProperties;
 		EngineProperties engineProperties;
-		List<TickZoom.Api.SymbolInfo> symbolInfo = new List<TickZoom.Api.SymbolInfo>();
+		
+		List<SymbolProperties> symbolInfo = new List<SymbolProperties>();
 		
 		public StarterProperties(ChartProperties chartProperties, EngineProperties engineProperties)
 		{
@@ -70,7 +71,8 @@ namespace TickZoom.Common
 				SymbolLibrary library = new SymbolLibrary();
 				string[] symbols = value.Split(new char[] { ',' });
 				for( int i=0; i<symbols.Length; i++) {
-					SymbolInfo symbol = library.LookupSymbol(symbols[i].Trim());
+					SymbolProperties symbol = library.GetSymbolProperties(symbols[i].Trim());
+					symbol.ChartGroup = i+1;
 					symbolInfo.Add(symbol);
 				}
 			}
@@ -97,18 +99,12 @@ namespace TickZoom.Common
 			}
 		}
 		
-		[Obsolete("Please use SymbolInfo instead.",true)]
-		public TickZoom.Api.SymbolProperties[] SymbolProperties {
-			get {
-				List<SymbolProperties> list = new List<SymbolProperties>();
-				foreach( var item in symbolInfo) {
-					list.Add((SymbolProperties) item);
-				}
-				return list.ToArray();
-			}
+		public ISymbolProperties[] SymbolProperties {
+			get { return symbolInfo.ToArray(); }
 		}
 		
-		public TickZoom.Api.SymbolInfo[] SymbolInfo {
+		[Obsolete("Please use SymbolProperties instead since it is mutable meaning you can programmatically override values from whatever was set (or not set) in the symbol dictionary.",true)]
+		public SymbolInfo[] SymbolInfo {
 			get { return symbolInfo.ToArray(); }
 		}
 	}

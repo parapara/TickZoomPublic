@@ -174,7 +174,7 @@ namespace TickZoom.Common
 	    			
 			TickEngine engine = Factory.Engine.TickEngine;
 			engine.Model = loader.TopModel;
-			engine.SymbolInfo = ProjectProperties.Starter.SymbolInfo;
+			engine.SymbolInfo = ProjectProperties.Starter.SymbolProperties;
 			
 			engine.IntervalDefault = ProjectProperties.Starter.IntervalDefault;
 			engine.EnableTickFilter = ProjectProperties.Engine.EnableTickFilter;

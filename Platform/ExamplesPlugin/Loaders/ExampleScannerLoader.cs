@@ -47,7 +47,7 @@ namespace TickZoom
 		public override void OnLoad(ProjectProperties properties) {
 			// Loop through and setup a default strategy to handle orders
 			// for each symbol.
-			for( int i=0; i<properties.Starter.SymbolInfo.Length; i++) {
+			for( int i=0; i<properties.Starter.SymbolProperties.Length; i++) {
 				string symbol = properties.Starter.SymbolInfo[i].Symbol;
 				ModelInterface market = CreateStrategy("StrategyCommon",symbol+"Strategy");
 				market.SymbolDefault = symbol;
