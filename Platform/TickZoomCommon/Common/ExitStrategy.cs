@@ -88,11 +88,7 @@ namespace TickZoom.Common
 			}
 			if( (strategySignal>0) != Strategy.Position.IsLong || (strategySignal<0) != Strategy.Position.IsShort ) {
 				strategySignal = Strategy.Position.Current;
-				if( strategySignal > 0) {
-					entryPrice = tick.Ask;
-				} else {
-					entryPrice = tick.Bid;
-				}
+				entryPrice = Strategy.Position.Price;
 				maxPnl = 0;
 				Position.Copy(Strategy.Position);
 				trailStop = 0;

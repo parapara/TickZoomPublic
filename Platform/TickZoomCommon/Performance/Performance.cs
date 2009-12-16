@@ -104,13 +104,7 @@ namespace TickZoom.Common
 		}
 		
 		private void EnterComboTradeInternal() {
-			if( next.Position.Current > 0) {
-				EnterComboTrade(Ticks[0].Ask);
-			} else if( next.Position.Current < 0) {
-				EnterComboTrade(Ticks[0].Bid);
-			} else {
-				throw new ApplicationException( "Direction was unset.");
-			}
+			EnterComboTrade(next.Position.Price);
 		}
 
 		public void EnterComboTrade(double fillPrice) {
@@ -127,22 +121,14 @@ namespace TickZoom.Common
 		private void ChangeComboSizeInternal() {
 			if( IsTrace) Log.Trace("ChangeComboSizeInternal()");
 			TransactionPairBinary combo = comboTradesBinary.Current;
-			if( next.Position.Current > 0) {
-				combo.ChangeSize(next.Position.Current,Ticks[0].Ask);
-			} else {
-				combo.ChangeSize(next.Position.Current,Ticks[0].Bid);
-			}
+			combo.ChangeSize(next.Position.Current,next.Position.Price);
 			comboTradesBinary.Current = combo;
 		}
 		
 		private void ExitComboTradeInternal() {
 			TransactionPairBinary comboTrade = comboTradesBinary.Current;
 			Tick tick = Ticks[0];
-			if( comboTrade.Direction > 0) {
-				ExitComboTrade(tick.Bid);
-			} else {
-				ExitComboTrade(tick.Ask);
-		    }
+			ExitComboTrade(next.Position.Price);
 		}
 					
 		public void ExitComboTrade(double fillPrice) {

@@ -66,8 +66,7 @@ namespace TickZoom.Common
 			} else if( position < current) {
 				price = model.Data.Ticks[0].Bid;
 			} else {
-				price = 0;
-//				throw new ApplicationException("Position.Change called with the same position. You must pass a different position value than Position.Current in order to call Change().");
+				throw new ApplicationException("Position.Change called with the same position. You must pass a different position value than Position.Current in order to call Change().");
 			}
 			Change( position, price, model.Data.Ticks[0].Time);
 		}
