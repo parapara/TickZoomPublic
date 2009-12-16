@@ -94,7 +94,7 @@ namespace TickZoom.Common
 					entryPrice = tick.Bid;
 				}
 				maxPnl = 0;
-				Position.Change(strategySignal);
+				Position.Copy(Strategy.Position);
 				trailStop = 0;
 				breakEvenStop = 0;
 				CancelOrders();
@@ -102,7 +102,7 @@ namespace TickZoom.Common
 			
 			if( Position.HasPosition ) {
 				// copy signal in case of increased position size
-				Position.Change(Strategy.Position.Current);
+				Position.Copy(Strategy.Position);
 				double exitPrice;
 				if( strategySignal > 0) {
 					exitPrice = tick.Bid;

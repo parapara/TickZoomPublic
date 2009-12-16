@@ -67,8 +67,8 @@ namespace TickZoom.Common
 				price = model.Data.Ticks[0].Bid;
 			} else {
 				price = 0;
+//				throw new ApplicationException("Position.Change called with the same position. You must pass a different position value than Position.Current in order to call Change().");
 			}
-			price = model.Data.Ticks[0].Bid;
 			Change( position, price, model.Data.Ticks[0].Time);
 		}
 		
@@ -76,9 +76,6 @@ namespace TickZoom.Common
 			#if TRACE
 			if( value != current) {
 				if( trace) log.Trace(model.Name+".Signal("+value+")");
-				if( trace) log.TickOn();
-			} else {
-				if( trace) log.TickOff();
 			}
 			#endif
 			if( current != position) {
@@ -86,6 +83,10 @@ namespace TickZoom.Common
 				this.price = price;
 				this.current = position;
 			}
+		}
+		
+		public void Copy( PositionInterface other) {
+			Change(other.Current,other.Price,other.Time);
 		}
 		
 		public string Symbol {

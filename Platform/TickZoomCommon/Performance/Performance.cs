@@ -82,12 +82,6 @@ namespace TickZoom.Common
 					EnterComboTradeInternal();
 				} else if( next.Position.IsFlat) {
 					ExitComboTradeInternal();
-//					if( Position.IsShort && graphTrades) {
-//						Chart.DrawArrow(ArrowDirection.Up,Color.Black,12.5f,Chart.ChartBars.BarCount,Ticks[0].Ask);
-//					}
-//					if( Position.IsLong && graphTrades) {
-//						Chart.DrawArrow(ArrowDirection.Down,Color.Black,12.5f,Chart.ChartBars.BarCount,Ticks[0].Bid);
-//					}
 				} else if( (next.Position.IsLong && Position.IsShort) || (next.Position.IsShort && Position.IsLong)) {
 					// The signal must be opposite. Either -1 / 1 or 1 / -1
 					ExitComboTradeInternal();
@@ -98,7 +92,7 @@ namespace TickZoom.Common
 				}
 				if( IsTrace) Log.Outdent();
 			} 
-			Position.Change(next.Position.Current);
+			Position.Copy(next.Position);
 			if( Position.HasPosition) {
 				comboTradesBinary.Current.UpdatePrice(tick);
 				double pnl = comboTrades.ProfitInPosition(comboTrades.Current,tick);
@@ -148,7 +142,7 @@ namespace TickZoom.Common
 				ExitComboTrade(tick.Bid);
 			} else {
 				ExitComboTrade(tick.Ask);
-			}
+		    }
 		}
 					
 		public void ExitComboTrade(double fillPrice) {

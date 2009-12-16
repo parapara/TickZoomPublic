@@ -48,6 +48,8 @@ namespace TickZoom.Api
 		
 		void Change( double position, double price, TimeStamp time);
 		
+		void Copy( PositionInterface other);
+
 		[Obsolete("Please use Price instead.",true)]
 		double SignalPrice {
 			get;

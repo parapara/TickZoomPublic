@@ -32,6 +32,7 @@ namespace TickZoom.Common
 	public class Portfolio : Strategy, PortfolioInterface
 	{
 		List<Strategy> strategies = new List<Strategy>();
+		List<StrategyWatcher> watchers = new List<StrategyWatcher>();
 		PortfolioType portfolioType = PortfolioType.None;
 		double closedEquity = 0;
 		double openEquity;
@@ -59,7 +60,7 @@ namespace TickZoom.Common
 					}
 					if( strategy != null) {
 						List<Strategy> tempStrategies;
-						if( symbolMap.TryGetValue(strategy.SymbolDefault,out tempStrategies)) {
+						if( symbolMap.TryGetValue(strategy.SymbolDefault, out tempStrategies)) {
 							tempStrategies.Add(strategy);
 						} else {
 							tempStrategies = new List<Strategy>();
@@ -101,16 +102,47 @@ namespace TickZoom.Common
 					}
 				}
 			} while( portfolioType == PortfolioType.None);
+			
+			// Create strategy watchers
+			foreach( var strategy in strategies) {
+				watchers.Add( new StrategyWatcher(strategy));
+			}
 		}	
+		
+		private class StrategyWatcher {
+			private double previousPosition = 0;
+			private Strategy strategy;
+			
+			public StrategyWatcher(Strategy strategy) {
+				this.strategy = strategy;	
+			}
+			public bool PositionChanged {
+				get { return previousPosition != strategy.Position.Current; }
+			}
+			public void Refresh() {
+				previousPosition = strategy.Position.Current;
+			}
+			public PositionInterface Position {
+				get { return strategy.Performance.Position; }
+			}
+		}
 	
 		public override bool OnProcessTick(Tick tick)
 		{
 			if( portfolioType == PortfolioType.SingleSymbol) {
 				double internalSignal = 0;
-				foreach( var strategy in strategies) {
-					internalSignal += strategy.Performance.Position.Current;
+				double totalPrice = 0;
+				int changeCount = 0;
+				foreach( var watcher in watchers) {
+					internalSignal += watcher.Position.Current;
+					if( watcher.PositionChanged) {
+						totalPrice += watcher.Position.Price;
+						changeCount++;
+						watcher.Refresh();
+					}
 				}
-				Position.Change(internalSignal);
+				double averagePrice = totalPrice / changeCount;
+				Position.Change(internalSignal,averagePrice,Ticks[0].Time);
 				return true;
 			} else if( portfolioType == PortfolioType.MultiSymbol) {
 				double tempClosedEquity = 0;

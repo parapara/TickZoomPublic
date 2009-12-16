@@ -98,7 +98,7 @@ namespace TickZoom.Common
 		
 		public sealed override bool OnProcessTick(Tick tick)
 		{
-			Position.Change(next.Position.Current);
+			Position.Copy(next.Position);
 			return true;
 		}
 		
