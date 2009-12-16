@@ -40,14 +40,29 @@ namespace TickZoom.Api
 			set;
 		}
 		
+		/// <summary>
+		/// What is the current position? Returns a positive size for a long 
+		/// and a negative size for a short position. Zero for a flat.
+		/// </summary>
 		double Current {
 			get;
 		}
 		
+		/// <summary>
+		/// Changes the current position.
+		/// </summary>
+		/// <param name="position">A new position.</param>
+		/// <exception cref="TickZoomException">
+		/// if position parameter has the same value as the current position.
+		/// </exception>
 		void Change( double position);
 		
 		void Change( double position, double price, TimeStamp time);
 		
+		/// <summary>
+		/// Copies a Position object including all properties to this position object.
+		/// </summary>
+		/// <param name="other">the other Position object.</param>
 		void Copy( PositionInterface other);
 
 		[Obsolete("Please use Price instead.",true)]
@@ -55,6 +70,9 @@ namespace TickZoom.Api
 			get;
 		}
 		
+		/// <summary>
+		/// The price at which the current position most recently changed.
+		/// </summary>
 		double Price {
 			get;
 		}
@@ -63,30 +81,47 @@ namespace TickZoom.Api
 		TimeStamp SignalTime {
 			get;
 		}
-		
+
+		/// <summary>
+		/// The when the current position last changed.
+		/// </summary>
 		TimeStamp Time {
 			get;
 		}
 		
+		/// <summary>
+		/// Is the position currently either long or short?
+		/// </summary>
 		bool HasPosition {
 			get;
 		}
 		
+		/// <summary>
+		/// Is the position currently flat?
+		/// </summary>
 		bool IsFlat {
 			get;
 		}
 		
+		/// <summary>
+		/// Is the position currently long?
+		/// </summary>
 		bool IsLong {
 			get;
 		}
 		
+		/// <summary>
+		/// Is the position currently short?
+		/// </summary>
 		bool IsShort {
 			get;
 		}
 		
+		/// <summary>
+		/// What is the size of the position? Returns the absolute value of the current position.
+		/// </summary>
 		double Size {
 			get;
 		}
-		
 	}
 }

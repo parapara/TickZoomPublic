@@ -140,14 +140,19 @@ namespace TickZoom.Common
 			if( order.IsActive &&
 			    Strategy.Position.IsFlat)
             {
-                if (tick.Ask <= order.Price || 
-				    (tick.IsTrade && tick.Price < order.Price))
+				double price = 0;
+				if (tick.Ask <= order.Price) {
+					price = tick.Ask;
+				} else if(tick.IsTrade && tick.Price < order.Price)
                 {
+					price = order.Price;
+				}
+				if( price != 0) {
                     LogEntry("Long Limit Entry at " + tick);
-                    Strategy.Position.Change(order.Positions);
+                    Strategy.Position.Change(order.Positions,price,tick.Time);
                     if (Strategy.Performance.GraphTrades)
                     {
-                        Strategy.Chart.DrawTrade(order, tick.Ask, Strategy.Position.Current);
+                        Strategy.Chart.DrawTrade(order, price, Strategy.Position.Current);
                     }
                     CancelOrders();
                 }
@@ -159,14 +164,18 @@ namespace TickZoom.Common
 			if( order.IsActive &&
 			    Strategy.Position.IsFlat)
             {
-                if (tick.Bid >= order.Price || 
-				    (tick.IsTrade && tick.Price > order.Price))
-                {
+				double price = 0;
+				if (tick.Bid >= order.Price) {
+					price = tick.Bid;
+				} else if(tick.IsTrade && tick.Price > order.Price) {
+					price = order.Price;
+				}
+				if( price != 0) {
                     LogEntry("Short Limit Entry at " + tick);
-                    Strategy.Position.Change(-order.Positions);
+                    Strategy.Position.Change(-order.Positions,price,tick.Time);
                     if (Strategy.Performance.GraphTrades)
                     {
-                        Strategy.Chart.DrawTrade(order, tick.Bid, Strategy.Position.Current);
+                        Strategy.Chart.DrawTrade(order, price, Strategy.Position.Current);
                     }
                     CancelOrders();
                 }

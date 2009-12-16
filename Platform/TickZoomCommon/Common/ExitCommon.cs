@@ -100,8 +100,8 @@ namespace TickZoom.Common
 			}
 		}
 		
-		private void FlattenSignal() {
-			Strategy.Position.Change(0);
+		private void FlattenSignal(double price) {
+			Strategy.Position.Change(0,price,Ticks[0].Time);
 			CancelOrders();
 		}
 	
@@ -117,7 +117,7 @@ namespace TickZoom.Common
 			    Strategy.Position.IsShort &&
 			    tick.Ask >= orders.buyStop.Price) {
 				LogExit("Buy Stop Exit at " + tick);
-				FlattenSignal();
+				FlattenSignal(tick.Ask);
 				if( Strategy.Performance.GraphTrades) {
 	                Strategy.Chart.DrawTrade(orders.buyStop,tick.Ask,Strategy.Position.Current);
 				}
@@ -129,14 +129,18 @@ namespace TickZoom.Common
 			if( orders.buyLimit.IsActive && 
 			    Strategy.Position.IsShort)
             {
-                if (tick.Ask <= orders.buyLimit.Price || 
-				    (tick.IsTrade && tick.Price < orders.buyLimit.Price))
-                {
+				double price = 0;
+				if (tick.Ask <= orders.buyLimit.Price) {
+					price = tick.Ask;
+				} else if(tick.IsTrade && tick.Price < orders.buyLimit.Price) {
+					price = orders.buyLimit.Price;
+				}
+				if( price != 0) {
                     LogExit("Buy Limit Exit at " + tick);
-                    FlattenSignal();
+                    FlattenSignal(price);
                     if (Strategy.Performance.GraphTrades)
                     {
-                        Strategy.Chart.DrawTrade(orders.buyLimit, tick.Ask, Strategy.Position.Current);
+                        Strategy.Chart.DrawTrade(orders.buyLimit, price, Strategy.Position.Current);
                     }
                     CancelOrders();
                 }
@@ -148,9 +152,9 @@ namespace TickZoom.Common
 			    Strategy.Position.IsLong &&
 			    tick.Bid <= orders.sellStop.Price) {
 				LogExit("Sell Stop Exit at " + tick);
-				FlattenSignal();
+				FlattenSignal(tick.Bid);
 				if( Strategy.Performance.GraphTrades) {
-	                Strategy.Chart.DrawTrade(orders.sellStop,tick.Ask,Strategy.Position.Current);
+	                Strategy.Chart.DrawTrade(orders.sellStop,tick.Bid,Strategy.Position.Current);
 				}
 				CancelOrders();
 			}
@@ -160,14 +164,17 @@ namespace TickZoom.Common
 			if( orders.sellLimit.IsActive &&
 			    Strategy.Position.IsLong)
             {
-                if (tick.Bid >= orders.sellLimit.Price || 
-				    (tick.IsTrade && tick.Price > orders.sellLimit.Price))
-                {
+				double price;
+				if (tick.Bid >= orders.sellLimit.Price) {
+					price = tick.Bid;
+				}
+				if(tick.IsTrade && tick.Price > orders.sellLimit.Price) {
+					price = orders.sellLimit.Price;
                     LogExit("Sell Stop Limit at " + tick);
-                    FlattenSignal();
+                    FlattenSignal(price);
                     if (Strategy.Performance.GraphTrades)
                     {
-                        Strategy.Chart.DrawTrade(orders.sellLimit, tick.Bid, Strategy.Position.Current);
+                        Strategy.Chart.DrawTrade(orders.sellLimit, price, Strategy.Position.Current);
                     }
                     CancelOrders();
                 }
@@ -188,6 +195,7 @@ namespace TickZoom.Common
         	if( Strategy.Position.IsFlat) {
         		throw new TickZoomException("Strategy must have a position before attempting to go flat.");
         	}
+        	LogExit("GoFlat");
         	if( Strategy.Position.IsLong) {
 	        	orders.sellMarket.Price = 0;
 	        	orders.sellMarket.Positions = Strategy.Position.Size;
@@ -199,6 +207,7 @@ namespace TickZoom.Common
 				if( Strategy.Performance.GraphTrades) {
 	        		Strategy.Chart.DrawTrade(orders.sellMarket,Ticks[0].Bid,Strategy.Position.Current);
 				}
+	        	FlattenSignal(Ticks[0].Bid);
         	}
         	if( Strategy.Position.IsShort) {
 	        	orders.buyMarket.Price = 0;
@@ -211,9 +220,8 @@ namespace TickZoom.Common
 				if( Strategy.Performance.GraphTrades) {
 	        		Strategy.Chart.DrawTrade(orders.buyMarket,Ticks[0].Ask,Strategy.Position.Current);
 				}
+	        	FlattenSignal(Ticks[0].Ask);
         	}
-        	LogExit("GoFlat");
-        	FlattenSignal();
 		}
 	
         public void BuyStop(double price) {
