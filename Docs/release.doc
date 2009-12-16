@@ -1,0 +1,55 @@
+/*
+ * Copyright 2008 M. Wayne Walter
+ * Software: TickZoom Trading Platform
+ * User: Wayne Walter
+ * 
+ * You can use and modify this software under the terms of the
+ * TickZOOM General Public License Version 1.0 or (at your option)
+ * any later version.
+ * 
+ * Businesses are restricted to 30 days of use.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * TickZOOM General Public License for more details.
+ *
+ * You should have received a copy of the TickZOOM General Public
+ * License along with this program.  If not, see
+ * 
+ * 
+ *
+ * User: Wayne Walter
+ * Date: 12/6/2009
+ * Time: 1:48 AM
+ * <http://www.tickzoom.org/wiki/Licenses>.
+ */
+
+/*! @page release_notes Release Notes
+
+@addindex release_notes
+
+
+@section latest_release_notes Latest Release Notes
+    @htmlonly The current version is $(VERSION). @endhtmlonly
+
+    -# Added documentation for updating with Git, and handling obsolete errors.
+    -# Added ChartGroup property to SymbolInfo as read only and also to SymbolProperties which is read/write from within the loaders only.  Also, changed the type of Symbol on Chart interface to SymbolInfo so charts can access the ChartGroup property.
+    -# Entry orders now use order price for fills in the case of the market trading 'through' the order.
+    -# ExitStrategy and Performance now use the price propogated via the Position object from the filled order.
+    -# Added Copy() to Position. Propogated signal amount among support objects.
+    -# Removed TransactionPairs from Performance object and Statistics object.
+    -# Refactored Position to allow setting the price at which the position changes. Also renamed properties and methods to Current, Change()
+    -# Renumbered to 0.6.x version.
+    -# Improved performance of charting and improved scrolling for real time charting. Especially, seperated drawing background only on resize instead of every timer ticker on real time.  Fixed ZedGraph to copy instead of reallocate backing buffer and added faster Bitmap copy method for ZedGraph.
+    -# SymbolManager now both reads and writes to the ServerCache folder rather than separate folders so it can properly send the latest back fill data.
+    -# Misc fixes. Fixed bug in TickQueue where it block restarting because of a 0 for binary symbol id. Make TickWriter ensure it was initialized properly before calling Add() or Close().
+    -# Fixed performance of engine/kernel to all throttling the parallel manager for low usage of cpu. The engine now properly reports work completed to parallel manager for better CPU throttling.
+    -# Fixed real time scaling issue so that none of the bars run off the top or bottom of the chart.
+    -# Handled next bar property setup on order creation. Removed 'immediate' fills from EnterCommon, ExitCommon. Orders that are specified as NextBar now become active only at the open of the next bar.
+    -# Setup fluent interface for orders i.e. Orders.Enter.NextBar.GoFlat()
+    -# Renamed most user objects to remove 'Common' suffix.
+    -# Made package push the stable or master branch to TickZoomPublic.
+    -# Fixed to build scripts. Uncommented push to TickZoomPublic. Fixed deploy to take a parameter of which branch to deploy on the build server. Added package command for testint the packaging of branches like stable and master.
+   
+*/

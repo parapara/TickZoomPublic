@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -78,12 +77,6 @@ You have completed setup and install of Git with GitHub. Now proceed with setup 
    -# You will see the progress as it creates the TickZoomPublic folder. It only takes several seconds.
    -# Next cd into the TickZoomPublic folder created by git clone.
       @verbatim cd TickZoomPublic @endverbatim
-   -# Set "git pull" to automatically use rebase instead of merge when pulling from from remote repositories.
-      @verbatim git config branch.autosetuprebase remote @endverbatim
-      Using "rebase" instead of merge treats the remote TickZoomPublic repository as the official version to automatically resolve merge conflicts.
-      That eliminates hassels when you need to update to another version of TickZoom.
-      @note Using rebase is required when you want to contribute any fixes or enhancements to the TickZoom public code. That's because when you do a 
-      pull with automatic rebase prior to pushing your new code, it also eliminates merge conflicts for the committers.
    -# Identify yourself for git commits.
       @verbatim git config user.name "Your Name" 
 git config user.email "Your email address" @endverbatim

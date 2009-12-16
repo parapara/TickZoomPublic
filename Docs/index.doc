@@ -33,7 +33,9 @@ Version: $(VERSION)
 </center>
 
 -# @ref install 
+-# @ref release_notes
 -# @ref update
+-# @ref obsolete
 
 The members only site for questions, tickets, and forums is at http://www.tickzoom.com
 */
