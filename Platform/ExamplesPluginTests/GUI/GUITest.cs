@@ -60,7 +60,7 @@ namespace MiscTest
 
 		[TearDown]
 		public void TearDown() {
-			DeleteFiles();
+//			DeleteFiles();
 			form.Close();
 		}
 		

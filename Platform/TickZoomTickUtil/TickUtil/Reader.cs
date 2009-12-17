@@ -101,7 +101,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public Y GetLastTick() {
-			Stream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read); 
+			Stream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite); 
 			length = stream.Length;
 			dataIn = new BinaryReader(stream,Encoding.Unicode); 
 			position = 0;
@@ -165,7 +165,7 @@ namespace TickZoom.TickUtil
 						length = filebytes.Length;
 		    			stream = new MemoryStream(filebytes);
 		    		} else {
-						stream = new FileStream(fileName, FileMode.Open, FileAccess.Read); 
+						stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite); 
 						length = stream.Length;
 		    		}
 		    			

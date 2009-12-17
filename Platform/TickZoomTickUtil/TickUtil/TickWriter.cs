@@ -109,7 +109,7 @@ namespace TickZoom.TickUtil
     			log.Notice("TickWriter file was erased to begin writing.");
     		}
 			if( keepFileOpen) {
-    			fs = new FileStream(fileName, FileMode.Append);
+    			fs = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
    				log.Debug("keepFileOpen - Open()");
     			memory = new MemoryStream();
 			}
@@ -181,7 +181,7 @@ namespace TickZoom.TickUtil
 			do {
 			    try { 
 					if( !keepFileOpen) {
-		    			fs = new FileStream(fileName, FileMode.Append);
+		    			fs = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
 		    			if( trace) log.Trace("!keepFileOpen - Open()");
 		    			memory = new MemoryStream();
 					}
