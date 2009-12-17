@@ -52,6 +52,7 @@ namespace TickZoom.TickUtil
 		FileStream fs = null;
 		MemoryStream memory = null;
 		bool isInitialized = false;
+		bool isPaused = false;
 
 		public TickWriter(bool eraseFileToStart)
 		{
@@ -62,6 +63,14 @@ namespace TickZoom.TickUtil
 		
 		public void Start() {
 			
+		}
+		
+		public void Pause() {
+			isPaused = true;	
+		}
+		
+		public void Resume() {
+			isPaused = false;
 		}
 		
 		bool CancelPending {
@@ -130,6 +139,9 @@ namespace TickZoom.TickUtil
 		
 		protected virtual bool AppendData() {
 			try {
+				while( isPaused) {
+					Factory.Parallel.Yield();
+				}
 				writeQueue.Dequeue(ref tick);
 				tickIO.init(tick);
 				if( trace) {
