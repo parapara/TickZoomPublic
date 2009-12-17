@@ -34,8 +34,7 @@ using TickZoom.Api;
 
 namespace TickZoom.TickUtil
 {
-	public abstract class Reader<Y>
-	where Y : ReadWritable<TickBinary>, new()
+	public abstract class Reader<Y>	where Y : ReadWritable<TickBinary>, new()
 	{
 		BackgroundWorker backgroundWorker;
 		long maxCount = long.MaxValue;
@@ -145,252 +144,256 @@ namespace TickZoom.TickUtil
 		int start;
 		private bool StartupTask() {
 		    log.Symbol = symbol.Symbol;
-		    try { 
-			    position = 0;
-			    if( !quietMode) {
-		    		LogInfo("Reading from file: " + fileName);
+		    for( int retry=0; retry<3; retry++) {
+			    try { 
+				    position = 0;
+				    if( !quietMode) {
+			    		LogInfo("Reading from file: " + fileName);
+				    }
+		    		
+	    			Directory.CreateDirectory( Path.GetDirectoryName(fileName));
+	
+	    			Stream stream;
+	    			if( bulkFileLoad) {
+	   					byte[] filebytes;
+		    			lock( fileLocker) {
+		   					if( !fileBytesDict.TryGetValue(symbol,out filebytes)) {
+					    	 	filebytes = File.ReadAllBytes(fileName);
+			    			 	fileBytesDict[symbol] = filebytes;
+		    				}
+		    			}	
+						length = filebytes.Length;
+		    			stream = new MemoryStream(filebytes);
+		    		} else {
+						stream = new FileStream(fileName, FileMode.Open, FileAccess.Read); 
+						length = stream.Length;
+		    		}
+		    			
+					dataIn = new BinaryReader(stream,Encoding.Unicode); 
+		    		
+		     		progressDivisor = length/20;
+		     		if( !quietMode || debug) {
+		    			if(debug) log.Debug("Starting to read data.");
+		    			log.Indent();
+		     		}
+					start = Environment.TickCount;
+					return true;
+		    	} catch ( Exception ex) {
+		    		ExceptionHandler(ex);
 			    }
-	    		
-    			Directory.CreateDirectory( Path.GetDirectoryName(fileName));
-
-    			Stream stream;
-    			if( bulkFileLoad) {
-   					byte[] filebytes;
-	    			lock( fileLocker) {
-	   					if( !fileBytesDict.TryGetValue(symbol,out filebytes)) {
-				    	 	filebytes = File.ReadAllBytes(fileName);
-		    			 	fileBytesDict[symbol] = filebytes;
-	    				}
-	    			}	
-					length = filebytes.Length;
-	    			stream = new MemoryStream(filebytes);
-	    		} else {
-					stream = new FileStream(fileName, FileMode.Open, FileAccess.Read); 
-					length = stream.Length;
-	    		}
-	    			
-				dataIn = new BinaryReader(stream,Encoding.Unicode); 
-	    		
-	     		progressDivisor = length/20;
-	     		if( !quietMode || debug) {
-	    		if(debug) log.Debug("Starting to read data.");
-	    		log.Indent();
-	     	}
-			start = Environment.TickCount;
-	    } catch ( Exception ex) {
-	    	ExceptionHandler(ex);
-	    }
-	    return true;
-	}
-	
-	private void ExceptionHandler(Exception e) {
-	    		if( e is CollectionTerminatedException) {
-			log.Warn( "Reader queue was terminated.");
-	    		} else if( e is ThreadAbortException) {
-			//	
-		} else if( e is FileNotFoundException) {
-	    			log.Error( "ERROR: " + e.Message);
-	    		} else {
-	    			log.Error( "ERROR: " + e);
-	    		}
-		if( dataIn != null) {
-			terminate = true;
-			dataIn.Close();
-			dataIn = null;
+		    	Factory.Parallel.Sleep(1000);
+		    }
+		    return false;
 		}
-	}
 	
-	byte dataVersion;
-	
-	public byte DataVersion {
-		get { return dataVersion; }
-	}
-	
-	private bool FileReader() {
-		if( terminate || !receiver.CanReceive) {
-			return false;
+		private void ExceptionHandler(Exception e) {
+    		if( e is CollectionTerminatedException) {
+				log.Warn( "Reader queue was terminated.");
+	   		} else if( e is ThreadAbortException) {
+				//	
+			} else if( e is FileNotFoundException) {
+	    		log.Error( "ERROR: " + e.Message);
+	    	} else {
+	    		log.Error( "ERROR: " + e);
+	    	}
+			if( dataIn != null) {
+				terminate = true;
+				dataIn.Close();
+				dataIn = null;
+			}
 		}
-		try {
-    		if( position < length && !CancelPending) {
-    			position += tickIO.FromReader(dataIn);
-    			tickIO.lSymbol = lSymbol;
-    			if( dataVersion == 0) {
-    				dataVersion = tickIO.DataVersion;			
-    			}
-    			tick = tickIO.Extract();
-				isDataRead = true;
-    			
-    			if( maxCount > 0 && count > maxCount) {
-				if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
-					FinishTask();
-    			}
-    			
-				if( IsAtEnd(tick)) {
-					FinishTask();
-					return false;
-    			}
-    
-    			if( IsAtStart(tick)) {
-	    			if( isFirstTick) {
-						receiver.OnHistorical(symbol);
-						if( !quietMode) {
-							log.Symbol = symbol.Symbol;
-							LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
-						}
-	    				isFirstTick = false;
-	    			}
-			
-    				count++;
-    				if( debug && count<5) {
-    					log.Debug("Read a tick " + tickIO);
-    				} else if( trace) {
-    					TickIO logTickIO = tickIO as TickIO;
-    					if( logTickIO != null) {
-    						log.Symbol = logTickIO.Symbol;
-    					}
-    					log.Trace("Read a tick " + tickIO);
-    				}
-    				receiver.OnSend(ref tick);
-				}
-				
-				if( position > nextUpdate) {
-					try {
-			    		progressCallback("Loading bytes...", position, length);
-					} catch( Exception ex) {
-						log.Debug( "Exception on progressCallback: " + ex.Message);
-					}
-			    	nextUpdate = position + progressDivisor;
-				}
-			} else {
-				FinishTask();
+	
+		byte dataVersion;
+		
+		public byte DataVersion {
+			get { return dataVersion; }
+		}
+		
+		private bool FileReader() {
+			if( terminate || !receiver.CanReceive) {
 				return false;
 			}
-		} catch( ObjectDisposedException) {
-			FinishTask();
-			return false;
-		} catch( Exception ex) {
-			log.Warn( "Exception thrown in Reader class", ex);
-			throw;
-		}
-	    return true;
-	}
-	
-	private bool FinishTask() {
-		try {
-			if( !quietMode && isDataRead ) {
-				log.Symbol = symbol.Symbol;
-				LogInfo("Processing ended for " + symbol + " at " + tickIO.ToPosition());
-	    		}
-			int end = Environment.TickCount;
-			if( !quietMode) {
-	    		LogInfo( "Processed " + count + " ticks in " + (end-start)  + " ms.");
-			}
 			try {
-	    		progressCallback("Processing complete.", length, length);
-			} catch( Exception ex) {
-				log.Debug( "Exception on progressCallback: " + ex.Message);
-			}
-			if( debug) log.Debug("calling receiver.OnEndHistorical()");
-			if( count > 0) {
-				receiver.OnEndHistorical(symbol);
-			}
-	    	fileReaderTask.Stop();
-	    		} catch ( ThreadAbortException) {
-			
-	    		} catch ( FileNotFoundException ex) {
-	    			log.Error( "ERROR: " + ex.Message);
-	    		} catch ( Exception ex) {
-	    			log.Error( "ERROR: " + ex);
-	    		} finally {
-			terminate = true;
-	    			if( dataIn != null) {
-	    				dataIn.Close();
+	    		if( position < length && !CancelPending) {
+	    			position += tickIO.FromReader(dataIn);
+	    			tickIO.lSymbol = lSymbol;
+	    			if( dataVersion == 0) {
+	    				dataVersion = tickIO.DataVersion;			
 	    			}
-	    		}
-		return true;
-	}
-	
-	public void Stop() {
-		terminate = true;
-		if( fileReaderTask != null) {
-			fileReaderTask.Stop();
-		}
-		if( dataIn != null) {
-			dataIn.Close();
-		}
-		lock(locker) {
-			readerList.Remove(this);
-		}
-		if( receiver != null && receiver.CanReceive) {
-			receiver.OnStop();
-		}
-	}
-	
-	public static void CloseAll() {
-		lock( locker) {
-			for( int i=0; i<readerList.Count; i++) {
-				readerList[i].Stop();
-			}
-			readerList.Clear();
-		}
-	}
-	
-	void progressCallback( string text, Int64 current, Int64 final) {
-		if( !quietMode) {
-			if( backgroundWorker != null && !backgroundWorker.CancellationPending &&
-			    backgroundWorker.WorkerReportsProgress) {
-				backgroundWorker.ReportProgress(0, (object) new ProgressImpl(text,current,final));
-			}
-		}
-	}
-	
-	public BackgroundWorker BackgroundWorker {
-		get { return backgroundWorker; }
-		set { backgroundWorker = value; }
-	}
-	
-	public Elapsed SessionStart {
-		get { return sessionStart; }
-		set { sessionStart = value; }
-	}
-	
-	public Elapsed SessionEnd {
-		get { return sessionEnd; }
-		set { sessionEnd = value; }
-	}
-	
-	public bool ExcludeSunday {
-		get { return excludeSunday; }
-		set { excludeSunday = value; }
-	}
-	
-	public string FileName {
-		get { return fileName; }
-	}
+	    			tick = tickIO.Extract();
+					isDataRead = true;
+	    			
+	    			if( maxCount > 0 && count > maxCount) {
+					if(debug) log.Debug("Ending data read because count reached " + maxCount + " ticks.");
+						FinishTask();
+	    			}
+	    			
+					if( IsAtEnd(tick)) {
+						FinishTask();
+						return false;
+	    			}
 	    
-	public SymbolInfo Symbol {
-		get { return symbol; }
-	}
-	
-	public bool LogProgress {
-		get { return logProgress; }
-		set { logProgress = value; }
-	}
-	   		
-	public long MaxCount {
-		get { return maxCount; }
-		set { maxCount = value; }
-	}
-	
-	public bool QuietMode {
-		get { return quietMode; }
-		set { quietMode = value; }
-	}
-	 		
-	public bool BulkFileLoad {
-		get { return bulkFileLoad; }
-		set { bulkFileLoad = value; }
-	}
+	    			if( IsAtStart(tick)) {
+		    			if( isFirstTick) {
+							receiver.OnHistorical(symbol);
+							if( !quietMode) {
+								log.Symbol = symbol.Symbol;
+								LogInfo("Starting loading for " + symbol + " from " + tickIO.ToPosition());
+							}
+		    				isFirstTick = false;
+		    			}
+				
+	    				count++;
+	    				if( debug && count<5) {
+	    					log.Debug("Read a tick " + tickIO);
+	    				} else if( trace) {
+	    					TickIO logTickIO = tickIO as TickIO;
+	    					if( logTickIO != null) {
+	    						log.Symbol = logTickIO.Symbol;
+	    					}
+	    					log.Trace("Read a tick " + tickIO);
+	    				}
+	    				receiver.OnSend(ref tick);
+					}
+					
+					if( position > nextUpdate) {
+						try {
+				    		progressCallback("Loading bytes...", position, length);
+						} catch( Exception ex) {
+							log.Debug( "Exception on progressCallback: " + ex.Message);
+						}
+				    	nextUpdate = position + progressDivisor;
+					}
+				} else {
+					FinishTask();
+					return false;
+				}
+			} catch( ObjectDisposedException) {
+				FinishTask();
+				return false;
+			} catch( Exception ex) {
+				log.Warn( "Exception thrown in Reader class", ex);
+				throw;
+			}
+		    return true;
+		}
+		
+		private bool FinishTask() {
+			try {
+				if( !quietMode && isDataRead ) {
+					log.Symbol = symbol.Symbol;
+					LogInfo("Processing ended for " + symbol + " at " + tickIO.ToPosition());
+		    		}
+				int end = Environment.TickCount;
+				if( !quietMode) {
+		    		LogInfo( "Processed " + count + " ticks in " + (end-start)  + " ms.");
+				}
+				try {
+		    		progressCallback("Processing complete.", length, length);
+				} catch( Exception ex) {
+					log.Debug( "Exception on progressCallback: " + ex.Message);
+				}
+				if( debug) log.Debug("calling receiver.OnEndHistorical()");
+				if( count > 0) {
+					receiver.OnEndHistorical(symbol);
+				}
+		    	fileReaderTask.Stop();
+		    		} catch ( ThreadAbortException) {
+				
+		    		} catch ( FileNotFoundException ex) {
+		    			log.Error( "ERROR: " + ex.Message);
+		    		} catch ( Exception ex) {
+		    			log.Error( "ERROR: " + ex);
+		    		} finally {
+				terminate = true;
+		    			if( dataIn != null) {
+		    				dataIn.Close();
+		    			}
+		    		}
+			return true;
+		}
+		
+		public void Stop() {
+			terminate = true;
+			if( fileReaderTask != null) {
+				fileReaderTask.Stop();
+			}
+			if( dataIn != null) {
+				dataIn.Close();
+			}
+			lock(locker) {
+				readerList.Remove(this);
+			}
+			if( receiver != null && receiver.CanReceive) {
+				receiver.OnStop();
+			}
+		}
+		
+		public static void CloseAll() {
+			lock( locker) {
+				for( int i=0; i<readerList.Count; i++) {
+					readerList[i].Stop();
+				}
+				readerList.Clear();
+			}
+		}
+		
+		void progressCallback( string text, Int64 current, Int64 final) {
+			if( !quietMode) {
+				if( backgroundWorker != null && !backgroundWorker.CancellationPending &&
+				    backgroundWorker.WorkerReportsProgress) {
+					backgroundWorker.ReportProgress(0, (object) new ProgressImpl(text,current,final));
+				}
+			}
+		}
+		
+		public BackgroundWorker BackgroundWorker {
+			get { return backgroundWorker; }
+			set { backgroundWorker = value; }
+		}
+		
+		public Elapsed SessionStart {
+			get { return sessionStart; }
+			set { sessionStart = value; }
+		}
+		
+		public Elapsed SessionEnd {
+			get { return sessionEnd; }
+			set { sessionEnd = value; }
+		}
+		
+		public bool ExcludeSunday {
+			get { return excludeSunday; }
+			set { excludeSunday = value; }
+		}
+		
+		public string FileName {
+			get { return fileName; }
+		}
+		    
+		public SymbolInfo Symbol {
+			get { return symbol; }
+		}
+		
+		public bool LogProgress {
+			get { return logProgress; }
+			set { logProgress = value; }
+		}
+		   		
+		public long MaxCount {
+			get { return maxCount; }
+			set { maxCount = value; }
+		}
+		
+		public bool QuietMode {
+			get { return quietMode; }
+			set { quietMode = value; }
+		}
+		 		
+		public bool BulkFileLoad {
+			get { return bulkFileLoad; }
+			set { bulkFileLoad = value; }
+		}
 	
 	}
 }
