@@ -26,11 +26,15 @@
  */
 
 /*! @page install Installation
+<center>
+\htmlonly
+Version: $(VERSION)
+\endhtmlonly
+</center>
 
 @addindex install
 
-You can use these steps to setup your TickZoom development environment so you can start creating your own automated
-trading portfolio, get updates to TickZoom releases, and contribute changes.
+You can use these steps to setup your TickZoom development environment to create your own trading strategies.
 
 @note The TickZoom open source application auto downloads the TickZoom data engine for which
 a secure user key is required. You may request a 2 week FREE demo at http://www.tickzoom.com
@@ -38,8 +42,8 @@ a secure user key is required. You may request a 2 week FREE demo at http://www.
 -# @ref setup_git_sect 
 -# @ref setup_clone_sect 
 -# @ref setup_run_sect 
--# @ref sharpd_setup 
--# @ref vs_setup 
+    -# @ref sharpd_setup 
+    -# @ref vs_setup 
 
 @section setup_git_sect Setup Git With GitHub
 
@@ -47,6 +51,7 @@ If this is your first time to use Git or GitHub, follow these steps.
 
    -# Install Git version 1.6.5.1<BR>
    http://cloud.github.com/downloads/tickzoom/TickZoomPublic/Git-1.6.5.1-preview20091022.exe
+      -* Select the option to use git commands at the windows prompt.
    -# Install TortoiseGit version 1.2.1.0-32bit and select SSH (instead of PLink) when asked.<BR>
    http://cloud.github.com/downloads/tickzoom/TickZoomPublic/TortoiseGit-1.2.1.0-32bit.msi
    -# Click "Signup" on the upper right corner of the GitHub site. It’s free to create an account.
@@ -55,6 +60,10 @@ If this is your first time to use Git or GitHub, follow these steps.
          -# At the prompt enter the following command after replacing with your own email address:
             @verbatim ssh-keygen -t rsa -C "your email address" @endverbatim
             (Press enter 3 times for default file name, and empty pass phrase.)
+            @note 
+            Leave the pass phase blank to avoid entering it every single time you communicate
+            with your repository. That's still sufficiently secure for an open source repository since
+            anyone must have your RSA private key in order to access your repository.
          -# Now, use Windows Explorer to find your C:\\Documents and Settings\\[User Name]\\.ssh folder. Inside that folder, select and open the id_rsa.pub file in Notepad.
          -# Copy everything in the id_rsa.pub file to the copy/paste clipboard.
          -# Now in a browser, open your GitHub account page. In the SSH Public Keys section click "add another public key", then paste your key into the key field. If you leave the title blank the key comment (your email) will be used for the title.
@@ -84,7 +93,7 @@ git config user.email "Your email address" @endverbatim
    -# Setup a shortcut to use when you update to another version of TickZoom.
       @verbatim git remote add upstream git://github.com/tickzoom/TickZoomPublic.git @endverbatim
 
-@section setup_run_sect Setup To Run TickZoom and Write Your Own Strategies
+@section setup_run_sect Setup To Write Your Own Strategies
 
    -# You need an IDE if you don’t have one. Either SharpDevelop or Visual Studio will work. You can find installation tips for those further below, after this section.
    -# Once you complete installation of SharpDevelop or Visual Studio, then you can navigate to the TickZoomPublic folder in Windows Explorer, then find the Platform\\TickZoom.sln file and open it in either SharpDevelop or Visual Studio.

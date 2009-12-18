@@ -126,8 +126,6 @@ namespace TickZoom.Common
 		}
 		
 		private void ExitComboTradeInternal() {
-			TransactionPairBinary comboTrade = comboTradesBinary.Current;
-			Tick tick = Ticks[0];
 			ExitComboTrade(next.Position.Price);
 		}
 					

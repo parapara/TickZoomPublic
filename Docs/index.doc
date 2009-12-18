@@ -25,7 +25,7 @@
  * <http://www.tickzoom.org/wiki/Licenses>.
  */
 
-/*! @page index Documentation for TickZoom Platform
+/*! @mainpage index Documentation for TickZoom Platform
 <center>
 \htmlonly
 Version: $(VERSION)
@@ -35,7 +35,7 @@ Version: $(VERSION)
 -# @ref install 
 -# @ref release_notes
 -# @ref update
--# @ref obsolete
+    -# @ref obsolete
 
-The members only site for questions, tickets, and forums is at http://www.tickzoom.com
+The members only site for questions, tickets, and forums is at http://members.tickzoom.com
 */

@@ -93,7 +93,6 @@ namespace TickZoom
 		{
 //			bid[0] = sumBidSizes / countBidLevels;
 //			ask[0] = sumAskSizes/countAskLevels;
-				
 			if( bid[0] > ask[0] ) {
 				ratio[0] = ask[0] == 0 ? 0 : (double) bid[0] / (double) ask[0] - 1;
 			} else if( ask[0] > bid[0] ) {

@@ -25,7 +25,12 @@
  * <http://www.tickzoom.org/wiki/Licenses>.
  */
 
-/*! @page update How to Update From GitHub
+/*! @page update How to Update
+<center>
+\htmlonly
+Version: $(VERSION)
+\endhtmlonly
+</center>
 
 @addindex update
 

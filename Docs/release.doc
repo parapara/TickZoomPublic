@@ -26,6 +26,11 @@
  */
 
 /*! @page release_notes Release Notes
+<center>
+\htmlonly
+Version: $(VERSION)
+\endhtmlonly
+</center>
 
 @addindex release_notes
 
