@@ -78,16 +78,20 @@ namespace MiscTest
 		
 			ModelLoaderInterface loader = new MQ_BadFakeTickLoader();
     		starter.Run(loader);
-    		Portfolio strategy = loader.TopModel as Portfolio;
+    		Portfolio portfolio = loader.TopModel as Portfolio;
     		
-    		MQ_BadFakeTick_0 mq0 = (MQ_BadFakeTick_0) strategy.Strategies[0];
-    		MQ_BadFakeTick_1 mq1 = (MQ_BadFakeTick_1) strategy.Strategies[1];
-    		MQ_BadFakeTick_2 mq2 = (MQ_BadFakeTick_2) strategy.Strategies[2];
+    		MQ_BadFakeTick_0 mq0 = (MQ_BadFakeTick_0) portfolio.Strategies[0];
+    		MQ_BadFakeTick_1 mq1 = (MQ_BadFakeTick_1) portfolio.Strategies[1];
+    		MQ_BadFakeTick_2 mq2 = (MQ_BadFakeTick_2) portfolio.Strategies[2];
+    		double mq0Net = mq0.Performance.Equity.CurrentEquity-mq0.Performance.Equity.StartingEquity;
+    		double mq1Net = mq1.Performance.Equity.CurrentEquity-mq1.Performance.Equity.StartingEquity;
+    		double mq2Net = mq2.Performance.Equity.CurrentEquity-mq2.Performance.Equity.StartingEquity;
+    		double total = mq0Net + mq1Net + mq2Net;
     		Assert.AreEqual(26.00,mq0.Performance.ComboTrades.CalcProfitLoss(0));
     		Assert.AreEqual(-27.5,mq1.Performance.ComboTrades.CalcProfitLoss(0));
     		Assert.AreEqual(-14.5,mq2.Performance.ComboTrades.CalcProfitLoss(0));
-    		Assert.AreEqual(-9.00,strategy.Performance.ComboTrades.CalcProfitLoss(0));
-    		Assert.AreEqual(-16.00,strategy.Performance.Equity.CurrentEquity-strategy.Performance.Equity.StartingEquity);
+    		Assert.AreEqual(-9.00,portfolio.Performance.ComboTrades.CalcProfitLoss(0));
+    		Assert.AreEqual(-16.00,portfolio.Performance.Equity.CurrentEquity-portfolio.Performance.Equity.StartingEquity);
  
 		}
 	}

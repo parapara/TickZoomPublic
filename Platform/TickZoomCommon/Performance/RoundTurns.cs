@@ -27,29 +27,23 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	[Obsolete("Please use TransactionPairs collection instead.")]
-	public class RoundTurns : TransactionPairs {
-		public RoundTurns(ProfitLoss pnl) : base(pnl)
-		{
-		}
-		public RoundTurns(ProfitLoss pnl,TransactionPairsBinary pairs) : base(pnl,pairs)
-		{
-		}
-	}
 	public class TransactionPairs : IEnumerable
 	{
 		string name = "TradeList";
 		TransactionPairsBinary transactionPairs;
 		int totalProfit = 0;
 		ProfitLoss profitLossCalculation;
+		Func<double,double> currentPrice;
 		
-		public TransactionPairs(ProfitLoss pnl)
+		public TransactionPairs(Func<double,double> currentPrice, ProfitLoss pnl)
 		{
+			this.currentPrice = currentPrice;
 			profitLossCalculation = pnl;
 			this.transactionPairs = new TransactionPairsBinary();
 		}
-		public TransactionPairs(ProfitLoss pnl,TransactionPairsBinary transactionPairs)
+		public TransactionPairs(Func<double,double> currentPrice, ProfitLoss pnl,TransactionPairsBinary transactionPairs)
 		{
+			this.currentPrice = currentPrice;
 			profitLossCalculation = pnl;
 			this.transactionPairs = transactionPairs;
 		}
@@ -65,10 +59,17 @@ namespace TickZoom.Common
 		}
 		
 		public double CurrentProfitLoss {
-			get { return Count == 0 ? 0 : CalcProfitLoss(Current); }
+			get { if( Count == 0 || transactionPairs.Current.Completed) {
+					return 0D;
+				} else {
+					System.Diagnostics.Debug.Assert(currentPrice!=null);
+					return ProfitInPosition(transactionPairs.Current,currentPrice(transactionPairs.Current.Direction));
+				}
+			}
 		}
 		
 		public double CalcProfitLoss(int index) {
+			if( index >= Count) return 0D;
 			double value = ProfitInPosition(index,transactionPairs[index].ExitPrice);
 			return value;
 		}
@@ -83,15 +84,11 @@ namespace TickZoom.Common
 			return Math.Round(value,3);
 		}
 		
-		public double ProfitInPosition( int index, Tick tick) {
-			TransactionPairBinary binary = transactionPairs[index];
-			double price = 0;
-			if( binary.Direction > 0) {
-				price = tick.Ask;	
-			} else if( binary.Direction < 0) {
-				price = tick.Bid;
+		internal double ProfitInPosition( TransactionPairBinary binary, double price) {
+			if( binary.Completed) {
+				price = binary.ExitPrice;
 			}
-			return ProfitInPosition(index,price);
+			return profitLossCalculation.CalculateProfit( binary.Direction, binary.EntryPrice, price);
 		}
 		
 		public double ProfitInPosition( int index, double price) {

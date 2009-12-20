@@ -121,16 +121,6 @@ namespace TickZoom.Common
 			binary.SetProperties(parameters);
 		}
 		
-		public void UpdatePrice(TickZoom.Api.Tick tick)
-		{
-			binary.UpdatePrice(tick);
-		}
-		
-		public void UpdatePrice(double price)
-		{
-			binary.UpdatePrice(price);
-		}
-		
 		public void ChangeSize(double newSize, double price)
 		{
 			binary.ChangeSize(newSize,price);

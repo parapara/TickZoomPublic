@@ -173,7 +173,8 @@ namespace TickZoom.Common
 			set { exitTime = value; }
 		}
 	}
-	public struct TransactionPairBinary 
+
+	public class TransactionPairBinary 
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(TransactionPair));
 		private static readonly bool debug = log.IsDebugEnabled;
@@ -189,6 +190,10 @@ namespace TickZoom.Common
 		private double maxPrice;
 		private double minPrice;
 		private bool completed;
+		
+		public TransactionPairBinary() {
+			
+		}
 		
 		public bool Completed {
 			get { return completed; }
@@ -222,9 +227,17 @@ namespace TickZoom.Common
 			completed = other.completed;
 		}
 		
-		public void UpdatePrice(Tick tick) {
-			UpdatePrice(tick.Bid);
+		public void TryUpdate(Tick tick) {
+			if( !completed) {
+				if( direction > 0) {
+					UpdatePrice(tick.Bid);
+				} else {
+					UpdatePrice(tick.Ask);
+				}
+				exitTime = tick.Time;
+			}
 		}
+		
 		
 		public void UpdatePrice(double price) {
 			if( trace ) log.Trace("UpdatePrice("+price+")");

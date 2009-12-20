@@ -52,13 +52,22 @@ namespace TickZoom.Common
 			Model equity = new Equity(strategy);
 			equityChain = Chain.InsertAfter(equity.Chain);
 			comboTradesBinary  = new TransactionPairsBinary();
-			comboTrades  = new TransactionPairs(profitLoss,comboTradesBinary);
 			comboTradesBinary.Name = "ComboTrades";
+		}
+		
+		public double GetCurrentPrice( double direction) {
+			System.Diagnostics.Debug.Assert(direction!=0);
+			if( direction > 0) {
+				return Ticks[0].Bid;
+			} else {
+				return Ticks[0].Ask;
+			}
 		}
 		
 		public override void OnInitialize()
 		{
 			next = Chain.Next.Model as StrategySupport;
+			comboTrades  = new TransactionPairs(GetCurrentPrice,profitLoss,comboTradesBinary);
 			profitLoss.FullPointValue = Data.SymbolInfo.FullPointValue;
 
 			if( graphAveragePrice) {
@@ -93,13 +102,13 @@ namespace TickZoom.Common
 				if( IsTrace) Log.Outdent();
 			} 
 			Position.Copy(next.Position);
-			if( Position.HasPosition) {
-				comboTradesBinary.Current.UpdatePrice(tick);
-				double pnl = comboTrades.ProfitInPosition(comboTrades.Current,tick);
-				if( pnl != 0) {
-					Equity.OnSetOpenEquity( pnl);
-				}
-			}
+//			if( Position.HasPosition) {
+//				comboTradesBinary.Current.TryUpdate(tick);
+//				double pnl = comboTrades.ProfitInPosition(comboTrades.Current,tick);
+//				if( pnl != 0) {
+//					Equity.OnSetOpenEquity( pnl);
+//				}
+//			}
 			return true;
 		}
 		
@@ -139,7 +148,6 @@ namespace TickZoom.Common
 			comboTrade.Completed = true;
 			comboTradesBinary.Current = comboTrade;
 			double pnl = profitLoss.CalculateProfit(comboTrade.Direction,comboTrade.EntryPrice,comboTrade.ExitPrice);
-			Equity.OnSetOpenEquity(0);
 			Equity.OnChangeClosedEquity( pnl);
 			
 			Strategy.OnExitTrade();
@@ -231,11 +239,11 @@ namespace TickZoom.Common
 		}
 
 		public TransactionPairs ComboTrades {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(profitLoss,comboTradesBinary.GetCompletedList(Ticks[0].Time,Ticks[0].Bid,Bars.BarCount));
-				} else {
-					return new TransactionPairs(profitLoss);
+			get { 
+				if( comboTradesBinary.Count > 0) {
+					comboTradesBinary.Current.TryUpdate(Ticks[0]);
 				}
+				return comboTrades;
 			}
 		}
 		

@@ -52,7 +52,7 @@ namespace TickZoom.Common
 				}
 			}
 			if( other.Count > 0) {
-				winners = new BaseStats(new TransactionPairs(Trades.ProfitLossCalculation,other));
+				winners = new BaseStats(new TransactionPairs(null,Trades.ProfitLossCalculation,other));
 			}
 		}
 		public BaseStats Winners {
@@ -66,7 +66,7 @@ namespace TickZoom.Common
 					other.Add(Trades.GetBinary(i));
 				}
 			}
-			losers = new BaseStats(new TransactionPairs(Trades.ProfitLossCalculation,other));
+			losers = new BaseStats(new TransactionPairs(null,Trades.ProfitLossCalculation,other));
 		}
 		public BaseStats Losers {
 			get { return losers; }

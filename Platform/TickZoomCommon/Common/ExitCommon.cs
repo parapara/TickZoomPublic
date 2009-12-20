@@ -92,7 +92,6 @@ namespace TickZoom.Common
 				orders.sellStop.IsActive = false;
 			}
 			if( position.HasPosition ) {
-				// copy signal in case of increased position size
 				if( orders.buyStop.IsActive ) ProcessBuyStop(tick);
 				if( orders.sellStop.IsActive ) ProcessSellStop(tick);
 				if( orders.buyLimit.IsActive ) ProcessBuyLimit(tick);

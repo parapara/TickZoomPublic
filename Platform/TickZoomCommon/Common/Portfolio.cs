@@ -158,13 +158,20 @@ namespace TickZoom.Common
 					closedEquity = tempClosedEquity;
 				}
 				if( tempOpenEquity != openEquity) {
-					Performance.Equity.OnSetOpenEquity(tempOpenEquity);
 					openEquity = tempOpenEquity;
 				}
 				return true;
 			} else {
 				throw new ApplicationException("PortfolioType was never set.");
 			}
+		}
+		
+		public double GetOpenEquity() {
+			double tempOpenEquity = 0;
+			foreach( var strategy in strategies) {
+				tempOpenEquity += strategy.Performance.Equity.OpenEquity;
+			}
+			return tempOpenEquity;
 		}
 		
 		/// <summary>
