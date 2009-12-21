@@ -51,7 +51,10 @@ namespace TickZoom.TickUtil
 
 		byte dataVersion;
 		TickBinary binary;
-		
+		TimeStamp localTime;
+		TimeStamp nextUtcOffsetUpdate;
+		double utcOffset;
+
 		public void Initialize() {
 			ClearContentMask();
 		}
@@ -59,7 +62,16 @@ namespace TickZoom.TickUtil
 		/// <inheritdoc/>
 		public void SetTime(TimeStamp utcTime)
 		{
-			this.Time = utcTime;
+			binary.UtcTime = utcTime;
+			if( utcTime >= nextUtcOffsetUpdate) {
+				utcOffset = utcTime.UtcOffset;
+				nextUtcOffsetUpdate = utcTime;
+				int dayOfWeek = nextUtcOffsetUpdate.GetDayOfWeek();
+				nextUtcOffsetUpdate.AddDays( 7 - dayOfWeek);
+				nextUtcOffsetUpdate.SetDate(nextUtcOffsetUpdate.Year,nextUtcOffsetUpdate.Month,nextUtcOffsetUpdate.Day);
+			}
+			localTime = binary.UtcTime;
+			localTime.AddDays(utcOffset);
 		}
 		
 		public void SetQuote(double dBid, double dAsk)
@@ -67,7 +79,7 @@ namespace TickZoom.TickUtil
 			SetQuote( dBid.ToLong(), dAsk.ToLong());
 		}
 		
-		internal void SetQuote(long lBid, long lAsk) {
+		public void SetQuote(long lBid, long lAsk) {
 			IsQuote=true;
 			binary.Bid = lBid;
 			binary.Ask = lAsk;
@@ -83,7 +95,7 @@ namespace TickZoom.TickUtil
 			SetTrade(side,price.ToLong(),size);
 		}
 		
-		internal void SetTrade(TradeSide side, long lPrice, int size) {
+		public void SetTrade(TradeSide side, long lPrice, int size) {
 			IsTrade=true;
 			binary.Side = (byte) side;
 			binary.Price = lPrice;
@@ -96,22 +108,14 @@ namespace TickZoom.TickUtil
 			fixed( ushort *b = binary.DepthBidLevels)
 			fixed( ushort *a = binary.DepthAskLevels) {
 				for(int i=0;i<TickBinary.DomLevels;i++) {
-					*(b+i) = bidSize[i];;
-					*(a+i) = askSize[i];;
+					*(b+i) = bidSize[i];
+					*(a+i) = askSize[i];
 				}
 			}
 		}
 		
-		/// <summary>
-		/// Obsolete: Please use Clone() instead.
-		/// </summary>
-		[Obsolete("Please use Copy() instead.",true)]
-		public void init(TickBinary tick) {
-			binary = tick;
-		}
-		
-		public void Copy(TickBinary tick) {
-			binary = tick;
+		public void SetSymbol( ulong lSymbol) {
+			binary.Symbol = lSymbol;
 		}
 		
 		/// <summary>
@@ -143,16 +147,15 @@ namespace TickZoom.TickUtil
 			bool simulateTicks = (contentMask & ContentBit.SimulateTicks) != 0;
 			bool quote = (contentMask & ContentBit.Quote) != 0;
 			bool trade = (contentMask & ContentBit.TimeAndSales) != 0;
-			binary.Symbol = tick.lSymbol;
+			binary.Symbol = lSymbol;
 			Initialize();
 			SetTime(tick.UtcTime);
 			IsSimulateTicks = simulateTicks;
 			if( quote) {
 				SetQuote(tick.lBid, tick.lAsk);
-			} else if( trade) {
+			}
+			if( trade) {
 				SetTrade(tick.Side, tick.lPrice, tick.Size);
-			} else {
-				throw new ApplicationException( "Unknown tick content mask = " + contentMask);
 			}
 			if( dom) {
 				fixed( ushort *b = binary.DepthBidLevels)
@@ -169,6 +172,7 @@ namespace TickZoom.TickUtil
 		/// <summary>
 		/// Use for setting quote data on the tick.
 		/// </summary>
+		[Obsolete("Please use multiple init methods instead to set last trade and quote data in two method calls. This greatly simplifies the API.",true)]
 		public void init(TimeStamp utcTime, double dBid, double dAsk) {
 			init( utcTime, dBid.ToLong(), dAsk.ToLong());
 		}
@@ -183,6 +187,7 @@ namespace TickZoom.TickUtil
 		/// <param name="utcTime"></param>
 		/// <param name="lBid"></param>
 		/// <param name="lAsk"></param>
+		[Obsolete("Please use multiple init methods instead to set last trade and quote data in two method calls. This greatly simplifies the API.",true)]
 		internal void init(TimeStamp utcTime, long lBid, long lAsk) {
 			ClearContentMask();
 			dataVersion = TickVersion;
@@ -198,6 +203,7 @@ namespace TickZoom.TickUtil
 		/// <param name="utcTime"></param>
 		/// <param name="price"></param>
 		/// <param name="size"></param>
+		[Obsolete("Please use multiple init methods instead to set last trade and quote data in two method calls. This greatly simplifies the API.",true)]
 		public void init(TimeStamp utcTime, double price, int size) {
 			init( utcTime, (byte) TradeSide.Unknown, price, size);
 		}
@@ -212,6 +218,7 @@ namespace TickZoom.TickUtil
 		/// <param name="side"></param>
 		/// <param name="price"></param>
 		/// <param name="size"></param>
+		[Obsolete("Please use multiple init methods instead to set last trade and quote data in two method calls. This greatly simplifies the API.",true)]
 		public void init(TimeStamp utcTime, byte side, double price, int size) {
 			init( utcTime, side, price.ToLong(), size);
 		}
@@ -223,6 +230,7 @@ namespace TickZoom.TickUtil
 		/// <param name="side"></param>
 		/// <param name="lPrice"></param>
 		/// <param name="size"></param>
+		[Obsolete("Please use multiple init methods instead to set last trade and quote data in two method calls. This greatly simplifies the API.",true)]
 		internal void init(TimeStamp utcTime, byte side, long lPrice, int size) {
 			ClearContentMask();
 			IsTrade=true;
@@ -563,29 +571,38 @@ namespace TickZoom.TickUtil
 			return position;
 		}
 		
-		private static readonly TickImpl Blank = new TickImpl();
+		private static readonly TickBinary Blank = new TickBinary();
 		public int FromReader(BinaryReader reader) {
-			this = Blank;
+			binary = Blank;
 			int position = 0;
 			dataVersion = reader.ReadByte(); position++;
 			switch( dataVersion) {
 				case 1:
-					return FromFileVersion1(reader) + position;
+					position += FromFileVersion1(reader);
+					break;
 				case 2:
-					return FromFileVersion2(reader) + position;
+					position += FromFileVersion2(reader);
+					break;
 				case 3:
-					return FromFileVersion3(reader) + position;
+					position += FromFileVersion3(reader);
+					break;
 				case 4:
-					return FromFileVersion4(reader) + position;
+					position += FromFileVersion4(reader);
+					break;
 				case 5:
-					return FromFileVersion5(reader) + position;
+					position += FromFileVersion5(reader);
+					break;
 				case 6:
-					return FromFileVersion6(reader) + position;
+					position += FromFileVersion6(reader);
+					break;
 				case 7:
-					return FromFileVersion7(reader) + position;
+					position += FromFileVersion7(reader);
+					break;
 				default:
 					throw new ApplicationException("Unknown Tick Version Number " + dataVersion);
 			}
+			SetTime(binary.UtcTime);
+			return position;
 		}
 		
 		public int CompareTo(object obj)
@@ -670,15 +687,12 @@ namespace TickZoom.TickUtil
 			}
 		}
 		
-		TimeStamp localTime;
 		public TimeStamp Time {
-			get { localTime = binary.UtcTime; localTime.AddDays(localTime.UtcOffset); return localTime; }
-			set { binary.UtcTime = value; }
+			get { return localTime; }
 		}
 		
 		public TimeStamp UTCTime {
 			get { return binary.UtcTime; }
-			set { binary.UtcTime = value; }
 		}
 		
 		public override int GetHashCode()
@@ -703,31 +717,25 @@ namespace TickZoom.TickUtil
 		
 		public long lBid {
 			get { return binary.Bid; }
-			set { binary.Bid = value; }
 		}
 		public long lAsk {
 			get { return binary.Ask; }
-			set { binary.Ask = value; }
 		}
 		
 		public long lPrice {
 			get { return binary.Price; }
-			set { binary.Price = value; }
 		}
 		
 		public TimeStamp UtcTime {
 			get { return binary.UtcTime; }
-			set { binary.UtcTime = value; }
 		}
 
 		public ulong lSymbol {
 			get { return binary.Symbol; }
-			set { binary.Symbol = value; }
 		}
 		
 		public string Symbol {
 			get { return binary.Symbol.ToSymbol(); }
-			set { binary.Symbol = value.ToULong(); }
 		}
 		
 		public int DomLevels {
@@ -814,6 +822,11 @@ namespace TickZoom.TickUtil
 			return binary;
 		}
 
+		public void Inject(TickBinary tick) {
+			binary = tick;
+			SetTime(binary.UtcTime);
+		}
+		
 		public bool IsRealTime {
 			get { return false; }
 			set { }

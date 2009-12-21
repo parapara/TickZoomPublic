@@ -291,6 +291,11 @@ namespace TickZoom.Api
 			return timeStampToDayOfYear( _timeStamp );
 		}
 
+		public int GetDayOfWeek()
+		{
+			return timeStampToWeekDay( _timeStamp );
+		}
+		
 		public static double CalendarDateTotimeStamp( int year, int month, int day,
 			int hour, int minute, int second, int millisecond )
 		{

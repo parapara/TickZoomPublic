@@ -73,34 +73,35 @@ namespace TickZoom.TickUtil
 			tick.SetDepth(bidSize,askSize);
 		}
 		
-		public void init(TickBinary tickBinary) {
-			tick.Copy(tickBinary);
-		}
-		
-		public void init(TickIO tickIO) {
-			tick.Copy(tickIO,tickIO.ContentMask);
+		public void SetSymbol( ulong lSymbol) {
+			tick.SetSymbol(lSymbol);
 		}
 		
 		public void init(TickIO tickIO, byte contentMask){
 			tick.Copy(tickIO,contentMask);
 		}
 		
+		[Obsolete("Please use multiple init methods instead of this one.",true)]
 		public void init(TimeStamp utcTime, double dBid, double dAsk) {
 			tick.init(utcTime,dBid,dAsk);
 		}
 
+		[Obsolete("Please use multiple init methods instead of this one.",true)]
 		public void init(TimeStamp utcTime, double price, int size) {
 			tick.init(utcTime,price,size);
 		}
 
+		[Obsolete("Please use multiple init methods instead of this one.",true)]
 		public void init(TimeStamp utcTime, byte side, double price, int size) {
 			init(utcTime, side, price, size);
 		}
 		
+		[Obsolete("Please use multiple init methods instead of this one.",true)]
 		public void init(TimeStamp utcTime, byte side, double dPrice, int size, double dBid, double dAsk) {
 			init(utcTime, side, dPrice, size, dBid, dAsk);
 		}
 
+		[Obsolete("Please use multiple init methods instead of this one.",true)]
 		public void init(TimeStamp utcTime, byte side, double price, int size, double dBid, double dAsk, ushort[] bidSize, ushort[] askSize) {
 			init(utcTime, side, price, size, dBid, dAsk, bidSize, askSize);
 		}
@@ -168,7 +169,6 @@ namespace TickZoom.TickUtil
 		
 		public TimeStamp Time {
 			get { return tick.Time; }
-			set { tick.Time = value; }
 		}
 		
 		public int CompareTo(TickBox other)
@@ -201,43 +201,45 @@ namespace TickZoom.TickUtil
 			return tick.Extract();
 		}
 		
+		public void Inject(TickBinary tickBinary) {
+			tick.Inject(tickBinary);
+		}
+		
+		
+		public void Inject(TickIO tickIO) {
+			tick.Copy(tickIO,tickIO.ContentMask);
+		}
+		
 		public byte ContentMask {
 			get { return tick.ContentMask; }
 		}
 		
 		public long lBid {
 			get { return tick.lBid; }
-			set { tick.lBid = value; }
 		}
 		
 		public long lAsk {
 			get { return tick.lAsk; }
-			set { tick.lAsk = value; }
 		}
 		
 		public long lPrice {
 			get { return tick.lPrice; }
-			set { tick.lPrice = value; }
 		}
 		
 		public bool IsRealTime {
 			get { return tick.IsRealTime; }
-			set { tick.IsRealTime = value; }
 		}
 		
 		public TimeStamp UtcTime {
 			get { return tick.UtcTime; }
-			set { tick.UtcTime = value; }
 		}
 		
 		public ulong lSymbol {
 			get { return tick.lSymbol; }
-			set { tick.lSymbol = value; }
 		}
 		
 		public string Symbol {
 			get { return tick.Symbol; }
-			set { tick.Symbol = value; }
 		}
 		
 		public int DomLevels {

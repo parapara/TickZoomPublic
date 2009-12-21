@@ -68,7 +68,7 @@ namespace TickZoom.TickData
 		    	while(true) {
 					tickReader.ReadQueue.Dequeue(ref tick);
 		    		stream.Seek(0,SeekOrigin.Begin);
-		    		tickIO.init(tick);
+		    		tickIO.Inject(tick);
 		    		tickIO.ToWriter(stream);
 		    		CompareSignature(stream.GetBuffer(),previous,stream.Position);
 		    		fileSize += stream.Position;

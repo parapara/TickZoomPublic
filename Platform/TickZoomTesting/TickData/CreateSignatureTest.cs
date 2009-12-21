@@ -63,7 +63,7 @@ namespace TickZoom.TickData
     			TickImpl tickImpl = new TickImpl();
 				for(int i=0;i<101;i++) {
     				tickReader.ReadQueue.Dequeue( ref tick);
-					tickImpl.Copy(tick);
+					tickImpl.Inject(tick);
 					compressed.Reset();
 					compressor.CompressTick(tick,compressed.Memory);
 					totalBytes+=compressedLength;
@@ -72,7 +72,7 @@ namespace TickZoom.TickData
 	    		Assert.AreEqual( TestSignature, compressor.Signature);
 				for(int i=0;i<200;i++) {
 	    			tickReader.ReadQueue.Dequeue(ref tick);
-					tickImpl.Copy(tick);
+					tickImpl.Inject(tick);
 					compressed.Reset();
 					compressor.CompressTick(tick,compressed.Memory);
 					totalBytes+=compressedLength;
@@ -110,7 +110,7 @@ namespace TickZoom.TickData
     			TickImpl tickImpl = new TickImpl();
 				for(int i=0;i<101;i++) {
     				tickReader.ReadQueue.Dequeue(ref tick);
-					tickImpl.Copy(tick);
+					tickImpl.Inject(tick);
 					compressor.CompareTick(tickImpl);
 					if( compressor.Count < 100) {
 						compressor.CopyMemory(output.Bytes,out length);
@@ -133,7 +133,7 @@ namespace TickZoom.TickData
 	    		byte[] buffer = new byte[1024];
 				for(int i=0;i<200;i++) {
 	    			tickReader.ReadQueue.Dequeue(ref tick);
-					tickImpl.Copy(tick);
+					tickImpl.Inject(tick);
 					compressor.CompareTick(tickImpl);
 					compressor.CalculateDifference(compressor.Current.Bytes,compressor.Previous.Bytes,compressor.Current.Length);
 					Array.Copy(compressor.Current.Bytes,buffer,compressor.Current.Length);

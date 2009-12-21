@@ -86,32 +86,26 @@ namespace TickZoom.Api
 		
 		long lBid {
 			get;
-			set;
 		}
 		
 		long lAsk {
 			get;
-			set;
 		}
 		
 		long lPrice {
 			get;
-			set;
 		}
 		
 		string Symbol {
 			get;
-			set;
 		}
 		
-		bool IsRealTime {
+		ulong lSymbol {
 			get;
-			set;
 		}
 		
 		bool IsSimulateTicks {
 			get;
-			set;
 		}
 		
 #region Obsolete
@@ -120,6 +114,14 @@ namespace TickZoom.Api
 		/// </summary>
 		[Obsolete("Please use Copy instead.",true)]
 		void init(TickIO tick, byte contentMask);
+		
+		/// <summary>
+		/// Obsolete: This property is unused and will be removed eventually.
+		/// </summary>
+		[Obsolete("This property is unused and will be removed eventually.",true)]
+		bool IsRealTime {
+			get;
+		}
 		
 		/// <summary>
 		/// Obsolete: Please use SetTime() and either SetQuote(), SetTrade(), SetDepth() instead

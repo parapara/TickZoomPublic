@@ -201,7 +201,9 @@ namespace TickZoom.Common
 			utcTime.AddDays(utcTime.UtcOffset);
 			double price = insertPrice;
 			
-			tickImpl.init(utcTime, price, price);
+			tickImpl.Initialize();
+			tickImpl.SetTime(utcTime);
+			tickImpl.SetQuote(price, price);
 
 			if( tickWriter == null) {
 	 			tickWriter = new TickWriter(true);

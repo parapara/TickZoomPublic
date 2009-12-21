@@ -216,7 +216,7 @@ namespace TickZoom.TickUtil
 			try {
 	    		if( position < length && !CancelPending) {
 	    			position += tickIO.FromReader(dataIn);
-	    			tickIO.lSymbol = lSymbol;
+	    			tickIO.SetSymbol(lSymbol);
 	    			if( dataVersion == 0) {
 	    				dataVersion = tickIO.DataVersion;			
 	    			}

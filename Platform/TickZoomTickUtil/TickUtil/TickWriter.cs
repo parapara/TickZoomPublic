@@ -137,7 +137,7 @@ namespace TickZoom.TickUtil
 					Factory.Parallel.Yield();
 				}
 				writeQueue.Dequeue(ref tick);
-				tickIO.init(tick);
+				tickIO.Inject(tick);
 				if( trace) {
 					log.Symbol = tickIO.Symbol;
 					log.TimeStamp = tickIO.Time;

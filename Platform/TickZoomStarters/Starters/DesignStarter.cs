@@ -112,12 +112,16 @@ namespace TickZoom.Common
 		public void StartSymbol(Receiver receiver, SymbolInfo symbol, TimeStamp startTime)
 		{
 			TickImpl tickImpl = new TickImpl();
-			tickImpl.init( new TimeStamp(2000,1,1), 100D, 100D);
-			tickImpl.lSymbol = symbol.BinaryIdentifier;
+			tickImpl.Initialize();
+			tickImpl.SetTime( new TimeStamp(2000,1,1));
+			tickImpl.SetQuote(100D, 100D);
+			tickImpl.SetSymbol( symbol.BinaryIdentifier);
 			TickBinary tickBinary = tickImpl.Extract();
 			receiver.OnHistorical(symbol);
 			receiver.OnSend(ref tickBinary );
-			tickImpl.init( new TimeStamp(2000,1,2), 101D, 101D);
+			tickImpl.Initialize();
+			tickImpl.SetTime( new TimeStamp(2000,1,2));
+			tickImpl.SetQuote(101D, 101D);
 			tickBinary = tickImpl.Extract();
 			receiver.OnSend(ref tickBinary);
 			receiver.OnEndHistorical(symbol);

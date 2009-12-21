@@ -88,7 +88,7 @@ namespace tzdata
 			TickIO tickIO = new TickImpl();
 			TickBinary tickBinary = new TickBinary();
 			inputQueue.Dequeue(ref tickBinary);
-			tickIO.init(tickBinary);
+			tickIO.Inject(tickBinary);
 			count++;
 			firstTick.Copy(tickIO);
 			firstTick.IsSimulateTicks = true;
@@ -100,7 +100,7 @@ namespace tzdata
 			try {
 				while(true) {
 					inputQueue.Dequeue(ref tickBinary);
-					tickIO.init(tickBinary);
+					tickIO.Inject(tickBinary);
 					
 					count++;
 					if( tickIO.Time >= startTime) {

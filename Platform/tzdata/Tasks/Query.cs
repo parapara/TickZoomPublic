@@ -69,14 +69,14 @@ namespace tzdata
 			TickIO tickIO = new TickImpl();
 			TickBinary tickBinary = new TickBinary();
 			queue.Dequeue(ref tickBinary);
-			tickIO.init(tickBinary);
+			tickIO.Inject(tickBinary);
 			count++;
 			firstTick.Copy( tickIO);
 			prevTick.Copy( tickIO);
 			try {
 				while(true) {
 					queue.Dequeue(ref tickBinary);
-					tickIO.init(tickBinary);
+					tickIO.Inject(tickBinary);
 					count++;
 					if( tickIO.Bid == prevTick.Bid && tickIO.Ask == prevTick.Ask) {
 						dups++;

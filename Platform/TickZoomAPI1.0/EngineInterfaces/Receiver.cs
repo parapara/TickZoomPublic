@@ -42,17 +42,14 @@ namespace TickZoom.Api
 	}
 	
 	public interface ReadWritable<T> {
-		void init(T tick);
+		void Inject(T tick);
+		void SetSymbol(ulong lSymbol);
 		T Extract();
 		int FromReader(BinaryReader reader);
 		void ToWriter(MemoryStream memory);
 		object ToPosition();
 		byte DataVersion {
 			get;
-		}
-		ulong lSymbol {
-			get;
-			set;
 		}
 	}
 	

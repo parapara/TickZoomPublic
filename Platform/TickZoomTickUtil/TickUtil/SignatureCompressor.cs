@@ -186,7 +186,7 @@ namespace TickZoom.TickUtil
 		
 		TickIO tickIO = new TickImpl();
 		public void CompressTick( TickBinary tick, MemoryStream memory) {
-			tickIO.init(tick);
+			tickIO.Inject(tick);
 			byte[] output = memory.GetBuffer();
 			int length = (int) memory.Length;
 			CompareTick(tickIO);
