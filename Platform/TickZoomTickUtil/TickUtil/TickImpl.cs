@@ -63,7 +63,7 @@ namespace TickZoom.TickUtil
 		public void SetTime(TimeStamp utcTime)
 		{
 			binary.UtcTime = utcTime;
-			if( utcTime >= nextUtcOffsetUpdate) {
+			if( utcTime.Internal >= nextUtcOffsetUpdate.Internal) {
 				utcOffset = utcTime.UtcOffset;
 				nextUtcOffsetUpdate = utcTime;
 				int dayOfWeek = nextUtcOffsetUpdate.GetDayOfWeek();

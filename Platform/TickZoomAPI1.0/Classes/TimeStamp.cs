@@ -54,6 +54,7 @@ namespace TickZoom.Api
 		public const double SecondsPerDay = 86400.0;
 		public const double MillisecondsPerSecond = 1000.0;
 		public const double MillisecondsPerDay = 86400000.0;
+        public const double MinimumTick = 1 / MillisecondsPerDay;
 		public const string DefaultFormatStr = "yyyy-MM-dd HH:mm:ss.fff";
 		
 		public void Assign( int year, int month, int day, int hour, int minute, int second, int millis) {
@@ -363,12 +364,11 @@ namespace TickZoom.Api
 		
 			return _CalendarDateToJulianDay( year, month, day, hour, minute, second, ms );
 		}
-		
-	    public void RoundTime()
+
+		public void RoundTime()
         {
-            double minimumTick = 1 / MillisecondsPerDay;
-            double numberOfTicks = Math .Round(_timeStamp / minimumTick, 0);
-            _timeStamp = numberOfTicks * minimumTick;
+	    	long numberOfTicks = (long)( (_timeStamp * MillisecondsPerDay) + 0.5);
+            _timeStamp = numberOfTicks * MinimumTick;
 		}
 	    
 	    private static void NormalizeCalendarDate( ref int year, ref int month, ref int day,
@@ -579,7 +579,10 @@ namespace TickZoom.Api
 		}
 
 		public void Sync() {
-			Assign(Year,Month,Day,Hour,Minute,Second,Millisecond);
+			int year, month, day, hour, minute, second, millisecond;
+ 		    GetDate(out year,out month,out day,out hour,out minute,out second,out millisecond);
+			
+			Assign(year,month,day,hour,minute,second,millisecond);
 		}
 		
 		public void AddMilliseconds( double dMilliseconds )

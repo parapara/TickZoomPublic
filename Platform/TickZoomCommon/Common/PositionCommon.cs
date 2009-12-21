@@ -72,11 +72,6 @@ namespace TickZoom.Common
 		}
 		
 		public virtual void Change( double position, double price, TimeStamp time) {
-			#if TRACE
-			if( value != current) {
-				if( trace) log.Trace(model.Name+".Signal("+value+")");
-			}
-			#endif
 			if( current != position) {
 				this.time = time;
 				this.price = price;
@@ -84,8 +79,15 @@ namespace TickZoom.Common
 			}
 		}
 		
-		public void Copy( PositionInterface other) {
-			Change(other.Current,other.Price,other.Time);
+		public void Copy( PositionInterface _other) {
+			PositionCommon other = _other as PositionCommon;
+			if( other != null) {
+				if( current != other.Current) {
+					Change(other.current, other.price, other.time);
+				}
+			} else {
+				throw new ApplicationException("Expected concrete class " + typeof(PositionCommon).Name);
+			}
 		}
 		
 		public string Symbol {
