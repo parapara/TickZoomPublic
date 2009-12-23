@@ -76,7 +76,7 @@ namespace TickZoom.MBTrading
         public void Initialize() {
         	tick = Factory.TickUtil.TickIO();
             lastTick = Factory.TickUtil.TickIO();
-        	tick.lSymbol = symbol.BinaryIdentifier;
+            tick.SetSymbol(symbol.BinaryIdentifier);
             this.level2Bids = new Level2Collection(this, symbol, enumMarketSide.msBid);
             this.level2Asks = new Level2Collection(this, symbol, enumMarketSide.msAsk);
         }
