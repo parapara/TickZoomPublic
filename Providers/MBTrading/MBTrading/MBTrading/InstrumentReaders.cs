@@ -55,7 +55,7 @@ namespace TickZoom.MBTrading
         {
             for(int i=0;i<readers.Count;i++)
             {
-                if(readers[i].Instrument.Symbol==Symbol) return i;
+                if(readers[i].Symbol.Symbol==Symbol) return i;
             }
             return -1;
         }
@@ -68,30 +68,19 @@ namespace TickZoom.MBTrading
             }
         }
         
-        public void AddQuotes(string symbol, bool saveFile)
+        public void AddDepth(SymbolInfo symbol)
         {
-        	int i = GetIndex(symbol);
+        	int i = GetIndex(symbol.Symbol);
             if (i == -1)
             {
-            	NewReader(symbol,QuoteType.Level1);
-            } 
-        }
-        
-        public void AddDepth(string symbol)
-        {
-        	int i = GetIndex(symbol);
-            if (i == -1)
-            {
-            	NewReader(symbol,QuoteType.Level2);
+            	NewReader(symbol);
             }
         }
         
-        private void NewReader(string symbol, QuoteType quoteType) {
-           	if( debug) log.Debug("NewReader for " + symbol + " with quote type " + quoteType);
- 	      	SymbolInfo instrument = Factory.Symbol.LookupSymbol(symbol);
-        	InstrumentReader reader = new InstrumentReader(m_OrderClient, m_Quotes, instrument);
+        private void NewReader(SymbolInfo symbol) {
+           	if( debug) log.Debug("NewReader for " + symbol + " with quote type " + symbol.FeedType);
+        	InstrumentReader reader = new InstrumentReader(m_OrderClient, m_Quotes, symbol);
         	reader.Receiver = receiver;
-        	reader.QuoteType = quoteType;
         	reader.Initialize();
             readers.Add(reader);
             if (m_Quotes.ConnectionState == enumConnectionState.csLoggedIn) {
@@ -131,7 +120,7 @@ namespace TickZoom.MBTrading
             for (int i = 0; i < readers.Count; i++)
             {
             	readers[i].Connect();
-            	if( debug) log.Debug("AdviseAll() advised symbol :" + readers[i].Instrument.Symbol);
+            	if( debug) log.Debug("AdviseAll() advised symbol :" + readers[i].Symbol.Symbol);
             }
         }
         
@@ -157,28 +146,28 @@ namespace TickZoom.MBTrading
         
         void OnCancelPlaced(MbtOpenOrder order) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == order.Symbol) {
+        		if( readers[i].Symbol.Symbol == order.Symbol) {
         			readers[i].OnCancelPlaced(order);
         		}
         	}
 	    }
         void OnReplacePlaced(MbtOpenOrder order) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == order.Symbol) {
+        		if( readers[i].Symbol.Symbol == order.Symbol) {
         			readers[i].OnReplacePlaced(order);
         		}
         	}
 	    }
         void OnReplaceRejected(MbtOpenOrder order) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == order.Symbol) {
+        		if( readers[i].Symbol.Symbol == order.Symbol) {
         			readers[i].OnReplaceRejected(order);
         		}
         	}
 	    }
         void OnCancelRejected(MbtOpenOrder order) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == order.Symbol) {
+        		if( readers[i].Symbol.Symbol == order.Symbol) {
         			readers[i].OnCancelRejected(order);
         		}
         	}
@@ -192,7 +181,7 @@ namespace TickZoom.MBTrading
 
 		void OnSubmit(MbtOpenOrder order) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == order.Symbol) {
+        		if( readers[i].Symbol.Symbol == order.Symbol) {
         			readers[i].OnSubmit(order);
         		}
         	}
@@ -200,42 +189,42 @@ namespace TickZoom.MBTrading
         
         void OnAcknowledge(MbtOpenOrder order) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == order.Symbol) {
+        		if( readers[i].Symbol.Symbol == order.Symbol) {
         			readers[i].OnAcknowledge(order);
         		}
         	}
 	    }
         void OnExecute(MbtOpenOrder order) { 
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == order.Symbol) {
+        		if( readers[i].Symbol.Symbol == order.Symbol) {
         			readers[i].OnExecute(order);
         		}
         	}
 	    }
         void OnRemove(MbtOpenOrder order) { 
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == order.Symbol) {
+        		if( readers[i].Symbol.Symbol == order.Symbol) {
         			readers[i].OnRemove(order);
         		}
         	}
 	    }
         void OnHistoryAdded(MBTORDERSLib.MbtOrderHistory orderhistory) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == orderhistory.Symbol) {
+        		if( readers[i].Symbol.Symbol == orderhistory.Symbol) {
         			readers[i].OnHistoryAdded(orderhistory);
         		}
         	}
 	    }
         void OnPositionAdded(MBTORDERSLib.MbtPosition position) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == position.Symbol) {
+        		if( readers[i].Symbol.Symbol == position.Symbol) {
         			readers[i].OnPositionAdded(position);
         		}
         	}
 	    }
         void OnPositionUpdated(MBTORDERSLib.MbtPosition position) {
         	for(int i=0; i<readers.Count; i++) {
-        		if( readers[i].Instrument.Symbol == position.Symbol) {
+        		if( readers[i].Symbol.Symbol == position.Symbol) {
         			readers[i].OnPositionUpdated(position);
         		}
         	}

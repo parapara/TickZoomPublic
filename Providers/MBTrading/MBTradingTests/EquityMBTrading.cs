@@ -67,7 +67,7 @@ namespace TickZoom.Test
 			if(debug) log.Debug("===StartSymbol===");
 			VerifyFeed verify = new VerifyFeed();
 			provider.Start(verify);
-  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+  			 provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");

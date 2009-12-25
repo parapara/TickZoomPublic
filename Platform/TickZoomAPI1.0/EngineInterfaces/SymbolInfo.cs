@@ -139,6 +139,20 @@ namespace TickZoom.Api
  		int ChartGroup {
  			get;
  		}
+ 		
+ 		/// <summary>
+ 		/// Determines whether Level1 or Level2 or both types of data should
+ 		/// be used to build the data for this symbol.
+ 		/// </summary>
+ 		FeedType FeedType {
+ 			get;
+ 		}
+	}
+	
+	public enum FeedType {
+		Level1,
+		Level2,
+		Both
 	}
 	
 	public interface ISymbolProperties : SymbolInfo

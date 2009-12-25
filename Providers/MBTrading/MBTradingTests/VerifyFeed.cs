@@ -76,7 +76,7 @@ namespace TickZoom.Test
 		private bool HandleTick(int expectedCount, Action<TickIO, TickIO, ulong> assertTick, SymbolInfo symbol) {
 			try { 
             	tickQueue.Dequeue(ref tickBinary);
-            	tick.init(tickBinary);
+            	tick.Copy(tickBinary);
 				if( debug && countLog < 5)
 				{
 					log.Debug("Received a tick " + tick);
@@ -87,7 +87,7 @@ namespace TickZoom.Test
             	if( count > 0) {
             		assertTick(tick,lastTick,symbol.BinaryIdentifier);
             	}
-            	lastTick.init(tick);
+            	lastTick.Copy(tick);
             	if( count >= expectedCount) return true;
 			} catch( QueueException ex) {
 				switch( ex.EntryType) {
@@ -127,7 +127,7 @@ namespace TickZoom.Test
 			try {
        			if( !tickQueue.CanDequeue) return false;
             	tickQueue.Dequeue(ref tickBinary);
-       			tick.init(tickBinary);
+       			tick.Copy(tickBinary);
 				if( debug && count < 5)
 				{
 					log.Debug("Received a tick " + tick);

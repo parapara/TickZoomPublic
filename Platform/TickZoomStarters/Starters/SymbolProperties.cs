@@ -52,7 +52,8 @@ namespace TickZoom.Common
 		private ulong binaryIdentifier;
 		private SymbolInfo universalSymbol;
 		private int chartGroup;
-		
+		private FeedType feedType = FeedType.Level2;
+
 		public int ChartGroup {
 			get { return chartGroup; }
 			set { chartGroup = value; }
@@ -146,5 +147,9 @@ namespace TickZoom.Common
 			return binaryIdentifier.GetHashCode();
 		}
 		
+		public FeedType FeedType {
+			get { return feedType; }
+			set { feedType = value; }
+		}
 	}
 }

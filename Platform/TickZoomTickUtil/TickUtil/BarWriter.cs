@@ -49,13 +49,13 @@ namespace TickZoom.TickUtil
 		
 		public void AddBar(double time, double open, double high, double low, double close, int volume, int openInterest) {
 			timeStamp.Internal = time;
-			closeTick.init( timeStamp, TradeSide.None, 0, volume, close, close);
+			closeTick.init( timeStamp, close, volume);
 			timeStamp.AddMilliseconds(-1);
-			highTick.init( timeStamp, TradeSide.None, 0, 0, high, high);
+			highTick.init( timeStamp, high, 0);
 			timeStamp.AddMilliseconds(-1);
-			lowTick.init( timeStamp, TradeSide.None, 0, 0, low, low);
+			lowTick.init( timeStamp, low, 0);
 			timeStamp.AddMilliseconds(-1);
-			openTick.init( timeStamp, TradeSide.None, 0, 0, open, open);
+			openTick.init( timeStamp, open, 0);
 			Add(openTick);
 			Add(lowTick);
 			Add(highTick);

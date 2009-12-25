@@ -25,7 +25,12 @@
  * <http://www.tickzoom.org/wiki/Licenses>.
  */
 
-/*! @page obsolete Correcting Obsolete Errors and Warnings
+/*! @page obsolete Resolving Obsolete Errors
+<center>
+\htmlonly
+Version: $(VERSION)
+\endhtmlonly
+</center>
 
 @addindex obsolete
 

@@ -33,6 +33,7 @@ namespace TickZoom.TickUtil
 	/// <summary>
 	/// Description of TickDOM.
 	/// </summary>
+	/// <inheritdoc/>
 	unsafe public struct TickImpl : TickIO
 	{
 		public const byte TickVersion = 7;
@@ -51,53 +52,123 @@ namespace TickZoom.TickUtil
 		byte dataVersion;
 		TickBinary binary;
 		
-		public bool IsRealTime {
-			get { return false; }
-			set { }
+		public void Initialize() {
+			ClearContentMask();
 		}
 		
+		/// <inheritdoc/>
+		public void SetTime(TimeStamp utcTime)
+		{
+			this.Time = utcTime;
+		}
+		
+		public void SetQuote(double dBid, double dAsk)
+		{
+			SetQuote( dBid.ToLong(), dAsk.ToLong());
+		}
+		
+		internal void SetQuote(long lBid, long lAsk) {
+			IsQuote=true;
+			binary.Bid = lBid;
+			binary.Ask = lAsk;
+		}
+		
+		public void SetTrade(double price, int size)
+		{
+			SetTrade(TradeSide.Unknown,price.ToLong(),size);
+		}
+		
+		public void SetTrade(TradeSide side, double price, int size)
+		{
+			SetTrade(side,price.ToLong(),size);
+		}
+		
+		internal void SetTrade(TradeSide side, long lPrice, int size) {
+			IsTrade=true;
+			binary.Side = (byte) side;
+			binary.Price = lPrice;
+			binary.Size = size;
+		}
+		
+		public void SetDepth(ushort[] bidSize, ushort[] askSize)
+		{
+			HasDepthOfMarket = true;
+			fixed( ushort *b = binary.DepthBidLevels)
+			fixed( ushort *a = binary.DepthAskLevels) {
+				for(int i=0;i<TickBinary.DomLevels;i++) {
+					*(b+i) = bidSize[i];;
+					*(a+i) = askSize[i];;
+				}
+			}
+		}
+		
+		/// <summary>
+		/// Obsolete: Please use Clone() instead.
+		/// </summary>
+		[Obsolete("Please use Copy() instead.",true)]
 		public void init(TickBinary tick) {
 			binary = tick;
 		}
 		
+		public void Copy(TickBinary tick) {
+			binary = tick;
+		}
+		
+		/// <summary>
+		/// Obsolete: Please use Copy() instead.
+		/// </summary>
+		[Obsolete("Please use Copy() instead.",true)]
 		public void init(TickIO tick) {
+			Copy(tick);
+		}
+		
+		public void Copy(TickIO tick) {
 			if( tick is TickImpl) {
 				this = (TickImpl) tick;
 			} else {  
-				init( tick, tick.ContentMask);
+				Copy( tick, tick.ContentMask);
 			}
 		}
 		
+		/// <summary>
+		/// Obsolete: Please use Copy() instead.
+		/// </summary>
+		[Obsolete("Please use Copy() instead.",true)]
 		public void init(TickIO tick, byte contentMask) {
+			Copy(tick,contentMask);
+		}
+		
+		public void Copy(TickIO tick, byte contentMask) {
 			bool dom = (contentMask & ContentBit.DepthOfMarket) != 0;
 			bool simulateTicks = (contentMask & ContentBit.SimulateTicks) != 0;
 			bool quote = (contentMask & ContentBit.Quote) != 0;
 			bool trade = (contentMask & ContentBit.TimeAndSales) != 0;
 			binary.Symbol = tick.lSymbol;
-			if( quote && !trade) {
-				init(tick.UtcTime, tick.lBid, tick.lAsk);
-			} else if( trade && !quote) {
-				init(tick.UtcTime, tick.Side, tick.lPrice, tick.Size);
-				IsSimulateTicks = simulateTicks;
-			} else if( quote && trade) {
-				init(tick.UtcTime, tick.Side, tick.lPrice, tick.Size, tick.lBid, tick.lAsk);
+			Initialize();
+			SetTime(tick.UtcTime);
+			IsSimulateTicks = simulateTicks;
+			if( quote) {
+				SetQuote(tick.lBid, tick.lAsk);
+			} else if( trade) {
+				SetTrade(tick.Side, tick.lPrice, tick.Size);
 			} else {
 				throw new ApplicationException( "Unknown tick content mask = " + contentMask);
-				}
+			}
 			if( dom) {
-				fixed( ushort *b = binary.DepthBidLevels) {
-				fixed( ushort *a = binary.DepthAskLevels) {
+				fixed( ushort *b = binary.DepthBidLevels)
+				fixed( ushort *a = binary.DepthAskLevels)
 				for(int i=0;i<TickBinary.DomLevels;i++) {
 					*(b+i) = tick.BidLevel(i);
 					*(a+i) = tick.AskLevel(i);
-				}
-				}
 				}
 			}
 			binary.ContentMask2 = contentMask;
 			dataVersion = tick.DataVersion;
 		}
 		
+		/// <summary>
+		/// Use for setting quote data on the tick.
+		/// </summary>
 		public void init(TimeStamp utcTime, double dBid, double dAsk) {
 			init( utcTime, dBid.ToLong(), dAsk.ToLong());
 		}
@@ -106,7 +177,13 @@ namespace TickZoom.TickUtil
 			binary.ContentMask2 = 0;
 		}
 		
-		public void init(TimeStamp utcTime, long lBid, long lAsk) {
+		/// <summary>
+		/// For internal use to set quote only data.
+		/// </summary>
+		/// <param name="utcTime"></param>
+		/// <param name="lBid"></param>
+		/// <param name="lAsk"></param>
+		internal void init(TimeStamp utcTime, long lBid, long lAsk) {
 			ClearContentMask();
 			dataVersion = TickVersion;
 			binary.UtcTime = utcTime;
@@ -115,16 +192,38 @@ namespace TickZoom.TickUtil
 			binary.Ask = lAsk;
 		}
 		
+		/// <summary>
+		/// Use to set last trade data on the tick.
+		/// </summary>
+		/// <param name="utcTime"></param>
+		/// <param name="price"></param>
+		/// <param name="size"></param>
 		public void init(TimeStamp utcTime, double price, int size) {
-			init( utcTime, TradeSide.None, price, size);
+			init( utcTime, (byte) TradeSide.Unknown, price, size);
 		}
 
+		/// <summary>
+		/// Sets the last trade data on the tick with the option
+		/// of setting the "side". The side of the trade is only useful
+		/// in advance data feed analysis to figure out which size of
+		/// the Bid/Ask spread absorbed this trade.
+		/// </summary>
+		/// <param name="utcTime"></param>
+		/// <param name="side"></param>
+		/// <param name="price"></param>
+		/// <param name="size"></param>
 		public void init(TimeStamp utcTime, byte side, double price, int size) {
 			init( utcTime, side, price.ToLong(), size);
 		}
 		
-		public void init(TimeStamp utcTime, byte side, long lPrice, int size) {
-			init(utcTime,binary.Price,binary.Price);
+		/// <summary>
+		/// For internal use in setting last trade data with side.
+		/// </summary>
+		/// <param name="utcTime"></param>
+		/// <param name="side"></param>
+		/// <param name="lPrice"></param>
+		/// <param name="size"></param>
+		internal void init(TimeStamp utcTime, byte side, long lPrice, int size) {
 			ClearContentMask();
 			IsTrade=true;
 			binary.Side = side;
@@ -132,11 +231,19 @@ namespace TickZoom.TickUtil
 			binary.Size = size;
 		}
 		
+		/// <summary>
+		/// Obsolete: Please use multiple init methods instead to set last trade and quote data in two method calls.
+		/// </summary>
+		[Obsolete("Please use multiple init methods instead to set last trade and quote data in two method calls.",true)]
 		public void init(TimeStamp utcTime, byte side, double dPrice, int size, double dBid, double dAsk) {
 			init(utcTime,side,dPrice.ToLong(),size,dBid.ToLong(),dAsk.ToLong());
 		}
-		
-		public void init(TimeStamp utcTime, byte side, long lPrice, int size, long lBid, long lAsk) {
+
+		/// <summary>
+		/// Obsolete: For setting tick values internally.
+		/// </summary>
+		[Obsolete("Please use multiple init methods instead to set last trade and quote data in two method calls. This greatly simplifies the API.",true)]
+		internal void init(TimeStamp utcTime, byte side, long lPrice, int size, long lBid, long lAsk) {
 			init(utcTime,lBid,lAsk);
 			ClearContentMask();
 			IsQuote = true;
@@ -146,6 +253,10 @@ namespace TickZoom.TickUtil
 			binary.Size = size;
 		}
 
+		/// <summary>
+		/// Obsolete: Please use multiple init methods instead to set last trade and quote data in two method calls. This greatly simplifies the API.
+		/// </summary>
+		[Obsolete("Please use multiple init methods instead to set last trade and quote data in two method calls. This greatly simplifies the API.",true)]
 		public void init(TimeStamp utcTime, byte side, double price, int size, double dBid, double dAsk, ushort[] bidSize, ushort[] askSize) {
 			init(utcTime,dBid,dAsk);
 			ClearContentMask();
@@ -166,22 +277,6 @@ namespace TickZoom.TickUtil
 			}
 		}
 		
-//		private static readonly Dictionary<byte,int> sizeOfList = new Dictionary<byte,int>();
-//		private static object locker = new object();
-//		public int Length {
-//			get {
-//				int retVal;
-//				if( !sizeOfList.TryGetValue(binary.ContentMask,out retVal)) {
-//					lock(locker) {
-//						MemoryStream memory = new MemoryStream(256);
-//						ToWriter(memory);
-//						sizeOfList[binary.ContentMask] = (int) memory.Length;
-//						retVal = (int) memory.Length;
-//					}
-//				}
-//				return retVal;
-//			}
-//		}
 		
 		public int BidDepth {
 			get { int total = 0;
@@ -444,7 +539,7 @@ namespace TickZoom.TickUtil
 			ClearContentMask();
 			IsQuote = true;
 			HasDepthOfMarket = true;
-			binary.Side = TradeSide.None;
+			binary.Side = (byte) TradeSide.Unknown;
 			binary.Price = (binary.Bid+binary.Ask)/2;
 			binary.Size = 0;
 			return position;
@@ -540,8 +635,8 @@ namespace TickZoom.TickUtil
 			get { return binary.Ask.ToDouble(); }
 		}
 		
-		public byte Side {
-			get { return binary.Side; }
+		public TradeSide Side {
+			get { return (TradeSide) binary.Side; }
 		}
 		
 		public double Price {
@@ -717,6 +812,11 @@ namespace TickZoom.TickUtil
 		public TickBinary Extract()
 		{
 			return binary;
+		}
+
+		public bool IsRealTime {
+			get { return false; }
+			set { }
 		}
 	}
 }

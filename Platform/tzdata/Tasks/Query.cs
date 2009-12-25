@@ -71,8 +71,8 @@ namespace tzdata
 			queue.Dequeue(ref tickBinary);
 			tickIO.init(tickBinary);
 			count++;
-			firstTick.init( tickIO);
-			prevTick.init( tickIO);
+			firstTick.Copy( tickIO);
+			prevTick.Copy( tickIO);
 			try {
 				while(true) {
 					queue.Dequeue(ref tickBinary);
@@ -81,12 +81,12 @@ namespace tzdata
 					if( tickIO.Bid == prevTick.Bid && tickIO.Ask == prevTick.Ask) {
 						dups++;
 					}
-					prevTick.init(tickIO);
+					prevTick.Copy(tickIO);
 				}
 			} catch( CollectionTerminatedException) {
 				
 			}
-			lastTick.init( tickIO);
+			lastTick.Copy( tickIO);
 			Console.WriteLine(reader.Symbol + ": " + count + " ticks from " + firstTick.Time + " to " + lastTick.Time + " " + dups + " duplicates");
 			TickReader.CloseAll();
 		}

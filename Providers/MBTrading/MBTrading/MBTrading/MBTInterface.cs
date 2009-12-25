@@ -71,7 +71,6 @@ namespace TickZoom.MBTrading
         private string password;
         private bool isLoggedIn;
 	    private readonly static object listLock = new object();
-        private List<string> symbols = new List<string>();
         private enumConnectionState permsHealth = enumConnectionState.csDisconnected;
         private enumConnectionState ordersHealth = enumConnectionState.csDisconnected;
         private enumConnectionState quotesHealth = enumConnectionState.csDisconnected;
@@ -285,7 +284,6 @@ namespace TickZoom.MBTrading
             int start = Environment.TickCount;
         	while( !closePending) {
             	CheckHealth();
-            	CheckSymbols();
             	CheckAccount();
             	DoEvents();
             	Thread.Sleep(1);
@@ -305,12 +303,6 @@ namespace TickZoom.MBTrading
         	}
         }
 
-        public void CheckSymbols() {
-            for( int i=symbols.Count-1; i>=0; i--) {
-            	instrumentReaders.AddDepth( symbols[i]);
-        	}
-        }
-        
         private void CheckHealth() {
         	try {
                 CheckPermsHealth();
@@ -606,7 +598,7 @@ namespace TickZoom.MBTrading
 		{
 			if( debug) log.Debug("StartSymbol " + symbol + ", " + lastTimeStamp);
 			receiver.OnRealTime(symbol);
-			instrumentReaders.AddDepth(symbol.Symbol);
+			instrumentReaders.AddDepth(symbol);
 		}
 		
 		public void StopSymbol(Receiver receiver, SymbolInfo symbol)

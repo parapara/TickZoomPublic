@@ -25,9 +25,9 @@ using System;
 
 namespace TickZoom.Api
 {
-	public class TradeSide {
-		public const byte None=0;
-		public const byte Buy=1;
-		public const byte Sell=2;
+	public enum TradeSide {
+		Unknown=0,
+		Buy=1,
+		Sell=2,
 	}
 }

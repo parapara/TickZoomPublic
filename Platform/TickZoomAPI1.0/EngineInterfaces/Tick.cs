@@ -57,7 +57,7 @@ namespace TickZoom.Api
 			get;
 		}
 		
-		byte Side {
+		TradeSide Side {
 			get;
 		}
 		

@@ -325,6 +325,7 @@ namespace TickZoom
 			get { return indicators; }
 		}
 		
+		/// <inheritdoc />
 		public int DrawText(string text, Color color, int bar, double y, Positioning orient) {
 			double x = barToXAxis(bar);
 			TextObj textObj = new TextObj(text, x,y);

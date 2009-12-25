@@ -90,9 +90,9 @@ namespace tzdata
 			inputQueue.Dequeue(ref tickBinary);
 			tickIO.init(tickBinary);
 			count++;
-			firstTick.init(tickIO);
+			firstTick.Copy(tickIO);
 			firstTick.IsSimulateTicks = true;
-			prevTick.init(tickIO);
+			prevTick.Copy(tickIO);
 			prevTick.IsSimulateTicks = true;
 			if( tickIO.Time >= startTime) {
 				writer.Add(firstTick);
@@ -109,7 +109,7 @@ namespace tzdata
 //							dups++;
 //						} else {
 //							Elapsed elapsed = tickIO.Time - prevTick.Time;
-							prevTick.init(tickIO);
+							prevTick.Copy(tickIO);
 							prevTick.IsSimulateTicks = true;
 //							if( elapsed.TotalMilliseconds < 5000) {
 //								fast++;
@@ -124,7 +124,7 @@ namespace tzdata
 					throw new ApplicationException("Unexpected QueueException: " + ex);
 				}
 			}
-			lastTick.init( tickIO);
+			lastTick.Copy( tickIO);
 			Console.WriteLine(reader.Symbol + ": " + count + " ticks from " + firstTick.Time + " to " + lastTick.Time + " " + dups + " duplicates, " + fast + " less than 50 ms");
 			TickReader.CloseAll();
 			writer.Close();

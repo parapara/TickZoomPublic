@@ -41,16 +41,48 @@ namespace TickZoom.TickUtil
 	{
 		private TickImpl tick;
 		
+		public void Copy(TickIO tickIO, byte contentMask){
+			tick.Copy(tickIO,contentMask);
+		}
+		
+		public void Initialize() {
+			tick.Initialize();
+		}
+		
+		public void SetTime(TimeStamp utcTime)
+		{
+			tick.SetTime(utcTime);
+		}
+		
+		public void SetQuote(double dBid, double dAsk)
+		{
+			tick.SetQuote(dBid,dAsk);
+		}
+		
+		public void SetTrade(double price, int size)
+		{
+			tick.SetTrade(price,size);
+		}
+		
+		public void SetTrade(TradeSide side, double price, int size)
+		{
+			tick.SetTrade(side,price,size);
+		}
+		
+		public void SetDepth(ushort[] bidSize, ushort[] askSize) {
+			tick.SetDepth(bidSize,askSize);
+		}
+		
 		public void init(TickBinary tickBinary) {
-			tick.init(tick);
+			tick.Copy(tickBinary);
 		}
 		
 		public void init(TickIO tickIO) {
-			tick.init(tickIO);
+			tick.Copy(tickIO,tickIO.ContentMask);
 		}
 		
 		public void init(TickIO tickIO, byte contentMask){
-			tick.init(tickIO,contentMask);
+			tick.Copy(tickIO,contentMask);
 		}
 		
 		public void init(TimeStamp utcTime, double dBid, double dAsk) {
@@ -106,7 +138,7 @@ namespace TickZoom.TickUtil
 			get { return tick.Ask; }
 		}
 		
-		public byte Side {
+		public TradeSide Side {
 			get { return tick.Side; }
 		}
 		
@@ -228,5 +260,7 @@ namespace TickZoom.TickUtil
 //		public int Length {
 //			get { return tick.Length; }
 //		}
+		
+
 	}
 }
