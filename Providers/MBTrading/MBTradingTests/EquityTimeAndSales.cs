@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -33,16 +33,14 @@ using TickZoom.TickUtil;
 
 namespace TickZoom.Test
 {
-#if FOREX
 	[TestFixture]
-	public class ForexMBTrading : EquityLevel2
+	public class EquityTimeAndSales : EquityLevel2
 	{
 		[TestFixtureSetUp]
 		public override void Init()
 		{
 			base.Init();
-			symbol = Factory.Symbol.LookupSymbol("USD/JPY");
+			symbol = Factory.Symbol.LookupSymbol("CSCO");
 		}	
 	}
-#endif
 }

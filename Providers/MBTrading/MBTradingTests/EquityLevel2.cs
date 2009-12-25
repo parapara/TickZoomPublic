@@ -39,9 +39,9 @@ using TickZoom.TickUtil;
 namespace TickZoom.Test
 {
 	[TestFixture]
-	public class EquityMBTrading
+	public class EquityLevel2
 	{
-		private static readonly Log log = Factory.Log.GetLogger(typeof(EquityMBTrading));
+		private static readonly Log log = Factory.Log.GetLogger(typeof(EquityLevel2));
 		private static readonly bool debug = log.IsDebugEnabled;		
 		Provider provider;
 		protected SymbolInfo symbol;
@@ -67,7 +67,7 @@ namespace TickZoom.Test
 			if(debug) log.Debug("===StartSymbol===");
 			VerifyFeed verify = new VerifyFeed();
 			provider.Start(verify);
-  			 provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
+  			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");

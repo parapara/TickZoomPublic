@@ -144,15 +144,39 @@ namespace TickZoom.Api
  		/// Determines whether Level1 or Level2 or both types of data should
  		/// be used to build the data for this symbol.
  		/// </summary>
- 		FeedType FeedType {
+ 		QuoteType QuoteType {
  			get;
  		}
+ 		
+ 		/// <summary>
+ 		/// What type of time and sales data to capture and stream.
+ 		/// </summary>
+ 		TimeAndSales TimeAndSales {
+ 			get;
+ 		}
+ 		
 	}
 	
-	public enum FeedType {
+	public enum TimeAndSales {
+		/// <summary>
+		/// Uses actual trades and is appropriate for stocks and futures.
+		/// </summary>
+		ActualTrades,
+		/// <summary>
+		/// Creates an extrapolated trade price and size by watching Level II data changes. 
+		/// This is appropriate for Forex since it never has actual trade data.
+		/// </summary>
+		Extrapolated,
+		/// <summary>
+		/// Leave last trade data empty in each tick.
+		/// </summary>
+		None
+	}
+	
+	public enum QuoteType {
 		Level1,
 		Level2,
-		Both
+		None
 	}
 	
 	public interface ISymbolProperties : SymbolInfo
@@ -172,7 +196,8 @@ namespace TickZoom.Api
 			get;
 			set;
 		}
-		
+
+#if UNNECESSARY
 		/// <summary>
 		/// Returns a fractional value for the minimum price move for the symbol.
 		/// For example: And U.S. stock's minimum tick will be 0.01
@@ -221,7 +246,8 @@ namespace TickZoom.Api
 			get;
 			set;
 		}
- 		
+ #endif
+ 
  		/// <summary>
  		/// With which other symbols with this one get drawn on a chart? Returns
  		/// a group number where 0 means never draw this symbol on any chart.

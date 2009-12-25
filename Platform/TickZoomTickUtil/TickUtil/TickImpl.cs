@@ -79,10 +79,26 @@ namespace TickZoom.TickUtil
 			SetQuote( dBid.ToLong(), dAsk.ToLong());
 		}
 		
+		public void SetQuote(double dBid, double dAsk, ushort bidSize, ushort askSize)
+		{
+			SetQuote( dBid.ToLong(), dAsk.ToLong(), bidSize, askSize);
+		}
+		
 		public void SetQuote(long lBid, long lAsk) {
 			IsQuote=true;
 			binary.Bid = lBid;
 			binary.Ask = lAsk;
+		}
+		
+		public void SetQuote(long lBid, long lAsk, ushort bidSize, ushort askSize) {
+			IsQuote=true;
+			binary.Bid = lBid;
+			binary.Ask = lAsk;
+			fixed( ushort *b = binary.DepthBidLevels)
+			fixed( ushort *a = binary.DepthAskLevels) {
+				*b = bidSize;
+				*a = askSize;
+			}
 		}
 		
 		public void SetTrade(double price, int size)
@@ -165,7 +181,7 @@ namespace TickZoom.TickUtil
 					*(a+i) = tick.AskLevel(i);
 				}
 			}
-			binary.ContentMask2 = contentMask;
+			binary.ContentMask = contentMask;
 			dataVersion = tick.DataVersion;
 		}
 		
@@ -178,7 +194,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		private void ClearContentMask() {
-			binary.ContentMask2 = 0;
+			binary.ContentMask = 0;
 		}
 		
 		/// <summary>
@@ -310,11 +326,11 @@ namespace TickZoom.TickUtil
 		
 		public override string ToString() {
 			string output = Time.ToString(TIMEFORMAT) + " " +
-				(IsTrade ? Side + "," + Price.ToString(",0.000") + "," + binary.Size + ", " : "") +
+				(IsTrade ? (Side != TradeSide.Unknown ? Side.ToString() + "," : "") + Price.ToString(",0.000") + "," + binary.Size + ", " : "") +
 				Bid.ToString(",0.000") + "/" + Ask.ToString(",0.000") + " ";
 			fixed( ushort *p = binary.DepthBidLevels) {
 				for(int i=TickBinary.DomLevels-1; i>=0; i--) {
-					if( i!=0) { output += ","; }
+					if( i!=TickBinary.DomLevels-1) { output += ","; }
 					output += *(p + i);
 				}
 			}
@@ -337,7 +353,7 @@ namespace TickZoom.TickUtil
 				byte *ptr = fptr;
 				*(ptr) = dataVersion; ptr++;
 				*(double*)(ptr) = binary.UtcTime.Internal; ptr+=sizeof(double);
-				*(ptr) = binary.ContentMask2; ptr++;
+				*(ptr) = binary.ContentMask; ptr++;
 				if( IsQuote) {
 					*(long*)(ptr) = binary.Bid; ptr += sizeof(long);
 					*(long*)(ptr) = binary.Ask; ptr += sizeof(long);
@@ -366,7 +382,7 @@ namespace TickZoom.TickUtil
 		private int FromFileVersion7(BinaryReader reader) {
 			int position = 0;
 			binary.UtcTime.Internal = reader.ReadDouble(); position += 8;
-			binary.ContentMask2 = reader.ReadByte(); position += 1;
+			binary.ContentMask = reader.ReadByte(); position += 1;
 			if( IsQuote ) {
 				binary.Bid = reader.ReadInt64(); position += 8;
 				binary.Ask = reader.ReadInt64(); position += 8;
@@ -624,7 +640,7 @@ namespace TickZoom.TickUtil
 			fixed( ushort*a2 = other.binary.DepthAskLevels) {
 			fixed( ushort*b1 = binary.DepthBidLevels) {
 			fixed( ushort*b2 = other.binary.DepthBidLevels) {
-				return binary.ContentMask2 == other.binary.ContentMask2 &&
+				return binary.ContentMask == other.binary.ContentMask &&
 					binary.UtcTime == other.binary.UtcTime &&
 					binary.Bid == other.binary.Bid &&
 					binary.Ask == other.binary.Ask &&
@@ -712,7 +728,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public byte ContentMask {
-			get { return binary.ContentMask2; }
+			get { return binary.ContentMask; }
 		}
 		
 		public long lBid {
@@ -743,45 +759,45 @@ namespace TickZoom.TickUtil
 		}
 		
 		public bool IsQuote {
-			get { return (binary.ContentMask2 & ContentBit.Quote) > 0; }
+			get { return (binary.ContentMask & ContentBit.Quote) > 0; }
 			set {
 				if( value ) {
-					binary.ContentMask2 |= ContentBit.Quote;
+					binary.ContentMask |= ContentBit.Quote;
 				} else {
-					binary.ContentMask2 &= ContentBit.Quote;
+					binary.ContentMask &= ContentBit.Quote;
 				}
 			}
 		}
 		
 		public bool IsSimulateTicks {
-			get { return (binary.ContentMask2 & ContentBit.SimulateTicks) > 0; }
+			get { return (binary.ContentMask & ContentBit.SimulateTicks) > 0; }
 			set {
 				if( value ) {
-					binary.ContentMask2 |= ContentBit.SimulateTicks;
+					binary.ContentMask |= ContentBit.SimulateTicks;
 				} else {
-					binary.ContentMask2 &= ContentBit.SimulateTicks;
+					binary.ContentMask &= ContentBit.SimulateTicks;
 				}
 			}
 		}
 		
 		public bool IsTrade {
-			get { return (binary.ContentMask2 & ContentBit.TimeAndSales) > 0; }
+			get { return (binary.ContentMask & ContentBit.TimeAndSales) > 0; }
 			set {
 				if( value ) {
-					binary.ContentMask2 |= ContentBit.TimeAndSales;
+					binary.ContentMask |= ContentBit.TimeAndSales;
 				} else {
-					binary.ContentMask2 &= ContentBit.TimeAndSales;
+					binary.ContentMask &= ContentBit.TimeAndSales;
 				}
 			}
 		}
 		
 		public bool HasDepthOfMarket {
-			get { return (binary.ContentMask2 & ContentBit.DepthOfMarket) > 0; }
+			get { return (binary.ContentMask & ContentBit.DepthOfMarket) > 0; }
 			set {
 				if( value ) {
-					binary.ContentMask2 |= ContentBit.DepthOfMarket;
+					binary.ContentMask |= ContentBit.DepthOfMarket;
 				} else {
-					binary.ContentMask2 &= ContentBit.DepthOfMarket;
+					binary.ContentMask &= ContentBit.DepthOfMarket;
 				}
 			}
 		}

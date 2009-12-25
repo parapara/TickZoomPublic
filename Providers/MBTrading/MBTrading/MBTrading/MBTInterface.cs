@@ -237,6 +237,7 @@ namespace TickZoom.MBTrading
         		TryRetryEnd();
         		if( debug) log.Debug("Quote Server Connected");
             	AttemptConnectReaders();
+            	InstrumentReaders.UpdateLastConnectTime();
             	lastChangeQuotes = 0;
         	} catch( Exception e) {
         		log.Error( e);
@@ -354,7 +355,6 @@ namespace TickZoom.MBTrading
 		            log.Info("Reconnect Connect {Readers timed out}");
 	            	m_Quotes.Disconnect();
 		            if( debug) log.Debug("Returned from Quotes.Connect {Readers Timeout}");
-		            lastChangeReaders = Environment.TickCount;
             	}
             }
         }

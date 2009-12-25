@@ -78,7 +78,7 @@ namespace TickZoom.MBTrading
         }
         
         private void NewReader(SymbolInfo symbol) {
-           	if( debug) log.Debug("NewReader for " + symbol + " with quote type " + symbol.FeedType);
+           	if( debug) log.Debug("NewReader for " + symbol + " with quote type " + symbol.QuoteType);
         	InstrumentReader reader = new InstrumentReader(m_OrderClient, m_Quotes, symbol);
         	reader.Receiver = receiver;
         	reader.Initialize();
@@ -124,6 +124,12 @@ namespace TickZoom.MBTrading
             }
         }
         
+        private int lastConnectTime = 0;
+        
+        public void UpdateLastConnectTime() {
+        	lastConnectTime = Environment.TickCount;
+        }
+        
         public int GetLastChangeTime()
         {
         	int lastChangeTime = 0;
@@ -132,6 +138,9 @@ namespace TickZoom.MBTrading
             	if( readers[i].LastChangeTime > lastChangeTime) {
             		lastChangeTime = readers[i].LastChangeTime;
             	}
+            }
+            if( lastConnectTime > lastChangeTime) {
+            	lastChangeTime = lastConnectTime;
             }
             return lastChangeTime;
         }

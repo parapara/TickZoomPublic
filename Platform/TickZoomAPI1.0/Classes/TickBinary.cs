@@ -33,7 +33,7 @@ namespace TickZoom.Api
 		public const int minTickSize = 256;
 		
 		public ulong Symbol;
-		public byte ContentMask2;
+		public byte ContentMask;
 		public TimeStamp UtcTime;
 		public long Bid;
 		public long Ask;

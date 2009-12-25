@@ -38,7 +38,7 @@ namespace TickZoom.MBTrading
 		Log log = Factory.Log.GetLogger(typeof(Level2Collection));
 		enumMarketSide side;
 		double lastPrice = 0;
-		long lastSize = 0;
+		int lastSize = 0;
 		InstrumentReader reader = null;
 		SymbolInfo instrument;
 		
@@ -82,15 +82,15 @@ namespace TickZoom.MBTrading
        		UpdateDepth();
        		if( this.Count > 0 ) {
 				if( lastPrice == this[0].dPrice) {
-		        	long volumeChange = (long) ((lastSize - this[0].lSize)/instrument.Level2LotSize);
+		        	int volumeChange = (int) ((lastSize - this[0].lSize)/instrument.Level2LotSize);
 		        	if( volumeChange > 0 ) {
-		        		reader.LogChange(side == enumMarketSide.msAsk ? TradeSide.Buy : TradeSide.Sell,
+		        		reader.LogLevel2Change(true, side == enumMarketSide.msAsk ? TradeSide.Buy : TradeSide.Sell,
 		        		                     lastPrice,volumeChange);
 		        	}
 		        } else if( lastPrice > 0) {
 		        	if( (side == enumMarketSide.msAsk && lastPrice < this[0].dPrice) || 
 		        	   	(side == enumMarketSide.msBid && lastPrice > this[0].dPrice ) ) {
-		        		reader.LogChange(side == enumMarketSide.msAsk ? TradeSide.Buy : TradeSide.Sell,
+		        		reader.LogLevel2Change(true, side == enumMarketSide.msAsk ? TradeSide.Buy : TradeSide.Sell,
 		        		                     lastPrice,lastSize/instrument.Level2LotSize);
 		        	}
 		        }

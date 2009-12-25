@@ -54,6 +54,13 @@ namespace TickZoom.Api
 		void SetQuote(double dBid, double dAsk);
 
 		/// <summary>
+		/// Sets quote data with size of bid and ask.
+		/// </summary>
+		/// <param name="dBid">The Bid price.</param>
+		/// <param name="dAsk">The Ask price.</param>
+		void SetQuote(double dBid, double dAsk, ushort bidSize, ushort askSize);
+		
+		/// <summary>
 		/// Sets last trade data for this tick.
 		/// </summary>
 		/// <param name="price">The price of the trade.</param>

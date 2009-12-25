@@ -58,10 +58,12 @@ namespace TickZoom.MBTrading
         private Thread quoteThread = null;
         private bool cancelThread = false;
         private Receiver receiver;
+        private double lastBid;
+        private double lastAsk;
+        private int lastBidSize;
+        private int lastAskSize;
         TickIO lastTick;
         TickIO tick;
-		TimeStamp tempDateTime;
-		int prevTickCount = 0;
 		SymbolInfo symbol;
         Dictionary<string,MbtOpenOrder> m_orders = new Dictionary<string,MbtOpenOrder>();
         
@@ -82,41 +84,88 @@ namespace TickZoom.MBTrading
         }
         
         public void ProcessTimeAndSales(ref TSRECORD pTimeAndSales) {
-			tempDateTime = (TimeStamp) pTimeAndSales.UTCDateTime;
+        	if( trace) log.Trace( "TimeAndSale: " + 
+        	                     pTimeAndSales.bstrExchange + ", " +
+        	                     pTimeAndSales.bstrSymbol + ", " +
+        	                     pTimeAndSales.cond + ", " +
+        	                     pTimeAndSales.dPrice + ", " +
+        	                     pTimeAndSales.lSize + ", " +
+        	                     pTimeAndSales.lType + ", " +
+        	                     pTimeAndSales.status + ", " +
+        	                     pTimeAndSales.tick + ", " +
+        	                     pTimeAndSales.type + ", " +
+        	                     pTimeAndSales.UTCDateTime );
 			int InsideMarketHours = 30030;
-			log.Debug( "Time and Sales: " + pTimeAndSales);
 			if( pTimeAndSales.status == enumTickStatus.tsNormal &&
 			    pTimeAndSales.type == enumTickType.ttTradeTick &&
-			    pTimeAndSales.cond == enumTickCondition.tcTrade_LastTrade &&
+			    pTimeAndSales.cond == enumTickCondition.tcTrade_RegularSale &&
 			    pTimeAndSales.lType == InsideMarketHours) {
-				tick.Initialize();
-				tick.SetTime(tempDateTime);
+				CreateTick();
 				tick.SetTrade(pTimeAndSales.dPrice, pTimeAndSales.lSize);
-        		TickBinary binary = new TickBinary();
-        		binary = tick.Extract();
-        		receiver.OnSend( ref binary);
+				if( Symbol.QuoteType == QuoteType.Level1) {
+					TryAddLevel1();
+				} else if( Symbol.QuoteType == QuoteType.Level2) {
+					TryAddLevel2();
+				}
+				SendTick();
 			}
         }
         
-        public void ProcessQuote(ref QUOTERECORD pQuote) {
-        	if( debug) log.Debug( "ProcessQuote: " + pQuote.dBid + "/" + pQuote.dAsk);
-			tempDateTime = (TimeStamp) pQuote.UTCDateTime;
+        private void CreateTick() {
+    		TimeStamp timeStamp = new TimeStamp();
+    		timeStamp.Internal = DateTime.Now.ToUniversalTime().ToOADate();
 			tick.Initialize();
-			tick.SetTime(tempDateTime);
-			tick.SetQuote(pQuote.dBid, pQuote.dAsk);
-        	if( debug) log.Debug( "Quote tick: " + tick);
-			if( tick.Bid != lastTick.Bid || tick.Ask != lastTick.Ask ||
-				Environment.TickCount - prevTickCount > 1000) {
-        		lastTick = tick;
-        		prevTickCount = Environment.TickCount;
-	
-        		TickBinary binary = tick.Extract();
-        		receiver.OnSend( ref binary);
-	        	if( debug) log.Debug( "Sent tick: " + binary.Bid + "/" + binary.Ask);
+			tick.SetTime(timeStamp);
+        }
+        
+        private void SendTick() {
+    		lastTick.Copy(tick,tick.ContentMask);
+    		TickBinary binary = new TickBinary();
+    		binary = tick.Extract();
+    		lastChangeTime = Environment.TickCount;
+    		receiver.OnSend( ref binary);
+        	if( debug) log.Debug( "Sent Tick: " + tick);
+        }
+        
+        public void ProcessLevel1(ref QUOTERECORD pQuote) {
+        	if( trace) log.Trace( "ProcessQuote: " + 
+        	                     pQuote.bstrCompany + ", " +
+        	                     pQuote.bstrMarket + ", " +
+        	                     pQuote.bstrSymbol + ", " +
+        	                     pQuote.bstrUnderlier + ", " +
+        	                     pQuote.dAsk + ", " +
+        	                     pQuote.dBid + ", " +
+        	                     pQuote.dLast + ", " +
+        	                     pQuote.dMarginMult + ", " +
+        	                     pQuote.dStrikePrice + ", " +
+        	                     pQuote.lAskSize + ", " +
+        	                     pQuote.lBidSize + ", " +
+        	                     pQuote.lContractSize + ", " +
+        	                     pQuote.lExpMonth + ", " +
+        	                     pQuote.lExpYear + ", " +
+        	                     pQuote.lFlags + ", " +
+        	                     pQuote.lLastSize + ", " +
+        	                     pQuote.putcall + ", " +
+        	                     pQuote.tick);
+			lastBid = pQuote.dBid;
+			lastAsk = pQuote.dAsk;
+			lastBidSize = pQuote.lBidSize;
+			lastAskSize = pQuote.lAskSize;
+			if( lastBid != lastTick.Bid || lastAsk != lastTick.Ask) {
+	        	CreateTick();
+	        	if( TryAddLevel1() ) {
+	        		SendTick();
+	        	}
 			}
         }
+        
+        private bool TryAddLevel1() {
+        	if( lastAsk == 0 || lastBid == 0 || lastAskSize == 0 || lastBidSize == 0) return false;
+			tick.SetQuote(lastBid, lastAsk, (ushort) lastBidSize, (ushort) lastAskSize);
+			if( trace) log.Trace("Level1 SetQuote()");
+			return true;
+		}
 
-        int lastUpdateTick = 0;
         public void ProcessLevel2(LEVEL2RECORD pRec)
         {       	
         	switch( pRec.side) {
@@ -129,9 +178,9 @@ namespace TickZoom.MBTrading
         		default:
         			throw new ApplicationException("Invalid Level II Side");
         	}
-        	if( Environment.TickCount > lastUpdateTick + 30) {
+        	if( Environment.TickCount > lastChangeTime + 30) {
         		if( level2Bids.HasChanged || level2Asks.HasChanged ) {
-	        		LogChange(TradeSide.Unknown,0,0);
+	        		LogLevel2Change(false,TradeSide.Unknown,0,0);
 	        	}
 			}
         }
@@ -157,18 +206,19 @@ namespace TickZoom.MBTrading
         private void AdviseSymbols() {
             if (Level2Bids.Count > 0) Level2Bids.Clear();
             if (Level2Asks.Count > 0) Level2Asks.Clear();
-            if( debug) log.Debug("Advising symbol for " + Symbol.Symbol + " with FeedType " + Symbol.FeedType);
-            switch( Symbol.FeedType) {
-            	case FeedType.Level1:
+            if( debug) log.Debug("Advising symbol for " + Symbol.Symbol + " with FeedType " + Symbol.QuoteType + " and TimeAndSales " + Symbol.TimeAndSales);
+            switch( Symbol.QuoteType) {
+            	case QuoteType.Level1:
 					m_Quotes.AdviseSymbol(this, Symbol.Symbol, (int)enumQuoteServiceFlags.qsfLevelOne);
 					break;
-				case FeedType.Level2:
+				case QuoteType.Level2:
 					m_Quotes.AdviseSymbol(this, Symbol.Symbol, (int)enumQuoteServiceFlags.qsfLevelTwo);
 					break;
-				case FeedType.Both:
-					m_Quotes.AdviseSymbol(this, Symbol.Symbol, (int)enumQuoteServiceFlags.qsfLevelOne);
-					m_Quotes.AdviseSymbol(this, Symbol.Symbol, (int)enumQuoteServiceFlags.qsfLevelTwo);
+				case QuoteType.None:
 					break;
+            }
+            if( Symbol.TimeAndSales == TimeAndSales.ActualTrades) {
+            	m_Quotes.AdviseSymbol(this, Symbol.Symbol, (int)enumQuoteServiceFlags.qsfTimeAndSales);
             }
             	
             advised = true;
@@ -197,36 +247,33 @@ namespace TickZoom.MBTrading
 			}
         }
         
-        public void LogChange(TradeSide side, double price, long size) {
+        public void LogLevel2Change(bool recordTrade, TradeSide side, double price, int size) {
+        	CreateTick();
+			
+			if( TryAddLevel2()) {
+        		if( Symbol.TimeAndSales == TimeAndSales.Extrapolated) {
+        			tick.SetTrade(side, price, size);
+        		}
+        		SendTick();
+			}
+		}
+        
+        private bool TryAddLevel2() {
     		// Update the last Dom total and time
     		// so we can log any changes if ticks don't
     		// come in timely due to a pause in the market.
-    		lastUpdateTick = Environment.TickCount;
     		level2Bids.UpdateTotalSize();
     		level2Asks.UpdateTotalSize();
     		
-    		// Now log any change to tick.
-    		TimeStamp timeStamp = new TimeStamp();
-    		timeStamp.Internal = DateTime.Now.ToUniversalTime().ToOADate();
     		if( LastBid > 0 && LastAsk > 0) {
-    			tick.Initialize();
-    			tick.SetTime(timeStamp);
-    			if( side != TradeSide.Unknown) {
-	    			tick.SetTrade(side, price, (int) size);
-    			}
     			tick.SetQuote(LastBid, LastAsk);
     			tick.SetDepth(level2Bids.DepthSizes,level2Asks.DepthSizes);
-		     	if( trace) {
-		    		log.Symbol = symbol.Symbol;
-		    		log.TimeStamp = tempDateTime;
-		    		log.Trace("Created Trade,Quote,DOM tick: " + tick);
-		    	}
-	        	// Grab a reference since other thread might change it.
-	        	TickBinary binary = new TickBinary();
-	        	binary = tick.Extract();
-				receiver.OnSend( ref binary);
+    			if( trace) log.Trace("Level2 SetQuote(), SetDepth()");
+    			return true;
+    		} else {
+    			return false;
     		}
-		}
+        }
 		
         object signalLock = new Object();
     	int orderStart = 0;
@@ -555,7 +602,7 @@ namespace TickZoom.MBTrading
         void MBTQUOTELib.IMbtQuotesNotify.OnQuoteData(ref QUOTERECORD pQuote)
         {
         	lock( quotesLocker) {
-       			ProcessQuote(ref pQuote);
+       			ProcessLevel1(ref pQuote);
         	}
         }
         void MBTQUOTELib.IMbtQuotesNotify.OnLevel2Data(ref LEVEL2RECORD pRec)

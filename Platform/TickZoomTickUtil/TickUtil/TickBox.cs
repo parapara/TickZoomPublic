@@ -59,6 +59,11 @@ namespace TickZoom.TickUtil
 			tick.SetQuote(dBid,dAsk);
 		}
 		
+		public void SetQuote(double dBid, double dAsk, ushort bidSize, ushort askSize)
+		{
+			tick.SetQuote(dBid,dAsk,bidSize,askSize);
+		}
+		
 		public void SetTrade(double price, int size)
 		{
 			tick.SetTrade(price,size);

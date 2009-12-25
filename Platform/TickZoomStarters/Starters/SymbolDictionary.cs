@@ -65,7 +65,7 @@ namespace TickZoom.Common
 				Directory.CreateDirectory(Path.GetDirectoryName(dictionaryPath));
 				SymbolDictionary dictionary;
 				if( File.Exists(dictionaryPath) ) {
-					using( StreamReader streamReader = new StreamReader(dictionaryPath)) {
+					using( StreamReader streamReader = new StreamReader(new FileStream(dictionaryPath,FileMode.Open,FileAccess.Read,FileShare.Read))) {
 						dictionary = SymbolDictionary.Create( streamReader);
 					}
 					return dictionary;
@@ -274,14 +274,26 @@ namespace TickZoom.Common
   <category name=""Stock"">
     <property name=""Level2LotSize"" value=""100"" />
     <property name=""Level2LotSizeMinimum"" value=""1"" />
-    <property name=""Level2Increment"" value=""0.10"" />
+    <property name=""Level2Increment"" value=""0.01"" />
     <property name=""FullPointValue"" value=""1"" />
     <property name=""MinimumTick"" value=""0.01"" />
    	<property name=""SessionStart"" value=""08:00:00"" />
    	<property name=""SessionEnd"" value=""16:30:00"" />
-    <symbol name=""MSFT"" />
-    <symbol name=""IBM"" />
+   	<property name=""TimeAndSales"" value=""ActualTrades"" />
+   	<property name=""QuoteType"" value=""Level1"" />
     <category name=""Testing"">
+      <symbol name=""CSCO"">
+          <property name=""TimeAndSales"" value=""ActualTrades"" />
+          <property name=""QuoteType"" value=""None"" />
+      </symbol>
+	  <symbol name=""MSFT"">
+          <property name=""TimeAndSales"" value=""None"" />
+     	  <property name=""QuoteType"" value=""Level2"" />
+	  </symbol>
+	  <symbol name=""IBM"">
+	      <property name=""TimeAndSales"" value=""None"" />
+	      <property name=""QuoteType"" value=""Level1"" />
+	  </symbol>
       <symbol name=""Design"" />
       <symbol name=""FullTick"" />
       <symbol name=""Daily4Ticks"" />
@@ -300,6 +312,8 @@ namespace TickZoom.Common
     <property name=""Level2Increment"" value=""10"" />
     <property name=""FullPointValue"" value=""1"" />
     <property name=""MinimumTick"" value=""0.01"" />
+    <property name=""TimeAndSales"" value=""Extrapolated"" />
+   	<property name=""QuoteType"" value=""Level1"" />
     <category name=""4 Pip"">
       <symbol name=""USD/CHF"" universal=""USDCHF"" />
       <symbol name=""USD/CAD"" universal=""USDCAD"" />
