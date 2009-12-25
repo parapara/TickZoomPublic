@@ -25,6 +25,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
@@ -127,6 +128,16 @@ namespace TickZoom.Api
 				string result = Factory.Symbol.LookupSymbol(symbol).Symbol;
 				return result;
 			}
+		}
+		
+		public static string StripInvalidPathChars(this string symbolStr) {
+       		List<char> invalidChars = new List<char>(Path.GetInvalidPathChars());
+       		invalidChars.Add('\\');
+       		invalidChars.Add('/');
+       		foreach( char invalid in invalidChars) {
+       			symbolStr = symbolStr.Replace(new string(invalid,1),"");
+       		}
+       		return symbolStr;
 		}
 	}
 }

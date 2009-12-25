@@ -186,7 +186,7 @@ namespace TickZoom.Common
 		}
 		
 		public bool WriteReport(string name, string folder) {
-			name = name.Replace("/","").Replace(@"\","");
+			name = name.StripInvalidPathChars();
 			TradeStatsReport tradeStats = new TradeStatsReport(this);
 			tradeStats.WriteReport(name, folder);
 			StrategyStats stats = new StrategyStats(ComboTrades);

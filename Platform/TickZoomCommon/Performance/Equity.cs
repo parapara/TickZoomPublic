@@ -340,6 +340,10 @@ namespace TickZoom.Common
 			set { startingEquity = value; }
 		}
 		
+		public double NetProfit {
+			get { return CurrentEquity - StartingEquity; }
+		}
+		
 		[Browsable(false)]
 		public double CurrentEquity {
 			get { 

@@ -26,7 +26,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Threading;
-
 using TickZoom.Api;
 
 namespace TickZoom.TickUtil
@@ -84,13 +83,8 @@ namespace TickZoom.TickUtil
        			throw new ApplicationException( "Must set AppDataFolder property in app.config");
        		}
        		
-       		List<char> invalidChars = new List<char>(Path.GetInvalidPathChars());
-       		invalidChars.Add('\\');
-       		invalidChars.Add('/');
-       		string symbolStr = _symbol.Symbol;
-       		foreach( char invalid in invalidChars) {
-       			symbolStr = symbolStr.Replace(new string(invalid,1),"");
-       		}
+       		string symbolStr = _symbol.Symbol.StripInvalidPathChars();
+       		
        		string fileNameRoot = storageFolder + "\\" + _folder + "\\" + symbolStr + "_Tick";
 			fileName = fileNameRoot+".tck";
 			Initialize( fileName);

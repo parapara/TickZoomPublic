@@ -133,6 +133,11 @@ namespace TickZoom.Api
 			set;
 		}
     	
+    	int OptimizePass {
+			get;
+			set;
+		}
+    	
     	int MaxBarsBack {
     		get;
     		set;

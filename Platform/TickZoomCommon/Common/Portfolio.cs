@@ -111,19 +111,22 @@ namespace TickZoom.Common
 		
 		private class StrategyWatcher {
 			private double previousPosition = 0;
-			private Strategy strategy;
+			private PositionInterface position;
 			
 			public StrategyWatcher(Strategy strategy) {
-				this.strategy = strategy;	
+				this.position = strategy.Performance.Position;	
 			}
+			
 			public bool PositionChanged {
-				get { return previousPosition != strategy.Position.Current; }
+				get { return previousPosition != position.Current; }
 			}
+			
 			public void Refresh() {
-				previousPosition = strategy.Position.Current;
+				previousPosition = position.Current;
 			}
+			
 			public PositionInterface Position {
-				get { return strategy.Performance.Position; }
+				get { return position; }
 			}
 		}
 	
@@ -141,8 +144,10 @@ namespace TickZoom.Common
 						watcher.Refresh();
 					}
 				}
-				double averagePrice = totalPrice / changeCount;
-				Position.Change(internalSignal,averagePrice,Ticks[0].Time);
+				if( changeCount > 0) {
+					double averagePrice = (totalPrice / changeCount).Round();
+					Position.Change(internalSignal,averagePrice,Ticks[0].Time);
+				}
 				return true;
 			} else if( portfolioType == PortfolioType.MultiSymbol) {
 				double tempClosedEquity = 0;

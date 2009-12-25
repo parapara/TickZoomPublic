@@ -137,17 +137,19 @@ namespace TickZoom.Common
         private void ProcessBuyLimit(Tick tick)
         {
 			LogicalOrder order = orders.buyLimit;
-			if( order.IsActive &&
-			    Strategy.Position.IsFlat)
+			if( order.IsActive && Strategy.Position.IsFlat)
             {
 				double price = 0;
+				bool isFilled = false;
 				if (tick.Ask <= order.Price) {
 					price = tick.Ask;
+					isFilled = true;
 				} else if(tick.IsTrade && tick.Price < order.Price)
                 {
 					price = order.Price;
+					isFilled = true;
 				}
-				if( price != 0) {
+				if( isFilled) {
                     LogEntry("Long Limit Entry at " + tick);
                     Strategy.Position.Change(order.Positions,price,tick.Time);
                     if (Strategy.Performance.GraphTrades)
@@ -165,12 +167,15 @@ namespace TickZoom.Common
 			    Strategy.Position.IsFlat)
             {
 				double price = 0;
+				bool isFilled = false;
 				if (tick.Bid >= order.Price) {
 					price = tick.Bid;
+					isFilled = true;
 				} else if(tick.IsTrade && tick.Price > order.Price) {
 					price = order.Price;
+					isFilled = true;
 				}
-				if( price != 0) {
+				if( isFilled) {
                     LogEntry("Short Limit Entry at " + tick);
                     Strategy.Position.Change(-order.Positions,price,tick.Time);
                     if (Strategy.Performance.GraphTrades)

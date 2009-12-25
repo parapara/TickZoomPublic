@@ -129,12 +129,15 @@ namespace TickZoom.Common
 			    Strategy.Position.IsShort)
             {
 				double price = 0;
+				bool isFilled = false;
 				if (tick.Ask <= orders.buyLimit.Price) {
 					price = tick.Ask;
+					isFilled = true;
 				} else if(tick.IsTrade && tick.Price < orders.buyLimit.Price) {
 					price = orders.buyLimit.Price;
+					isFilled = true;
 				}
-				if( price != 0) {
+				if( isFilled) {
                     LogExit("Buy Limit Exit at " + tick);
                     FlattenSignal(price);
                     if (Strategy.Performance.GraphTrades)
@@ -163,12 +166,16 @@ namespace TickZoom.Common
 			if( orders.sellLimit.IsActive &&
 			    Strategy.Position.IsLong)
             {
-				double price;
+				double price = 0;
+				bool isFilled = false;
 				if (tick.Bid >= orders.sellLimit.Price) {
 					price = tick.Bid;
-				}
-				if(tick.IsTrade && tick.Price > orders.sellLimit.Price) {
+					isFilled = true;
+				} else if(tick.IsTrade && tick.Price > orders.sellLimit.Price) {
 					price = orders.sellLimit.Price;
+					isFilled = true;
+				}
+				if( isFilled) {
                     LogExit("Sell Stop Limit at " + tick);
                     FlattenSignal(price);
                     if (Strategy.Performance.GraphTrades)

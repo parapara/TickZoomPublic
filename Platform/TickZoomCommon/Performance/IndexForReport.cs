@@ -40,7 +40,7 @@ namespace TickZoom.Common
 		}
 		
 		public bool WriteReport(string name, string folder) {
-			string pathName = folder + name + @".html";
+			string pathName = folder + name + @"\index.html";
 			fwriter = File.CreateText( pathName );
 			WriteReport(name,fwriter);
 			fwriter.Flush();
@@ -60,8 +60,8 @@ namespace TickZoom.Common
 			fwriter.WriteLine("<BODY>");
 			fwriter.WriteLine("<H1>" + name + " Strategy Report</H1>");
 	
-			fwriter.WriteLine("<A href=\""+name+"/Equity.html\">Equity Report</A><BR>");
-			fwriter.WriteLine("<A href=\""+name+"/Trades.html\">Trade List</A>");
+			fwriter.WriteLine("<A href=\"Equity.html\">Equity Report</A><BR>");
+			fwriter.WriteLine("<A href=\"Trades.html\">Trade List</A>");
 			
 			fwriter.WriteLine("</BODY>");
 			fwriter.WriteLine("</HTML>");

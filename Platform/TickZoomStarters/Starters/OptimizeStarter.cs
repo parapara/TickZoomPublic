@@ -196,9 +196,10 @@ namespace TickZoom.Common
 			
 			engine.ReportWriter.OptimizeValues = optimizeValues;
 			
+			totalTasks++;
+			engine.OptimizePass = totalTasks;
 			engine.QueueTask();
 			engineIterations.Add(engine);
-			totalTasks++;
 		}
 		
 	    internal bool SetOptimizeValues(Dictionary<string,object> optimizeValues) {

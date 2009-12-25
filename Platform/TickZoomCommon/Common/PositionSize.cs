@@ -61,7 +61,7 @@ namespace TickZoom.Common
 			if( previousSignal != strategy.Position.Current ) {
 				// Pass 
 				previousSignal = strategy.Position.Current;
-				Position.Change(strategy.Position.Current * size);
+				Position.Change(previousSignal * size, strategy.Position.Price, strategy.Position.Time);
 			}
 			return true;
 		}

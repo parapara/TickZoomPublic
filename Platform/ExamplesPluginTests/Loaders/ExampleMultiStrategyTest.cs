@@ -65,14 +65,22 @@ namespace Loaders
 		
 		[Test]
 		public void RoundTurn1() {
-			VerifyRoundTurn( 1, "1983-04-18 15:59:00.001", 30.560,
-			                 "1983-04-19 15:59:00.001", 30.700);
+			VerifyRoundTurn( 1, "1983-04-18 15:59:00.001", 30.52,
+			                 "1983-04-19 15:59:00.001", 30.725);
 		}
 		
 		[Test]
 		public void RoundTurn2() {
-			VerifyRoundTurn( 2, "1983-04-19 15:59:00.001", 30.700,
-			                 "1983-04-27 15:59:00.001",30.800);
+			VerifyRoundTurn( 2, "1983-04-19 15:59:00.001", 30.725,
+			                 "1983-04-27 15:59:00.001",30.755);
+		}
+		
+		[Test]
+		public void CompareEquity() {
+			double expectedTotal = strategy.Strategies[0].Performance.Equity.NetProfit;
+			expectedTotal += strategy.Strategies[1].Performance.Equity.NetProfit;
+			double actualTotal = strategy.Performance.Equity.NetProfit / 10000;
+			Assert.AreEqual(expectedTotal.Round(),actualTotal.Round(),"net profit totals");
 		}
 		
 		
