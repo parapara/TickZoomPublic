@@ -71,17 +71,17 @@ namespace TickZoom.TradingFramework
 			
 			exitStrategy.TickConsoleWrite();
 		}
-		
-		[Test]
+
+	    [Test]
 		public void LongStopTest() {
-			TimeStamp expected = new TimeStamp("2005-02-10 10:53:34.477");
-			Assert.AreEqual(-1,exitStrategy.signalDirection[41],"Long stop exit");
+			TimeStamp expected = new TimeStamp("2005-02-10 09:57:54.325");
 			Assert.AreEqual(expected,exitStrategy.signalChanges[41],"Long stop exit");
+			Assert.AreEqual(1,exitStrategy.signalDirection[41],"Long stop exit");
 		}
-		
+	
 		[Test]
 		public void ShortStopTest() {
-			TimeStamp expected = new TimeStamp("2005-02-09 10:06:47.427");
+			TimeStamp expected = new TimeStamp("2005-02-09 09:51:41.949");
 			Assert.AreEqual(-1,exitStrategy.signalDirection[13],"Short stop exit");
 			Assert.AreEqual(expected,exitStrategy.signalChanges[13],"Short stop exit");
 		}

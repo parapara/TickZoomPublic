@@ -83,6 +83,9 @@ namespace TickZoom.Common
 		{
 			if( IsTrace) Log.Trace("ProcessTick() Previous="+Strategy+" Previous.Signal="+Strategy.Position.Current);
 			
+			// Handle ActiveNow orders.
+			Strategy.OrderManager.ProcessOrders(tick);
+			
 			if( stopTradingToday || stopTradingThisWeek || stopTradingThisMonth ) {
 				return true;
 			}

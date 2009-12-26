@@ -67,9 +67,13 @@ namespace TickZoom.Common
 		public sealed override bool OnProcessTick(Tick tick)
 		{
 			if( IsTrace) Log.Trace("OnProcessTick()");
+			ProcessOrders(tick);
+			return true;
+		}
+		
+		public void ProcessOrders(Tick tick) {
 			Strategy.Orders.Enter.ActiveNow.OnProcessOrders(tick);
 			Strategy.Orders.Exit.ActiveNow.OnProcessOrders(tick);
-			return true;
 		}
 		
 	 	public IList<LogicalOrder> Orders {
