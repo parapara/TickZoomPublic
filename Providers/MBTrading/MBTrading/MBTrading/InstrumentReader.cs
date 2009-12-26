@@ -66,7 +66,7 @@ namespace TickZoom.MBTrading
         TickIO tick;
 		SymbolInfo symbol;
         Dictionary<string,MbtOpenOrder> m_orders = new Dictionary<string,MbtOpenOrder>();
-        
+        	
         public InstrumentReader(MbtOrderClient orderClient, MbtQuotes quotes, SymbolInfo instrument)
         {
         	m_OrderClient = orderClient;
@@ -112,8 +112,7 @@ namespace TickZoom.MBTrading
         }
         
         private void CreateTick() {
-    		TimeStamp timeStamp = new TimeStamp();
-    		timeStamp.Internal = DateTime.Now.ToUniversalTime().ToOADate();
+        	TimeStamp timeStamp = TimeStamp.UtcNow;
 			tick.Initialize();
 			tick.SetTime(timeStamp);
         }

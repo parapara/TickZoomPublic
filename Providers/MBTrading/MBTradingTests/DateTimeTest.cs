@@ -33,17 +33,16 @@ using TickZoom.TickUtil;
 
 namespace TickZoom.Test
 {
-
-	
 	[TestFixture]
-	public class EquityLevel1 : EquityLevel2
+	public class DateTimeTest
 	{
-		[TestFixtureSetUp]
-		public override void Init()
+		[Test]
+		public void TestDateTime()
 		{
-			base.Init();
-			symbol = Factory.Symbol.LookupSymbol("IBM");
+			Log log = Factory.Log.GetLogger(typeof(DateTimeTest));
+			TimeStamp normalUtcNow = new TimeStamp(DateTime.UtcNow.ToOADate());
+			TimeStamp adjustedUtcNow = TimeStamp.UtcNow;
+			log.Info( "normal = " + normalUtcNow + ", adjusted = " + adjustedUtcNow);
 		}	
-		
 	}
 }

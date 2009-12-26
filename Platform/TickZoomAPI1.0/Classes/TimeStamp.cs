@@ -23,6 +23,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
+using System.Threading;
 
 namespace TickZoom.Api
 {
@@ -134,6 +136,46 @@ namespace TickZoom.Api
 		}
 		
 //		#endif
+		private static void Synchronize() {
+			lock(locker) {
+				Thread.CurrentThread.Priority = ThreadPriority.Highest;
+	        	lastDateTime = DateTime.UtcNow.Ticks;
+	        	long currentDateTime;
+	        	do {
+	        		lastStopWatch = System.Diagnostics.Stopwatch.GetTimestamp();
+	        		currentDateTime = DateTime.UtcNow.Ticks;
+	        		long frequency = System.Diagnostics.Stopwatch.Frequency;
+	        		stopWatchFrequency = frequency / 10000000;
+	        	} while( lastDateTime == currentDateTime);
+	        	lastDateTime = currentDateTime;
+	        	Thread.CurrentThread.Priority = ThreadPriority.Normal;
+			}
+		}
+		private static object locker = new object();
+		private static long lastStopWatch;
+		private static long stopWatchFrequency = 1L;
+		private static long lastDateTime;
+
+		private static DateTime GetAdjustedDateTime() {
+        	DateTime nowUtcTime = DateTime.UtcNow;
+        	long dateTimeDelta = nowUtcTime.Ticks - lastDateTime;
+        	long stopWatchDelta = (System.Diagnostics.Stopwatch.GetTimestamp() - lastStopWatch) / stopWatchFrequency;
+        	long timeDelta = stopWatchDelta - dateTimeDelta;
+        	// Check is system time was change.
+        	if( timeDelta > 1000000L || timeDelta < -1000000L) {
+        		Synchronize();
+        		return new DateTime(lastDateTime);
+        	} else {
+        		return nowUtcTime.AddTicks(timeDelta);
+        	}
+		}
+		
+		public static TimeStamp UtcNow {
+			get { 
+				DateTime dateTimeNow = GetAdjustedDateTime();
+				return new TimeStamp(dateTimeNow.ToOADate());
+			}
+		}
 		
 		public TimeStamp( string timeString) {
 			string[] strings = timeString.Split(new char[] {' '});
@@ -448,7 +490,6 @@ namespace TickZoom.Api
 			out int day, out int hour, out int minute, out int second, out int millisecond )
 		{
 			double jDay = timeStampToJulianDay( timeStamp );
-			
 			double ms;
 			JulianDayToCalendarDate( jDay, out year, out month, out day, out hour,
 				out minute, out second, out ms );
@@ -776,60 +817,63 @@ namespace TickZoom.Api
 			_timeStamp += elapsed.elapsed;
 		}
 
-		public static string ToString( double timeStamp, string fmtStr )
+		public static string ToString( double timeStamp, string _fmtStr )
 		{
 			int		year, month, day, hour, minute, second, millisecond;
 
+			StringBuilder fmtStr = new StringBuilder(_fmtStr);
 			if ( !CheckValidDate( timeStamp ) )
 				return "Date Error";
 
 			timeStampToCalendarDate( timeStamp, out year, out month, out day, out hour, out minute,
 											out second, out millisecond );
+			fmtStr.Replace( "yyyy", year.ToString("d4") );
+			fmtStr.Replace( "MM", month.ToString("d2") );
+			fmtStr.Replace( "dd", day.ToString("d2") );
 			if ( year <= 0 )
 			{
 				year = 1 - year;
-				fmtStr = fmtStr + " (BC)";
+				fmtStr.Append(" (BC)");
 			}
 
-			if ( fmtStr.IndexOf("[d]") >= 0 )
-			{
-				fmtStr = fmtStr.Replace( "[d]", ((int) timeStamp).ToString() );
-				timeStamp -= (int) timeStamp;
-			}
-			if ( fmtStr.IndexOf("[h]") >= 0 || fmtStr.IndexOf("[hh]") >= 0 )
-			{
-				fmtStr = fmtStr.Replace( "[h]", ((int) (timeStamp * 24)).ToString("d") );
-				fmtStr = fmtStr.Replace( "[hh]", ((int) (timeStamp * 24)).ToString("d2") );
-				timeStamp = ( timeStamp * 24 - (int) (timeStamp * 24) ) / 24.0;
-			}
-			if ( fmtStr.IndexOf("[m]") >= 0 || fmtStr.IndexOf("[mm]") >= 0 )
-			{
-				fmtStr = fmtStr.Replace( "[m]", ((int) (timeStamp * 1440)).ToString("d") );
-				fmtStr = fmtStr.Replace( "[mm]", ((int) (timeStamp * 1440)).ToString("d2") );
-				timeStamp = ( timeStamp * 1440 - (int) (timeStamp * 1440) ) / 1440.0;
-			}
-			if ( fmtStr.IndexOf("[s]") >= 0 || fmtStr.IndexOf("[ss]") >= 0 )
-			{
-				fmtStr = fmtStr.Replace( "[s]", ((int) (timeStamp * 86400)).ToString("d") );
-				fmtStr = fmtStr.Replace( "[ss]", ((int) (timeStamp * 86400)).ToString("d2") );
-				timeStamp = ( timeStamp * 86400 - (int) (timeStamp * 86400) ) / 86400.0;
-			}
-			if ( fmtStr.IndexOf("[f]") >= 0 )
-				fmtStr = fmtStr.Replace( "[f]", ((int) (timeStamp * 864000)).ToString("d") );
-			if ( fmtStr.IndexOf("[ff]") >= 0 )
-				fmtStr = fmtStr.Replace( "[ff]", ((int) (timeStamp * 8640000)).ToString("d") );
-			if ( fmtStr.IndexOf("[fff]") >= 0 )
-				fmtStr = fmtStr.Replace( "[fff]", ((int) (timeStamp * 86400000)).ToString("d") );
-			if ( fmtStr.IndexOf("[ffff]") >= 0 )
-				fmtStr = fmtStr.Replace( "[ffff]", ((int) (timeStamp * 864000000)).ToString("d") );
-			if ( fmtStr.IndexOf("[fffff]") >= 0 )
-				fmtStr = fmtStr.Replace( "[fffff]", ((int) (timeStamp * 8640000000)).ToString("d") );
+			fmtStr.Replace( "HH", hour.ToString("d2") );
+			fmtStr.Replace( "mm", minute.ToString("d2") );
+			fmtStr.Replace( "ss", second.ToString("d2") );
+			fmtStr.Replace( "fff", ((int)millisecond).ToString("d3") );
+			
+//			if ( _fmtStr.IndexOf("d") >= 0 )
+//			{
+//				fmtStr = fmtStr.Replace( "dd", ((int) timeStamp).ToString("d2") );
+//				fmtStr = fmtStr.Replace( "d", ((int) timeStamp).ToString("d") );
+//				timeStamp -= (int) timeStamp;
+//			}
+//			if ( _fmtStr.IndexOf("h") >= 0 )
+//			{
+//				fmtStr = fmtStr.Replace( "hh", ((int) (timeStamp * 24)).ToString("d2") );
+//				fmtStr = fmtStr.Replace( "h", ((int) (timeStamp * 24)).ToString("d") );
+//				timeStamp = ( timeStamp * 24 - (int) (timeStamp * 24) ) / 24.0;
+//			}
+//			if ( _fmtStr.IndexOf("m") >= 0 )
+//			{
+//				fmtStr = fmtStr.Replace( "mm", ((int) (timeStamp * 1440)).ToString("d2") );
+//				fmtStr = fmtStr.Replace( "m", ((int) (timeStamp * 1440)).ToString("d") );
+//				timeStamp = ( timeStamp * 1440 - (int) (timeStamp * 1440) ) / 1440.0;
+//			}
+//			if ( _fmtStr.IndexOf("s") >= 0 )
+//			{
+//				fmtStr = fmtStr.Replace( "ss", ((int) (timeStamp * 86400)).ToString("d2") );
+//				fmtStr = fmtStr.Replace( "s", ((int) (timeStamp * 86400)).ToString("d") );
+//				timeStamp = ( timeStamp * 86400 - (int) (timeStamp * 86400) ) / 86400.0;
+//			}
+//			if ( _fmtStr.IndexOf("f") >= 0 ) {
+//				fmtStr = fmtStr.Replace( "fffff", ((int) (timeStamp * 8640000000)).ToString("d") );
+//				fmtStr = fmtStr.Replace( "ffff", ((int) (timeStamp * 864000000)).ToString("d") );
+//				fmtStr = fmtStr.Replace( "fff", ((int) (timeStamp * 86400000)).ToString("d") );
+//				fmtStr = fmtStr.Replace( "ff", ((int) (timeStamp * 8640000)).ToString("d") );
+//				fmtStr = fmtStr.Replace( "f", ((int) (timeStamp * 864000)).ToString("d") );
+//			}
 
-			//DateTime dt = timeStampToDateTime( timeStamp );
-			if ( year > 9999 )
-				year = 9999;
-			DateTime dt = new DateTime( year, month, day, hour, minute, second, millisecond );
-			return dt.ToString( fmtStr );
+			return fmtStr.ToString();
 		}
 	}
 }

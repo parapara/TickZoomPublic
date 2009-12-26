@@ -51,6 +51,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DateTimeTest.cs" />
     <Compile Include="EquityLevel1.cs" />
     <Compile Include="EquityLevel2.cs" />
     <Compile Include="EquityTimeAndSales.cs" />
