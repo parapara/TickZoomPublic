@@ -38,6 +38,20 @@ Version: $(VERSION)
 @section latest_release_notes Latest Release Notes
     @htmlonly The current version is $(VERSION). @endhtmlonly
 
+    -# Added static TimeStamp.UtcNow property to get the current time in a TimeStamp that is accurate to 1 millisecond instead of the DateTime.Now or DateTime.UtcNow which is only accurate to 10 to 15 millisecond granularity.
+    -# Fixed ActiveNow to fill orders on the same tick that the order is created where appropriate and for faster processing during real time trading.
+    -# Added TimeAndSales and QuoteType property in the symbol dictionary and MBTrading provider. TimeAndSales options are ActualTrades, Extrapolated, or None. QuoteType options are Level1, Level2, or None.
+    -# MBTrading updated for new Tick api
+    -# Also made RunUpdate parameter obsolete so to avoid issues for users during updates.
+    -# Optimized handling of BarSeries, Circular, TimeStamp, Position copying, and cleaned up references to custom profiler.
+    -# Performance improvement due to optimizing time zones calculations to updated every Saturday night during historical tests.
+    -# Refactored tick API for creating ticks to replace init() with SetTime(), SetQuote(), SetTrade(), and SetDepth(). 
+    -# Fixed link in Statistics reports. Made optimized statistics reports to do subfolders numbered for each pass of optimization. Fixed defects found in using order price for simulated fill orders.
+    -# Optimized Performance object for 30% speedup plus faster exception handling in the data engine.
+    -# Improving appearance of the online documentation including prettier html header, footer and layout for documentation.
+
+@section version_0_6_0_735 Version 0.6.0.735 Release Notes -- December 17, 2009
+
     -# Added documentation for updating with Git, and handling obsolete errors.
     -# Added ChartGroup property to SymbolInfo as read only and also to SymbolProperties which is read/write from within the loaders only.  Also, changed the type of Symbol on Chart interface to SymbolInfo so charts can access the ChartGroup property.
     -# Entry orders now use order price for fills in the case of the market trading 'through' the order.

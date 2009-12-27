@@ -79,6 +79,14 @@ a {
 	text-decoration: none;
 }
 
+div.navigation {
+	text-align:left; /* reset text alignment */
+	width:748px; /* or a percentage, or whatever */
+	margin:0 auto; /* for the rest of browsers to center */ 
+	background: white;
+	padding: 10px;
+}
+
 div.contents {
 	text-align:left; /* reset text alignment */
 	width:748px; /* or a percentage, or whatever */

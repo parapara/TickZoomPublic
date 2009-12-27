@@ -106,13 +106,14 @@ git config user.email "Your email address" @endverbatim
 
 @section sharpd_setup Setup SharpDevelop for TickZoom
 
-   -# Install both SharpDevelop 3.1<BR>
+   -# Install SharpDevelop 3.1<BR>
       http://cloud.github.com/downloads/tickzoom/TickZoomPublic/SharpDevelop_3.1.0.4977_Setup.msi
    -# Get Windows 7 SDK which works for Vista and XP also. You can download the Windows 7 SDK from:<BR>
       Web Install: http://www.microsoft.com/downloads/details.aspx?displaylang=en&FamilyID=c17ba869-9671-4330-a63e-1fd44e0e2505
 
 @section vs_setup Setup Visual Studio for TickZoom
 
+   -# TickZoom offers "best effort" support for Visual Studio. If you have any doubt, please choose SharpDevelop instead of Visual Studio so as to get full support with any issues you have from TickZoom.
    -# You will need a version of Visual Studio which supports .NET 3.5. The install typically includes the Windows SDK.
    -# In Visual Studio, you must disable the feature that pops up dialog boxs for unhandled exceptions because of a defect in Visual Studio where it intercepts ordinary exceptions passed between DLLs. Otherwise, you will continually get these dialog boxes popping up when using Visual Studio.
 

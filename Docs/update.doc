@@ -55,7 +55,8 @@ git stash apply
 
 @note
 You should consider creating a new branch on your local repository prior to updating. That way,
-you may easily check out your previous branch if you encounter and serious difficulty.
+you may easily check out your previous branch if you encounter any serious difficulty. But you 
+can also use "git rebase --abort" if you have problems to reset things back how they were.
 
 Here's the low down of each of these commands:
 
