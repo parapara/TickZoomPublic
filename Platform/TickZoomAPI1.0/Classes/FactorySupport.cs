@@ -81,16 +81,20 @@ namespace TickZoom.Api
 
             object obj = null;
             try { 
-	            obj = Load( currentDirectoryPath, type, assemblyName, false, args);
+	            if( obj == null && !string.IsNullOrEmpty(currentDirectoryPath)) {
+	            	obj = Load( currentDirectoryPath, type, assemblyName, false, args);
+            	}
 	            if( obj == null && !string.IsNullOrEmpty(commandLinePath)) {
 		            obj = Load( commandLinePath, type, assemblyName, false, args);
 	            }
-            } catch( Exception ex) {
-            	// if not found in main bin folder, look in the update folder
-	            obj = Load( currentDirectoryPath, type, assemblyName, true, args);
+	            if( obj == null && !string.IsNullOrEmpty(currentDirectoryPath)) {
+	            	obj = Load( currentDirectoryPath, type, assemblyName, true, args);
+	            }
 	            if( obj == null && !string.IsNullOrEmpty(commandLinePath)) {
 		            obj = Load( commandLinePath, type, assemblyName, true, args);
 	            }
+            } catch( Exception ex) {
+            	// if not found in main bin folder, look in the update folder
             	LogMsg("Individual load failed: " + ex.Message);
             }
             if( obj == null) {

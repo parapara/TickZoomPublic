@@ -748,11 +748,10 @@ namespace TickZoom
         void Form1Shown(object sender, EventArgs e)
         {
    			string autoUpdateFlag = Factory.Settings["AutoUpdate"];
-   			string runUpdate = Factory.Settings["RunUpdate"];
-   			if( "true".Equals(autoUpdateFlag) && "true".Equals(runUpdate)) {
+   			if( "true".Equals(autoUpdateFlag) ) {
 	           	commandWorker.RunWorkerAsync(4);
    		    } else {
-				log.Notice("To enable AutoUpdate, set AutoUpdate and RunUpdate to 'true'");
+				log.Notice("To enable AutoUpdate, set AutoUpdate 'true' in app.config");
 				CheckForEngineInvoke();
    			}
         }
