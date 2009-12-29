@@ -42,7 +42,7 @@ namespace Loaders
 	{
 		#region SetupTest
 		Log log = Factory.Log.GetLogger(typeof(ExampleSimpleTest));
-		Strategy strategy;
+		protected Strategy strategy;
 		private string symbols = "Daily4Sim";
 		
 		public string Symbols {

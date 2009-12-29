@@ -105,8 +105,14 @@ namespace TickZoom.TickUtil
 			length = stream.Length;
 			dataIn = new BinaryReader(stream,Encoding.Unicode); 
 			position = 0;
+			try { 
 		    	while( position < length && !CancelPending) {
-		    		position += tickIO.FromReader(dataIn);
+					position += tickIO.FromReader(dataIn);
+				}
+			} catch( ObjectDisposedException) {
+				// Only partial tick was read at the end of the file.
+				// Another writer must not have completed.
+				log.Warn("ObjectDisposedException returned from tickIO.FromReader(). Incomplete last tick. Ignoring.");
 			}
 			return tickIO;
 		}

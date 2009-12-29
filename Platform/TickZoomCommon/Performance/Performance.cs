@@ -44,7 +44,8 @@ namespace TickZoom.Common
 		Chain equityChain;
 		StrategySupport next;
 		TradeProfitLoss profitLoss;
-
+		List<double> positionChanges = new List<double>();
+		
 		public Performance(Strategy strategy) : base(strategy)
 		{
 			this.strategy = strategy;
@@ -85,8 +86,8 @@ namespace TickZoom.Common
 		{
 			if( IsTrace) Log.Trace("ProcessTick() Previous="+next+" Signal="+next.Position.Current);
 			if( next.Position.Current != Position.Current) {
+				positionChanges.Add(next.Position.Current);
 				if( IsTrace) Log.Trace("ProcessTick() Signal Changed.");
-				if( IsTrace) Log.Indent();
 				if( Position.IsFlat) {
 					EnterComboTradeInternal();
 				} else if( next.Position.IsFlat) {
@@ -99,7 +100,6 @@ namespace TickZoom.Common
 					// Instead it has increased or decreased position size.
 					ChangeComboSizeInternal();
 				}
-				if( IsTrace) Log.Outdent();
 			} 
 			Position.Copy(next.Position);
 //			if( Position.HasPosition) {
@@ -201,6 +201,11 @@ namespace TickZoom.Common
 			set { profitLoss.Slippage = value; }
 		}
 		
+		
+		public List<double> PositionChanges {
+			get { return positionChanges; }
+		}
+
 		public double Commission {
 			get { return profitLoss.Commission; }
 			set { profitLoss.Commission = value; }

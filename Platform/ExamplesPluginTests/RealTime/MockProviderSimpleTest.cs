@@ -48,18 +48,60 @@ namespace RealTime
 		{
 			return new RealTimeStarter();
 		}
-		[TestFixtureSetUpAttribute()]
+		[TestFixtureSetUp]
 		public override void RunStrategy()
 		{
-			ConfigurationManager.AppSettings.Set("TestProviderCutOff-Daily4Sim","1984-12-31 00:00:00.000");
+			ConfigurationManager.AppSettings.Set("TestProviderCutOff-Mock4Sim","1984-12-31 00:00:00.000");
+			DeleteFiles();
 			base.Symbols="Mock4Sim";
 			base.RunStrategy();
 		}
+		
+		[Test]
+		public void VerifyChanges() {
+			TestPositionChange[] changes = ReadPositionChange();
+			System.Collections.Generic.List<double> expectedChanges = strategy.Performance.PositionChanges;
+			Assert.AreEqual(expectedChanges.Count,changes.Length,"length");
+			for( int i=0; i<expectedChanges.Count; i++) {
+				Assert.AreEqual(expectedChanges[i],changes[i].Position,"at index " + i);
+			}
+		}
+	
+		public class TestPositionChange { 
+			public string Symbol;
+			public double Position;
+		}
+		
+		private TestPositionChange[] ReadPositionChange() {
+			System.Collections.Generic.List<TestPositionChange> changes = new System.Collections.Generic.List<TestPositionChange>();
+			string appDataFolder = Factory.Settings["AppDataFolder"];
+			string path = appDataFolder + @"\MockProviderData\"+base.Symbols+"_Trades.txt";
+			StreamReader re = File.OpenText(path);
+			char[] seperators = new Char[] { ',' };
+			while( !re.EndOfStream) {
+				string line = re.ReadLine();
+				string[] fields = line.Split(seperators);
+				TestPositionChange change = new TestPositionChange();
+				if( fields.Length > 0) {
+					change.Symbol = fields[0];
+				}
+				if( fields.Length > 1) {
+					change.Position = double.Parse(fields[1]);
+				}
+				changes.Add(change);
+			}
+			re.Close();
+			return changes.ToArray();
+		}
+		
 		private void DeleteFiles() {
 			while( true) {
 				try {
 					string appData = Factory.Settings["AppDataFolder"];
-		 			File.Delete( appData + @"\TestServerCache\Mock4Sim.tck");
+		 			File.Delete( appData + @"\TestServerCache\Mock4Sim_Tick.tck");
+		 			File.Delete( appData + @"\TestServerCache\ESZ9_Tick.tck");
+		 			File.Delete( appData + @"\TestServerCache\IBM_Tick.tck");
+		 			File.Delete( appData + @"\TestServerCache\GBPUSD_Tick.tck");
 					break;
 				} catch( Exception) {
 				}

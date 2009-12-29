@@ -48,12 +48,13 @@ namespace TickZoom.TickUtil
 	    [FieldOffset(4)] public StartStop StartStop;
 	    [FieldOffset(4)] public StartSymbol StartSymbol;
 	    [FieldOffset(4)] public StartSymbol StopSymbol;
-	    [FieldOffset(4)] public PositionFill PositionChange;
+	    [FieldOffset(4)] public PositionChange PositionChange;
     }
     
-    public struct PositionFill {
+    public struct PositionChange {
 	    public int Receiver;
-	    public double PositionInterface;
+        public ulong Symbol;
+	    public double Position;
     }
     
 	public enum ProviderEventType {
@@ -81,12 +82,6 @@ namespace TickZoom.TickUtil
         public ulong Symbol;
     }
     
-    public struct PositionChange
-    {
-        public ulong Symbol;
-        public double Position;
-    }
-
     public struct ErrorEvent
     {
 //        public string Message;
