@@ -27,52 +27,47 @@ using TickZoom.Api;
 using TickZoom.Common;
 using TickZoom.TickUtil;
 
-#if REFACTORED
-
-namespace TickZoom.Unit.Indicators
+namespace TickZoom.Indicators
 {
 	[TestFixture]
 	public class TEMATest
 	{
 		private static readonly Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		TEMA tema;
-		Data bars;
-		Ticks ticks;
-		[Test]
-		public void Constructor()
-		{
-			SymbolInfo properties = new SymbolPropertiesImpl();
- 			DataImpl data = new DataImpl(properties,10000,1000);
-			ticks = new TickSeries(10000);
-			bars = data.GetInternal(IntervalsInternal.Day1);
-			tema = new TEMA(new PricesWrapper(bars.Close),14);
-			Assert.IsNotNull(tema, "ema constructor");
-			tema.IntervalDefault = IntervalsInternal.Day1;
-			ModelDriverFactory factory = new ModelDriverFactory();
-			factory.GetInstance(tema).EngineInitialize(data);
+		TestBars bars;
+		
+		[TearDown]
+		public void TearDown() {
+			
+		}
+		
+		[SetUp]
+		public void Setup() {
+			bars = Factory.Engine.TestBars(Intervals.Day1);
+			tema = new TEMA(bars.Close,14);
+			Assert.IsNotNull(tema, "constructor");
+			tema.IntervalDefault = Intervals.Day1;
 			for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
 				ModelInterface formula = tema.Chain.Dependencies[j].Model;
-				factory.GetInstance(formula).EngineInitialize(data);
+				formula.Bars = bars;
+				formula.OnBeforeInitialize();
+				formula.OnInitialize();
 			}
-			Assert.AreEqual(0,tema.Count, "ema list");
-			ticks.Release();
+			tema.Bars = bars;
+			tema.OnBeforeInitialize();
+			tema.OnInitialize();
 		}
+		
 		[Test]
 		public void Values()
 		{
-			Constructor();
-			TickImpl tick = new TickImpl();
-			TimeStamp timeStamp = new TimeStamp();
 			for( int i = 0; i < data.Length; i++) {
-				timeStamp.Internal = DateTime.Now.ToUniversalTime().ToOADate();
-				tick.init(timeStamp,data[i],data[i]);
-				TickWrapper wrapper = new TickWrapper();
-				wrapper.SetTick( tick);
-				bars.Update( ref wrapper);
-				ModelDriverFactory factory = new ModelDriverFactory();
+				// open, high, low, close all the same.
+				bars.AddBar( data[i], data[i], data[i], data[i], 0);
 				for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
 					ModelInterface formula = tema.Chain.Dependencies[j].Model;
-					factory.GetInstance(formula).EngineIntervalOpen(IntervalsInternal.Day1);
+					formula.OnBeforeIntervalOpen();
+					formula.OnIntervalClose();
 				}
 				tema.OnBeforeIntervalOpen();
 				tema.OnIntervalClose();
@@ -202,4 +197,3 @@ namespace TickZoom.Unit.Indicators
 		
 	}
 }
-#endif

@@ -120,6 +120,7 @@
     <Compile Include="EngineInterfaces\Series.cs" />
     <Compile Include="EngineInterfaces\Starter.cs" />
     <Compile Include="EngineInterfaces\StarterProperties.cs" />
+    <Compile Include="EngineInterfaces\TestBars.cs" />
     <Compile Include="EngineInterfaces\Tick.cs" />
     <Compile Include="EngineInterfaces\TickEngine.cs" />
     <Compile Include="EngineInterfaces\TickIO.cs" />

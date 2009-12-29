@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Software: TickZoom Trading Platform
  * Copyright 2009 M. Wayne Walter
@@ -22,51 +22,11 @@
 #endregion
 
 using System;
-using System.Reflection;
+using System.ComponentModel;
 
 namespace TickZoom.Api
 {
-
-	
-	/// <summary>
-	/// Description of Factory.
-	/// </summary>
-	public interface EngineFactory
-	{
-		void Release();
-		
-		TickEngine TickEngine {
-			get;
-		}
-		
-		WebServer WebServer {
-			get;
-		}
-		
-		Chain Chain(ModelInterface model);
-		
-		Series<T> Series<T>();
-		
-		Interval DefineInterval(BarUnit unit,double period);
-		
-		Interval DefineInterval(BarUnit unit,double period,BarUnit unit2,double period2);
-		
-		Integers Integers();
-		
-		Integers Integers(int capacity);
-		
-		Doubles Doubles();
-		
-		Doubles Doubles(int capacity);
-
-		Longs Longs();
-		
-		Longs Longs(int capacity);
-		
-		Doubles Doubles(object obj);
-		
-		Parallel Parallel();
-		
-		TestBars TestBars(Interval interval);
+	public interface TestBars : Bars {
+		void AddBar( double open, double high, double low, double close, int volume);
 	}
 }
