@@ -60,7 +60,6 @@ namespace MiscTest
 
 		[TearDown]
 		public void TearDown() {
-//			DeleteFiles();
 			form.Close();
 		}
 		
@@ -154,7 +153,7 @@ namespace MiscTest
 //			form.HistoricalButtonClick(null,null);
 			WaitComplete(30, () => { return form.PortfolioDocs.Count == 1; } );
 			Assert.AreEqual(1,form.PortfolioDocs.Count,"Charts");
-			WaitComplete(10, () => { return false; } );
+			WaitComplete(30, () => { return false; } );
 			form.btnStop_Click(null,null);
 			WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
 			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");

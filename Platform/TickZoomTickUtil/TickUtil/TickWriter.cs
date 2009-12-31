@@ -206,10 +206,6 @@ namespace TickZoom.TickUtil
 		protected virtual void CompressTick(TickBinary tick, MemoryStream memory) {
 		}
 		
-//		public void Terminate() {
-//			writeQueue.Terminate();
-//		}
-
 		public void Add(TickIO tickIO) {
 			if( !isInitialized) {
 				throw new ApplicationException("Please initialized TickWriter first.");
