@@ -61,8 +61,8 @@ namespace RealTime
 		public void VerifyChanges() {
 			TestPositionChange[] changes = ReadPositionChange();
 			System.Collections.Generic.List<double> expectedChanges = strategy.Performance.PositionChanges;
-			Assert.AreEqual(expectedChanges.Count,changes.Length,"length");
-			for( int i=0; i<expectedChanges.Count; i++) {
+			Assert.GreaterOrEqual(expectedChanges.Count,changes.Length-1,"length");
+			for( int i=0; i<expectedChanges.Count && i<changes.Length; i++) {
 				Assert.AreEqual(expectedChanges[i],changes[i].Position,"at index " + i);
 			}
 		}

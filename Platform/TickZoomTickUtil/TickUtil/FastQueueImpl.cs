@@ -44,7 +44,7 @@ namespace TickZoom.TickUtil
 		int dequeueSleepCounter = 0;
 		long enqueueConflicts = 0;
 		long dequeueConflicts = 0;
-	    int isLocked = 0;
+		TaskLock spinLock = new TaskLock();
 	    readonly int spinCycles = 1000;
 	    int timeout = 30000; // milliseconds
 	    private static Pool<Queue<T>> queuePool;
@@ -92,16 +92,16 @@ namespace TickZoom.TickUtil
 	    }
 	    
 		private bool SpinLockNB() {
-	    	while( isLocked == 1 || Interlocked.CompareExchange(ref isLocked,1,0) == 1) Interlocked.Increment(ref lockSpins);
-	    	return true;
+        	spinLock.Lock();
+        	return true;
 	    }
 	    
 	    private void SpinUnLock() {
-	    	isLocked = 0;
+        	spinLock.Unlock();
 	    }
 	    
 	    public bool CanEnqueue {
-	    	get { return queue != null && queue.Count<maxSize && isLocked == 0; }
+	    	get { return queue != null && queue.Count<maxSize && !spinLock.IsLocked; }
 	    }
 	    
 	    public bool CanDequeue {
@@ -109,7 +109,7 @@ namespace TickZoom.TickUtil
 		    	if( !isStarted) { 
 		    		if( !StartDequeue()) return false;
 		    	}
-	    		return queue!=null && queue.Count>0 && isLocked == 0;
+	    		return queue!=null && queue.Count>0 && !spinLock.IsLocked;
 	    	}
 	    }
 	    
