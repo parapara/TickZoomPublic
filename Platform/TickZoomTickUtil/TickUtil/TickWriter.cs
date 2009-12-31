@@ -225,7 +225,7 @@ namespace TickZoom.TickUtil
 				throw new ApplicationException("Please initialized TickWriter first.");
 			}
 			if( debug) log.Debug("Entering Close()");
-    		if( appendThread != null) {
+    		if( appendThread != null && writeQueue != null) {
 				writeQueue.EnQueue(EntryType.Terminate, symbol);
 				appendThread.Join();
 				writeQueue = null;
