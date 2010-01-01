@@ -141,11 +141,11 @@ namespace TickZoom.Api
 				Thread.CurrentThread.Priority = ThreadPriority.Highest;
 	        	lastDateTime = DateTime.UtcNow.Ticks;
 	        	long currentDateTime;
+        		long frequency = System.Diagnostics.Stopwatch.Frequency;
+        		stopWatchFrequency = frequency;
 	        	do {
 	        		lastStopWatch = System.Diagnostics.Stopwatch.GetTimestamp();
 	        		currentDateTime = DateTime.UtcNow.Ticks;
-	        		long frequency = System.Diagnostics.Stopwatch.Frequency;
-	        		stopWatchFrequency = frequency / 10000000;
 	        	} while( lastDateTime == currentDateTime);
 	        	lastDateTime = currentDateTime;
 	        	Thread.CurrentThread.Priority = ThreadPriority.Normal;
@@ -155,11 +155,12 @@ namespace TickZoom.Api
 		private static long lastStopWatch;
 		private static long stopWatchFrequency = 1L;
 		private static long lastDateTime;
+		private static long tickFrequency = 10000000L;
 
 		private static DateTime GetAdjustedDateTime() {
         	DateTime nowUtcTime = DateTime.UtcNow;
         	long dateTimeDelta = nowUtcTime.Ticks - lastDateTime;
-        	long stopWatchDelta = (System.Diagnostics.Stopwatch.GetTimestamp() - lastStopWatch) / stopWatchFrequency;
+        	long stopWatchDelta = (System.Diagnostics.Stopwatch.GetTimestamp() - lastStopWatch) * tickFrequency / stopWatchFrequency ;
         	long timeDelta = stopWatchDelta - dateTimeDelta;
         	// Check is system time was change.
         	if( timeDelta > 1000000L || timeDelta < -1000000L) {

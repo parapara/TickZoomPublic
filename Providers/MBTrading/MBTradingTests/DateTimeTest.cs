@@ -43,6 +43,10 @@ namespace TickZoom.Test
 			TimeStamp normalUtcNow = new TimeStamp(DateTime.UtcNow.ToOADate());
 			TimeStamp adjustedUtcNow = TimeStamp.UtcNow;
 			log.Info( "normal = " + normalUtcNow + ", adjusted = " + adjustedUtcNow);
+
+			normalUtcNow = new TimeStamp(DateTime.UtcNow.ToOADate());
+			adjustedUtcNow = TimeStamp.UtcNow;
+			log.Info( "normal = " + normalUtcNow + ", adjusted = " + adjustedUtcNow);
 		}	
 	}
 }

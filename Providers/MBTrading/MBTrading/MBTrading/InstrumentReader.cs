@@ -549,7 +549,9 @@ namespace TickZoom.MBTrading
 						retVal += value;
 			    	} catch(TargetParameterCountException) {
 						// Ignore
-			    	}
+					} catch(NullReferenceException) {
+						if( debug) log.Debug("Null reference on " + pis[i].Name);
+					}
 				}
 	    	} catch(Exception ex) {
 	    		log.Notice( "Exception: " + ex);
