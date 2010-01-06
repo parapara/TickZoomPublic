@@ -51,7 +51,7 @@ namespace TickZoom
 			double high = Bars.High[1] + boxSize;
 			double low = Bars.Low[1] - boxSize;
 			if( Position.IsLong && !barFlag) {
-				if( Performance.ComboTrades.CurrentProfitLoss > 0) {
+				if( Performance.ComboTrades.OpenProfitLoss > 0) {
 					if(Position.Size>1) {
 						Orders.Enter.ActiveNow.BuyMarket(); // Reduce TradeSignal.Positions.
 					}
@@ -66,7 +66,7 @@ namespace TickZoom
 				}
 			}
 			if( Position.IsShort && !barFlag) {
-				if( Performance.ComboTrades.CurrentProfitLoss > 0) {
+				if( Performance.ComboTrades.OpenProfitLoss > 0) {
 					if(Position.Size>1) {
 						Orders.Enter.ActiveNow.SellMarket(); // Reduce TradeSignal.Positions.
 					}

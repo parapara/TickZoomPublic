@@ -75,7 +75,7 @@ namespace TickZoom
 			if( Position.HasPosition) {
 				// TODO: Handle commission costs correctly inside Trade object.
 				int profitTarget = (int) (100 + Position.Size*contractSize*10); // *2 to double cost of commission.
-				if( Performance.ComboTrades.CurrentProfitLoss >= profitTarget) {
+				if( Performance.ComboTrades.OpenProfitLoss >= profitTarget) {
 					Orders.Exit.ActiveNow.GoFlat();
 					Reset();
 					return true;

@@ -72,6 +72,12 @@ namespace TickZoom
 		Interval intervalChartUpdate = initialInterval;
 		string storageFolder;
 		SymbolInfo symbol;
+		bool showTradeTips = true;
+		
+		public bool ShowTradeTips {
+			get { return showTradeTips; }
+			set { showTradeTips = value; }
+		}
 		
 	    public ChartControl()
 		{

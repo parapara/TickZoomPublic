@@ -109,7 +109,7 @@
     <Compile Include="Performance\RoundTurnImpl.cs" />
     <Compile Include="Performance\RoundTurnsBinary.cs" />
     <Compile Include="Performance\StrategyStats.cs" />
-    <Compile Include="Performance\RoundTurns.cs" />
+    <Compile Include="Performance\TransactionPairs.cs" />
     <Compile Include="Performance\TradeStats.cs" />
     <Compile Include="Performance\TradeStatsReport.cs" />
     <Compile Include="Performance\Transaction.cs" />

@@ -371,7 +371,7 @@ namespace TickZoom.Common
 				if( isMultiSymbolPortfolio) {
 					return portfolio.GetOpenEquity();
 				} else {
-					return strategy.Performance.ComboTrades.CurrentProfitLoss;
+					return strategy.Performance.ComboTrades.OpenProfitLoss;
 				}
 			}
 		}

@@ -58,7 +58,25 @@ namespace TickZoom.Common
 			get { return transactionPairs.Count; }
 		}
 		
+		/// <summary>
+		/// Returns the profit or loss of the most recent trade whether
+		/// completed or still open.
+		/// </summary>
 		public double CurrentProfitLoss {
+			get { if( Count == 0) {
+					return 0D;
+				} else {
+					System.Diagnostics.Debug.Assert(currentPrice!=null);
+					return ProfitInPosition(transactionPairs.Current,currentPrice(transactionPairs.Current.Direction));
+				}
+			}
+		}
+		
+		/// <summary>
+		/// Returns the open profit or loss of the most recent trade only
+		/// if still open. Zero if the most recent rade already closed.
+		/// </summary>
+		public double OpenProfitLoss {
 			get { if( Count == 0 || transactionPairs.Current.Completed) {
 					return 0D;
 				} else {

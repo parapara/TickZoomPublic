@@ -258,7 +258,7 @@ namespace TickZoom.Common
 				}
 			}
 			Assert.AreEqual(6,daily.Count,"Daily Count");
-			Assert.AreEqual(0.2080,Math.Round(daily.CurrentProfitLoss,3),"Final trade completion");
+			Assert.AreEqual(0.2080,Math.Round(daily.OpenProfitLoss,3),"Final trade completion");
 		}
 		[Test]
 		public void WeeklyTesting() {
@@ -268,7 +268,7 @@ namespace TickZoom.Common
 				log.Notice(i + ": " + weekly[i]);
 			}
 			Assert.AreEqual(5,weekly.Count,"Weekly Count");
-			Assert.AreEqual(-0.802,Math.Round(weekly.CurrentProfitLoss,3),"Final trade completion");
+			Assert.AreEqual(-0.802,Math.Round(weekly.OpenProfitLoss,3),"Final trade completion");
 		}
 		[Test]
 		public void MonthlyTesting() {
@@ -278,7 +278,7 @@ namespace TickZoom.Common
 				log.Notice(i + ": " + monthly[i]);
 			}
 			Assert.AreEqual(4,monthly.Count,"Monthly Count");
-			Assert.AreEqual(0.386,Math.Round(monthly.CurrentProfitLoss,3),"Final trade completion");
+			Assert.AreEqual(0.386,Math.Round(monthly.OpenProfitLoss,3),"Final trade completion");
 		}
 	}
 }
