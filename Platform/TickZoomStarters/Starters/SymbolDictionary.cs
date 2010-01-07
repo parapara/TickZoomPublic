@@ -349,6 +349,7 @@ namespace TickZoom.Common
         <symbol name=""TST_VR5"" />
         <symbol name=""TST_VR6"" />
         <symbol name=""TST_VR7"" />
+        <symbol name=""TST_VR8"" />
       </category>
       <symbol name=""CHF/JPY"" universal=""CHFJPY"" />
       <symbol name=""EUR/JPY"" universal=""EURJPY"" />
@@ -364,6 +365,9 @@ namespace TickZoom.Common
     <property name=""FullPointValue"" value=""50"" />
     <property name=""MinimumTick"" value=""0.25"" />
       <symbol name=""/ESZ9"" />
+    <category name=""Testing"">
+      <symbol name=""ESZ9"" />
+    </category>
   </category>
 </category>";
 #endregion

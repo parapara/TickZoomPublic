@@ -45,7 +45,8 @@ namespace TickZoom.Api
 		void Inject(T tick);
 		void SetSymbol(ulong lSymbol);
 		T Extract();
-		int FromReader(BinaryReader reader);
+		int FromReader(byte version, BinaryReader reader);
+		void FromReader(MemoryStream reader);
 		void ToWriter(MemoryStream memory);
 		object ToPosition();
 		byte DataVersion {

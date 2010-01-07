@@ -106,6 +106,7 @@ namespace TickZoom.TickUtil
     			fs = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
    				log.Debug("keepFileOpen - Open()");
     			memory = new MemoryStream();
+    			ReserveHeader(memory);
 			}
      		if( !CancelPending ) {
 				StartAppendThread();
@@ -167,6 +168,15 @@ namespace TickZoom.TickUtil
     		}
 		}
 		
+		private void ReserveHeader( MemoryStream memory) {
+	    	memory.SetLength(1);
+	    	memory.Position = 1;
+		}
+			    	
+		private void SetupHeader( MemoryStream memory) {
+			memory.GetBuffer()[0] = (byte) memory.Length;
+		}
+		
 		private int origSleepSeconds = 3;
 		private int currentSleepSeconds = 3;
 		private void WriteToFile(MemoryStream memory, ReadWritable<TickBinary> tick) {
@@ -178,12 +188,13 @@ namespace TickZoom.TickUtil
 		    			fs = new FileStream(fileName, FileMode.Append, FileAccess.Write, FileShare.Read);
 		    			if( trace) log.Trace("!keepFileOpen - Open()");
 		    			memory = new MemoryStream();
+		    			ReserveHeader(memory);
 					}
 			    	tick.ToWriter(memory);
 			    	CompressTick(tick.Extract(),memory);
+			    	SetupHeader(memory);
 			    	fs.Write(memory.GetBuffer(),0,(int)memory.Position);
-			    	memory.SetLength(0);
-			    	memory.Position = 0;
+	    			ReserveHeader(memory);
 					if( !keepFileOpen) {
 			    		fs.Close();
 			    		if( trace) log.Trace("!keepFileOpen - Close()");

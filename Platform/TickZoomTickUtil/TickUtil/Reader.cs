@@ -58,6 +58,7 @@ namespace TickZoom.TickUtil
 		private static object locker = new object();
 		bool terminate = false;
 		string storageFolder;
+		MemoryStream memory;
 		
 		public Reader()
 		{
@@ -104,10 +105,12 @@ namespace TickZoom.TickUtil
 			Stream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite); 
 			length = stream.Length;
 			dataIn = new BinaryReader(stream,Encoding.Unicode); 
+			memory = new MemoryStream();
+			memory.SetLength(TickImpl.minTickSize);
 			position = 0;
 			try { 
 		    	while( position < length && !CancelPending) {
-					position += tickIO.FromReader(dataIn);
+					ReadTick();
 				}
 			} catch( ObjectDisposedException) {
 				// Only partial tick was read at the end of the file.
@@ -176,6 +179,8 @@ namespace TickZoom.TickUtil
 		    		}
 		    			
 					dataIn = new BinaryReader(stream,Encoding.Unicode); 
+					memory = new MemoryStream();
+					memory.SetLength(TickImpl.minTickSize);
 		    		
 		     		progressDivisor = length/20;
 		     		if( !quietMode || debug) {
@@ -215,14 +220,34 @@ namespace TickZoom.TickUtil
 			get { return dataVersion; }
 		}
 		
+		private void ReadTick() {
+			byte size = dataIn.ReadByte();
+			position++;
+			// Check for old style prior to version 8 where
+			// single byte version # was first.
+			if( size < 8) {
+    			position += tickIO.FromReader(size,dataIn);
+			} else {
+				size--; // Subtract the size byte.
+				memory.Position = 0;
+				while(memory.Position < size) {
+					memory.Position += dataIn.Read(memory.GetBuffer(), (int) memory.Position, (int) (size-memory.Position));
+				}
+				memory.SetLength(memory.Position);
+				memory.Position = 0;
+				position += memory.Length;
+				tickIO.FromReader(memory);
+			}
+   			tickIO.SetSymbol(lSymbol);
+		}
+		
 		private bool FileReader() {
 			if( terminate || !receiver.CanReceive) {
 				return false;
 			}
 			try {
 	    		if( position < length && !CancelPending) {
-	    			position += tickIO.FromReader(dataIn);
-	    			tickIO.SetSymbol(lSymbol);
+					ReadTick();
 	    			if( dataVersion == 0) {
 	    				dataVersion = tickIO.DataVersion;			
 	    			}

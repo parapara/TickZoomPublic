@@ -36,7 +36,7 @@ namespace TickZoom.TickUtil
 	/// <inheritdoc/>
 	unsafe public struct TickImpl : TickIO
 	{
-		public const byte TickVersion = 7;
+		public const byte TickVersion = 8;
 		public const int minTickSize = 256;
 		
 		public static long ToLong( double value) { return value.ToLong(); }
@@ -379,6 +379,36 @@ namespace TickZoom.TickUtil
 				writer.SetLength(writer.Position);
 			}
 		}
+		
+		private unsafe int FromFileVersion8(byte *fptr) {
+			byte *ptr = fptr;
+	    	binary.UtcTime.Internal = * (double*)ptr; ptr+=sizeof(double);
+			binary.ContentMask = *ptr; ptr++;
+			if( IsQuote ) {
+				binary.Bid = * (long*) ptr; ptr+=sizeof(long);
+				binary.Ask = * (long*) ptr; ptr+=sizeof(long);
+			}
+			if( IsTrade) {
+				binary.Side = *ptr; ptr++;
+				binary.Price = * (long*) ptr; ptr+=sizeof(long);
+				binary.Size = * (int*) ptr; ptr+=sizeof(int);
+			}
+			if( HasDepthOfMarket) {
+				fixed( ushort *p = binary.DepthBidLevels) {
+					for( int i=0; i<TickBinary.DomLevels; i++) {
+						*(p+i) = * (ushort*) ptr; ptr += 2;
+					}
+				}
+				fixed( ushort *p = binary.DepthAskLevels) {
+					for( int i=0; i<TickBinary.DomLevels; i++) {
+						*(p+i) = * (ushort*) ptr; ptr += 2;
+					}
+				}
+			}
+			int len = (int) (ptr - fptr);
+			return len;
+		}
+
 		private int FromFileVersion7(BinaryReader reader) {
 			int position = 0;
 			binary.UtcTime.Internal = reader.ReadDouble(); position += 8;
@@ -415,6 +445,7 @@ namespace TickZoom.TickUtil
 			}
 			return position;
 		}
+		
 		private int FromFileVersion6(BinaryReader reader) {
 			int position = 0;
 			binary.UtcTime.Internal = reader.ReadDouble(); position += 8;
@@ -587,11 +618,32 @@ namespace TickZoom.TickUtil
 			return position;
 		}
 		
-		private static readonly TickBinary Blank = new TickBinary();
-		public int FromReader(BinaryReader reader) {
-			binary = Blank;
+		public void FromReader(MemoryStream reader) {
+			binary = default(TickBinary);
+			fixed( byte *fptr = reader.GetBuffer()) {
+				byte *sptr = fptr + reader.Position;
+				byte *ptr = sptr;
+				dataVersion = *ptr; ptr ++;
+				switch( dataVersion) {
+					case 8:
+						ptr += FromFileVersion8(ptr);
+						break;
+					default:
+						throw new ApplicationException("Unknown Tick Version Number " + dataVersion);
+				}
+				reader.Position += (int) (ptr - sptr);
+			}
+			SetTime(binary.UtcTime);
+		}
+
+		/// <summary>
+		/// Old style FormatReader for legacy versions of TickZoom tck
+		/// data files.
+		/// </summary>
+		public int FromReader(byte dataVersion, BinaryReader reader) {
+			binary = default(TickBinary);
+			this.dataVersion = dataVersion;
 			int position = 0;
-			dataVersion = reader.ReadByte(); position++;
 			switch( dataVersion) {
 				case 1:
 					position += FromFileVersion1(reader);

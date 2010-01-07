@@ -63,7 +63,8 @@ namespace TickZoom.TickUtil
 		}
 		
 		private void CompareTick( BinaryReader reader) {
-			currentTick.FromReader(reader);
+			byte version = reader.ReadByte();
+			currentTick.FromReader(version,reader);
 			CompareTick(currentTick);
 		}
 		

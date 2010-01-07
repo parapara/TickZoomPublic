@@ -197,9 +197,14 @@ namespace TickZoom.TickUtil
 			return CompareTo(other) == 0;
 		}
 		
-		public int FromReader(BinaryReader reader)
+		public int FromReader(byte version, BinaryReader reader)
 		{
-			return tick.FromReader(reader);
+			return tick.FromReader(version,reader);
+		}
+		
+		public void FromReader(MemoryStream reader)
+		{
+			tick.FromReader(reader);
 		}
 		
 		public TickBinary Extract() {

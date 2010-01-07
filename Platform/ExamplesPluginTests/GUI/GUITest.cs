@@ -38,6 +38,7 @@ using System.Windows.Forms;
 using NUnit.Framework;
 using TickZoom;
 using TickZoom.Api;
+using TickZoom.TickUtil;
 
 namespace MiscTest
 {
@@ -164,8 +165,23 @@ namespace MiscTest
 			AutoUpdate auto = new AutoUpdate();
 			string hash1 = auto.GetMD5HashFromFile(compareFile1);
 			string hash2 = auto.GetMD5HashFromFile(compareFile2);
-			Assert.AreEqual(hash1,hash2,"Tick data files");
-
+			TickReader reader1 = new TickReader();
+			reader1.Initialize(compareFile1);
+			TickReader reader2 = new TickReader();
+			reader2.Initialize(compareFile2);
+			TickBinary tick1 = new TickBinary();
+			TickBinary tick2 = new TickBinary();
+			try {
+				while(true) {
+					reader1.ReadQueue.Dequeue(ref tick1);
+					reader2.ReadQueue.Dequeue(ref tick2);
+					Assert.AreEqual(tick1,tick2);
+				}
+			} catch( QueueException ex) {
+				Assert.AreEqual(ex.EntryType,EntryType.EndHistorical);
+			}
+			reader1.Stop();
+			reader2.Stop();
 		}
 	}
 
