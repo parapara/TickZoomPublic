@@ -95,10 +95,12 @@ namespace TickZoom.Api
 		    // This loads plugins from the plugin folder
 		    List<string> files = new List<string>();
 		    files.AddRange( Directory.GetFiles(path, "*plugin*.dll", SearchOption.AllDirectories));
+		    files.AddRange( Directory.GetFiles(path, "*plugin*.dll", SearchOption.AllDirectories));
 	        // This loads plugins from the installation folder
 	        // so all the common models and modelloaders get loaded.
 	        files.AddRange( Directory.GetFiles(System.Environment.CurrentDirectory, "*plugin*.dll", SearchOption.AllDirectories));
 	        files.AddRange( Directory.GetFiles(System.Environment.CurrentDirectory, "*test*.dll", SearchOption.AllDirectories));
+	        files.AddRange( Directory.GetFiles(System.Environment.CurrentDirectory, "*test*.exe", SearchOption.AllDirectories));
 	        
 	        
 		    foreach (String filename in files)

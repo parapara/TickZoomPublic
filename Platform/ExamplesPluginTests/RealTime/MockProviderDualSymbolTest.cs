@@ -49,6 +49,11 @@ namespace RealTime
 			return new RealTimeStarter();
 		}
 		
+		public static void Main(string[] args) {
+			MockProviderDualSymbol fixture = new MockProviderDualSymbol();
+			fixture.RunStrategy();
+		}
+		
 		[TestFixtureSetUpAttribute()]
 		public override void RunStrategy()
 		{
