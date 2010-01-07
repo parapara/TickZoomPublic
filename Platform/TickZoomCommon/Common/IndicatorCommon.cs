@@ -39,12 +39,14 @@ namespace TickZoom.Common
 		private readonly Log instanceLog;
 		private readonly bool instanceDebug;
 		private readonly bool instanceTrace;
+		private bool isChartDynamic = false;
 		double startValue = Double.NaN;
 		bool isStartValueSet = false;
-		Interval fastUpdateInterval = Intervals.Year1;
+		Interval fastUpdateInterval = null;
 		Doubles output;
 		Doubles input;
 		object anyInput;
+		
 		private Performance performance;
 		
 		protected object AnyInput {
@@ -67,7 +69,9 @@ namespace TickZoom.Common
 			instanceTrace = instanceLog.IsTraceEnabled;
 			isIndicator = true;
 			Drawing.GroupName = Name;
-			RequestUpdate(fastUpdateInterval);
+			if( fastUpdateInterval != null) {
+				RequestUpdate(fastUpdateInterval);
+			}
 			output =  Doubles();
 		}
 
@@ -78,6 +82,7 @@ namespace TickZoom.Common
 			} else {
 				input = Doubles(anyInput);
 			}
+			isChartDynamic = Chart != null && Chart.IsDynamicUpdate;
 		}
 		
 		public sealed override bool OnBeforeIntervalOpen() {
@@ -101,10 +106,12 @@ namespace TickZoom.Common
 
 		public override bool OnProcessTick(Tick tick)
 		{
-			if( Chart.IsDynamicUpdate) {
+			if( isChartDynamic) {
 				Update();
+				return true;
+			} else {
+				return false;
 			}
-			return true;
 		}
 		
 		public override bool OnIntervalClose() {
