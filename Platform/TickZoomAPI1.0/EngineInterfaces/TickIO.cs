@@ -123,14 +123,6 @@ namespace TickZoom.Api
 		void init(TickIO tick, byte contentMask);
 		
 		/// <summary>
-		/// Obsolete: This property is unused and will be removed eventually.
-		/// </summary>
-		[Obsolete("This property is unused and will be removed eventually.",true)]
-		bool IsRealTime {
-			get;
-		}
-		
-		/// <summary>
 		/// Obsolete: Please use SetTime() and either SetQuote(), SetTrade(), SetDepth() instead
 		/// </summary>
 		[Obsolete("Please use SetTime() and either SetQuote(), SetTrade(), SetDepth() instead.",true)]
