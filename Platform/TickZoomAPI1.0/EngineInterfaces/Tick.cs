@@ -69,10 +69,6 @@ namespace TickZoom.Api
 			get;
 		}
 		
-		int Sentiment {
-			get;
-		}
-		
 		int Volume {
 			get;
 		}
