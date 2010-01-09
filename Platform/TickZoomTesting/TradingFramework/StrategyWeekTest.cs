@@ -48,6 +48,11 @@ namespace TickZoom.TradingFramework
 		public double Low;
 		public double Close;
 		public TimeStamp TickTime;
+		
+		public override string ToString()
+		{
+			return "Bar " + Time + " - " + EndTime;
+		}
 	}
 	
 	public class BarsList : List<Bar> {
@@ -135,8 +140,8 @@ namespace TickZoom.TradingFramework
 //			for( int i=0; i<bars.Count;i++) {
 //				log.WriteFile(i+": Time="+bars[i].Time+"/"+bars[i].EndTime);
 //			}
-			Assert.AreEqual(expected.EndTime,bar.EndTime,"EndTime");
 			Assert.AreEqual(expected.Time,bar.Time,"Time");
+			Assert.AreEqual(expected.EndTime,bar.EndTime,"EndTime");
 			Assert.AreEqual(expected.TickTime,bar.TickTime,"TickTime");
 			Assert.AreEqual(expected.Open,bar.Open,"Open");
 			Assert.AreEqual(expected.High,bar.High,"High");

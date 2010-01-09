@@ -121,7 +121,8 @@ namespace TickZoom.Common
 			TransactionPairBinary pair = TransactionPairBinary.Create();
 			pair.Direction = next.Position.Current;
 			pair.EntryPrice = fillPrice;
-			pair.EntryTime = Ticks[0].Time;
+			Tick tick = Ticks[0];
+			pair.EntryTime = tick.Time;
 			pair.EntryBar = Chart.ChartBars.BarCount;
 			comboTradesBinary.Add(pair);
 			Strategy.OnEnterTrade();

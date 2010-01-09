@@ -122,6 +122,7 @@ namespace TickZoom.Common
 			tickImpl.Initialize();
 			tickImpl.SetTime( new TimeStamp(2000,1,2));
 			tickImpl.SetQuote(101D, 101D);
+			tickImpl.SetSymbol( symbol.BinaryIdentifier);
 			tickBinary = tickImpl.Extract();
 			receiver.OnSend(ref tickBinary);
 			receiver.OnEndHistorical(symbol);

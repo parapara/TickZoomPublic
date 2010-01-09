@@ -53,10 +53,11 @@ namespace TickZoom.TickUtil
 		TickBinary binary;
 		TimeStamp localTime;
 		TimeStamp nextUtcOffsetUpdate;
-		double utcOffset;
+		long utcOffset;
 
 		public void Initialize() {
-			ClearContentMask();
+			binary = default(TickBinary);
+			localTime = default(TimeStamp);
 		}
 		
 		/// <inheritdoc/>
@@ -71,7 +72,7 @@ namespace TickZoom.TickUtil
 				nextUtcOffsetUpdate.SetDate(nextUtcOffsetUpdate.Year,nextUtcOffsetUpdate.Month,nextUtcOffsetUpdate.Day);
 			}
 			localTime = binary.UtcTime;
-			localTime.AddDays(utcOffset);
+			localTime.AddSeconds(utcOffset);
 		}
 		
 		public void SetQuote(double dBid, double dAsk)
@@ -352,7 +353,7 @@ namespace TickZoom.TickUtil
 			fixed( byte *fptr = &buffer[writer.Position]) {
 				byte *ptr = fptr;
 				*(ptr) = dataVersion; ptr++;
-				*(double*)(ptr) = binary.UtcTime.Internal; ptr+=sizeof(double);
+				*(long*)(ptr) = binary.UtcTime.Internal; ptr+=sizeof(double);
 				*(ptr) = binary.ContentMask; ptr++;
 				if( IsQuote) {
 					*(long*)(ptr) = binary.Bid; ptr += sizeof(long);
@@ -382,7 +383,7 @@ namespace TickZoom.TickUtil
 		
 		private unsafe int FromFileVersion8(byte *fptr) {
 			byte *ptr = fptr;
-	    	binary.UtcTime.Internal = * (double*)ptr; ptr+=sizeof(double);
+	    	binary.UtcTime.Internal = *(long*)ptr; ptr+=sizeof(double);
 			binary.ContentMask = *ptr; ptr++;
 			if( IsQuote ) {
 				binary.Bid = * (long*) ptr; ptr+=sizeof(long);
@@ -411,7 +412,14 @@ namespace TickZoom.TickUtil
 
 		private int FromFileVersion7(BinaryReader reader) {
 			int position = 0;
-			binary.UtcTime.Internal = reader.ReadDouble(); position += 8;
+			double d = reader.ReadDouble(); position += 8;
+//			if( d < 0) {
+//				int x = 0;
+//			}
+			binary.UtcTime.dInternal = d;
+//			if( binary.UtcTime.ToString().Contains("Error")) {
+//				int x = 0;
+//			}
 			binary.ContentMask = reader.ReadByte(); position += 1;
 			if( IsQuote ) {
 				binary.Bid = reader.ReadInt64(); position += 8;
@@ -448,7 +456,7 @@ namespace TickZoom.TickUtil
 		
 		private int FromFileVersion6(BinaryReader reader) {
 			int position = 0;
-			binary.UtcTime.Internal = reader.ReadDouble(); position += 8;
+			binary.UtcTime.dInternal = reader.ReadDouble(); position += 8;
 			binary.Bid = reader.ReadInt64(); position += 8;
 			binary.Ask = reader.ReadInt64(); position += 8;
 			ClearContentMask();
@@ -477,7 +485,7 @@ namespace TickZoom.TickUtil
 
 		private int FromFileVersion5(BinaryReader reader) {
 			int position = 0;
-			binary.UtcTime.Internal = reader.ReadDouble(); position += 8;
+			binary.UtcTime.dInternal = reader.ReadDouble(); position += 8;
 			binary.Bid = reader.ReadInt32(); position += 4;
 			sbyte spread = reader.ReadSByte();	position += 1;
 			binary.Ask = binary.Bid + spread;
@@ -514,7 +522,7 @@ namespace TickZoom.TickUtil
 			for( int i=0; i<TickBinary.SymbolSize; i++) {
 				reader.ReadChar(); position += 2;
 			}
-			binary.UtcTime.Internal = reader.ReadDouble(); position += 8;
+			binary.UtcTime.dInternal = reader.ReadDouble(); position += 8;
 			binary.Bid = reader.ReadInt32(); position += 4;
 			sbyte spread = reader.ReadSByte();	position += 1;
 			binary.Ask = binary.Bid + spread;
@@ -671,12 +679,6 @@ namespace TickZoom.TickUtil
 			}
 			SetTime(binary.UtcTime);
 			return position;
-		}
-		
-		public int CompareTo(object obj)
-		{
-			TickImpl other = (TickImpl) obj;
-			return binary.UtcTime.CompareTo(other.binary.UtcTime);
 		}
 		
 		public bool memcmp(ushort* array1, ushort* array2) {
@@ -893,6 +895,7 @@ namespace TickZoom.TickUtil
 		public void Inject(TickBinary tick) {
 			binary = tick;
 			SetTime(binary.UtcTime);
+//			string x = ToString();
 		}
 		
 		public bool IsRealTime {

@@ -571,21 +571,21 @@ namespace TickZoom
         }
         
 		private void IntervalsUpdate() {
-			intervalDefault = Factory.Engine.DefineInterval((BarUnit)defaultCombo.SelectedValue, Convert.ToDouble(defaultBox.Text));
-			intervalEngine = Factory.Engine.DefineInterval((BarUnit)engineBarsCombo.SelectedValue, Convert.ToDouble(engineBarsBox.Text));
+			intervalDefault = Factory.Engine.DefineInterval((BarUnit)defaultCombo.SelectedValue, Convert.ToInt32(defaultBox.Text));
+			intervalEngine = Factory.Engine.DefineInterval((BarUnit)engineBarsCombo.SelectedValue, Convert.ToInt32(engineBarsBox.Text));
 			if( engineRollingCheckBox.Checked) {
-				intervalEngine= Factory.Engine.DefineInterval((BarUnit)engineBarsCombo.SelectedValue, Convert.ToDouble(engineBarsBox.Text),
-											(BarUnit)engineBarsCombo2.SelectedValue, Convert.ToDouble(engineBarsBox2.Text));
+				intervalEngine= Factory.Engine.DefineInterval((BarUnit)engineBarsCombo.SelectedValue, Convert.ToInt32(engineBarsBox.Text),
+											(BarUnit)engineBarsCombo2.SelectedValue, Convert.ToInt32(engineBarsBox2.Text));
 			} else {
-				intervalChartDisplay = Factory.Engine.DefineInterval((BarUnit)chartDisplayCombo.SelectedValue, Convert.ToDouble(chartDisplayBox.Text));
+				intervalChartDisplay = Factory.Engine.DefineInterval((BarUnit)chartDisplayCombo.SelectedValue, Convert.ToInt32(chartDisplayBox.Text));
 			}
 			if( chartBarsCheckBox.Checked ) {
-				intervalChartBar = Factory.Engine.DefineInterval((BarUnit)chartBarsCombo.SelectedValue, Convert.ToDouble(chartBarsBox.Text),
-			                                      (BarUnit)chartBarsCombo2.SelectedValue, Convert.ToDouble(chartBarsBox2.Text));
+				intervalChartBar = Factory.Engine.DefineInterval((BarUnit)chartBarsCombo.SelectedValue, Convert.ToInt32(chartBarsBox.Text),
+			                                      (BarUnit)chartBarsCombo2.SelectedValue, Convert.ToInt32(chartBarsBox2.Text));
 			} else {
-				intervalChartBar = Factory.Engine.DefineInterval((BarUnit)chartBarsCombo.SelectedValue, Convert.ToDouble(chartBarsBox.Text));
+				intervalChartBar = Factory.Engine.DefineInterval((BarUnit)chartBarsCombo.SelectedValue, Convert.ToInt32(chartBarsBox.Text));
 			}
-			intervalChartUpdate = Factory.Engine.DefineInterval((BarUnit)chartUpdateCombo.SelectedValue, Convert.ToDouble(chartUpdateBox.Text));
+			intervalChartUpdate = Factory.Engine.DefineInterval((BarUnit)chartUpdateCombo.SelectedValue, Convert.ToInt32(chartUpdateBox.Text));
         }
 
 		private void IntervalDefaults() {

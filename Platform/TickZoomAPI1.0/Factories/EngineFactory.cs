@@ -47,9 +47,9 @@ namespace TickZoom.Api
 		
 		Series<T> Series<T>();
 		
-		Interval DefineInterval(BarUnit unit,double period);
+		Interval DefineInterval(BarUnit unit,int period);
 		
-		Interval DefineInterval(BarUnit unit,double period,BarUnit unit2,double period2);
+		Interval DefineInterval(BarUnit unit,int period,BarUnit unit2,int period2);
 		
 		Integers Integers();
 		

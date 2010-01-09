@@ -342,6 +342,9 @@ namespace TickZoom.Common
 		<symbol name=""USD_JPY_YEARS"" />
 		<symbol name=""USDJPYBenchMark"" />
         <symbol name=""USD_JPY_Volume"" />
+        <symbol name=""USD_JPY_TEST"">
+	    	<property name=""SessionEnd"" value=""09:22:13.000"" />
+		</symbol>
         <symbol name=""TST_TST"" />
         <symbol name=""TST_VR2"" />
         <symbol name=""TST_VR3"" />

@@ -1,4 +1,4 @@
-<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectGuid>{2183BC2B-A766-40DA-9A99-9EA5F8B428CA}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -118,6 +118,7 @@
     <Compile Include="Utilities\tzdata.cs" />
     <None Include="app.config" />
     <None Include="Lib\nunit.framework.dll" />
+    <None Include="Startup\optimizeResults.csv" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TickZoomAPI1.0\API1.0.csproj">

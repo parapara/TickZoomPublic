@@ -178,7 +178,7 @@ namespace TickZoom.TickUtil
 		
 		public int CompareTo(TickBox other)
 		{
-			return tick.CompareTo(other.tick);
+			return tick.CompareTo(ref other.tick);
 		}
 		
 		public override int GetHashCode()

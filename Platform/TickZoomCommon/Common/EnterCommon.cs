@@ -217,7 +217,7 @@ namespace TickZoom.Common
 		
 		private void LogEntry(string description) {
 			if( Chart.IsDynamicUpdate) {
-				Log.Notice("Bar="+Chart.DisplayBars.CurrentBar+", " + description);
+        		if( IsNotice) Log.Notice("Bar="+Chart.DisplayBars.CurrentBar+", " + description);
 			} else {
         		if( IsDebug) Log.Debug("Bar="+Chart.DisplayBars.CurrentBar+", " + description);
 			}

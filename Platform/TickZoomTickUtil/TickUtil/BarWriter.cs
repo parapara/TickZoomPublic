@@ -48,7 +48,7 @@ namespace TickZoom.TickUtil
 		}
 		
 		public void AddBar(double time, double open, double high, double low, double close, int volume, int openInterest) {
-			timeStamp.Internal = time;
+			timeStamp.dInternal = time;
 			closeTick.Initialize();
 			closeTick.SetTime(timeStamp);
 			closeTick.SetTrade(close, volume);

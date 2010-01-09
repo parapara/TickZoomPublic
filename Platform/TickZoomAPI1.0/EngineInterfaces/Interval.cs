@@ -37,7 +37,7 @@ namespace TickZoom.Api
 			get;
 		}
 		
-		double Period {
+		int Period {
 			get;
 		}
 		

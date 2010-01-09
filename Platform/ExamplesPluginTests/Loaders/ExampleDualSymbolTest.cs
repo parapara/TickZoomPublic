@@ -90,7 +90,10 @@ namespace Loaders
 		
 		[Test]
 		public void CheckPortfolio() {
+			double expected = fourTicksPerBar.Performance.Equity.CurrentEquity;
+			expected += fullTickData.Performance.Equity.CurrentEquity;
 			Assert.AreEqual(-139600, portfolio.Performance.Equity.CurrentEquity);
+//			Assert.AreEqual(expected, portfolio.Performance.Equity.CurrentEquity);
 		}
 		
 		[Test]

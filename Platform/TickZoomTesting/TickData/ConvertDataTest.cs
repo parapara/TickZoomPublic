@@ -31,9 +31,11 @@ using NUnit.Framework;
 using TickZoom.Api;
 using TickZoom.TickUtil;
 
+#if OBSOLETE
+
 namespace TickZoom.TickData
 {
-	[TestFixture]
+//	[TestFixture]
 	public class ConvertDataTest
 	{
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -128,3 +130,5 @@ namespace TickZoom.TickData
 		
 	}
 }
+
+#endif

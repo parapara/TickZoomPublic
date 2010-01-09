@@ -44,14 +44,14 @@ namespace RealTime
 	[TestFixture]
 	public class MockProviderDualSymbol : ExampleDualSymbolTest
 	{
-		public override Starter CreateStarter()
-		{
-			return new RealTimeStarter();
-		}
-		
 		public static void Main(string[] args) {
 			MockProviderDualSymbol fixture = new MockProviderDualSymbol();
 			fixture.RunStrategy();
+		}
+		
+		public override Starter CreateStarter()
+		{
+			return new RealTimeStarter();
 		}
 		
 		[TestFixtureSetUpAttribute()]
@@ -67,7 +67,7 @@ namespace RealTime
 				try {
 					string appData = Factory.Settings["AppDataFolder"];
 		 			File.Delete( appData + @"\TestServerCache\MockFull_Tick.tck");
-		 			File.Delete( appData + @"\TestServerCache\Mock4Sim.tck");
+		 			File.Delete( appData + @"\TestServerCache\Mock4Sim_Tick.tck");
 					break;
 				} catch( Exception) {
 				}

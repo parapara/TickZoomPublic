@@ -42,6 +42,7 @@ namespace TickZoom.Common
 		PositionInterface position;
 		Strategy strategy;
 		private readonly Log instanceLog;
+		private readonly bool instanceNotice;
 		private readonly bool instanceDebug;
 		private readonly bool instanceTrace;
 		private string fullName;
@@ -49,6 +50,7 @@ namespace TickZoom.Common
 		public StrategySupport(Strategy strategy)
 		{
 			instanceLog = Factory.Log.GetLogger(this.GetType()+"."+strategy.Name);
+			instanceNotice = instanceLog.IsNoticeEnabled;
 			instanceDebug = instanceLog.IsDebugEnabled;
 			instanceTrace = instanceLog.IsTraceEnabled;
 			this.strategy = strategy;
@@ -77,6 +79,10 @@ namespace TickZoom.Common
 		
 		public Log Log {
 			get { return instanceLog; }
+		}
+		
+		public bool IsNotice {
+			get { return instanceNotice; }
 		}
 		
 		public bool IsDebug {

@@ -57,11 +57,11 @@ namespace TickZoom.Common
 		public readonly static Interval Day1 = Factory.Engine.DefineInterval(BarUnit.Day,1);
 		public readonly static Interval Hour1 = Factory.Engine.DefineInterval(BarUnit.Hour,1);
 		public readonly static Interval Hour4 = Factory.Engine.DefineInterval(BarUnit.Hour,4);
-		public readonly static Interval Range40 = Factory.Engine.DefineInterval(BarUnit.Range,0.40);
-		public readonly static Interval Range30 = Factory.Engine.DefineInterval(BarUnit.Range,0.30);
-		public readonly static Interval Range20 = Factory.Engine.DefineInterval(BarUnit.Range,0.20);
-		public readonly static Interval Range10 = Factory.Engine.DefineInterval(BarUnit.Range,0.10);
-		public readonly static Interval Range5 = Factory.Engine.DefineInterval(BarUnit.Range,0.05);
-		public static Interval Define(BarUnit unit, double period) { return Factory.Engine.DefineInterval(unit,period); }
-		public static Interval Define(BarUnit unit, double period, BarUnit unit2, double period2) { return Factory.Engine.DefineInterval(unit,period,unit2,period2); }	}
+		public readonly static Interval Range40 = Factory.Engine.DefineInterval(BarUnit.Range,40);
+		public readonly static Interval Range30 = Factory.Engine.DefineInterval(BarUnit.Range,30);
+		public readonly static Interval Range20 = Factory.Engine.DefineInterval(BarUnit.Range,20);
+		public readonly static Interval Range10 = Factory.Engine.DefineInterval(BarUnit.Range,10);
+		public readonly static Interval Range5 = Factory.Engine.DefineInterval(BarUnit.Range,5);
+		public static Interval Define(BarUnit unit, int period) { return Factory.Engine.DefineInterval(unit,period); }
+		public static Interval Define(BarUnit unit, int period, BarUnit unit2, int period2) { return Factory.Engine.DefineInterval(unit,period,unit2,period2); }	}
 }
