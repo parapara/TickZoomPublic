@@ -115,7 +115,7 @@
     <Compile Include="Utilities\AutoUpdateTest.cs" />
     <Compile Include="Utilities\ISINTest.cs" />
     <Compile Include="Utilities\SymbolTest.cs" />
-    <Compile Include="Utilities\tzdata.cs" />
+    <Compile Include="Utilities\tzdataTest.cs" />
     <None Include="app.config" />
     <None Include="Lib\nunit.framework.dll" />
     <None Include="Startup\optimizeResults.csv" />

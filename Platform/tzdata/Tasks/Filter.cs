@@ -34,21 +34,20 @@ using TickZoom.TickUtil;
 
 namespace tzdata
 {
-	/// <summary>
-	/// Description of Query.
-	/// </summary>
+
+	
 	public class Filter
 	{
 		public Filter(string[] args)
 		{
-			if( args.Length != 2 && args.Length != 4) {
+			if( args.Length != 3 && args.Length != 5) {
 				Console.Write("Filter Usage:");
-				Console.Write("tzdata fromdir todir [starttimestamp endtimestamp]");
-				Console.Write("tzdata fromfile tofile [starttimestamp endtimestamp]");
+				Console.Write("tzdata filter <symbol> <fromfile> <tofile> [<starttimestamp> <endtimestamp>]");
 				return;
 			}
-			string from = args[0];
-			string to = args[1];
+			string symbol = args[0];
+			string from = args[1];
+			string to = args[2];
 			TimeStamp startTime;
 			TimeStamp endTime;
 			if( args.Length > 2) {
@@ -58,26 +57,15 @@ namespace tzdata
 				startTime = TimeStamp.MinValue;
 				endTime = TimeStamp.MaxValue;
 			}
-			if( Directory.Exists( from) ) {
-				DirectoryInfo di = new DirectoryInfo(from);
-				FileInfo[] files = di.GetFiles("*");
-				Directory.CreateDirectory(to);
-				foreach(FileInfo fi in files)
-				{
-					string outputPath = to + Path.DirectorySeparatorChar + fi.Name;
-				    FilterFile(fi.FullName,outputPath,startTime,endTime);
-				}
-			} else {
-				FilterFile(from,to,startTime,endTime);
-			}
+			FilterFile(symbol,from,to,startTime,endTime);
 		}
 		
-		private void FilterFile(string inputPath, string outputPath, TimeStamp startTime, TimeStamp endTime) {
+		private void FilterFile(string symbol, string inputPath, string outputPath, TimeStamp startTime, TimeStamp endTime) {
 			TickReader reader = new TickReader();
 			TickWriter writer = new TickWriter(true);
 			writer.KeepFileOpen = true;
-			writer.Initialize( outputPath);
-			reader.Initialize( inputPath);
+			writer.Initialize( outputPath, symbol);
+			reader.Initialize( inputPath, symbol);
 			TickQueue inputQueue = reader.ReadQueue;
 			TickImpl firstTick = new TickImpl();
 			TickImpl lastTick = new TickImpl();

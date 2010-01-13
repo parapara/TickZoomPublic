@@ -75,6 +75,7 @@ namespace TickZoom.TickUtil
 			get { return backgroundWorker != null && backgroundWorker.CancellationPending; }
 		}
 		
+		[Obsolete("Pass symbol string instead of SymbolInfo",true)]
 		public void Initialize(string _folder, SymbolInfo symbolInfo) {
 			symbol = symbolInfo;
 			lSymbol = symbolInfo.BinaryIdentifier;
@@ -82,13 +83,19 @@ namespace TickZoom.TickUtil
 			Initialize(_folder,symbolInfo.Symbol);
 		}
 		
-		public void Initialize(string _folder, string _symbol) {
-			if( fileName == null) {
-				fileName = storageFolder + "\\" + _folder + "\\" + _symbol.Replace("/","") + "_Tick" + ".tck";
+		public void Initialize(string folderOrfile, string _symbol) {
+			symbol = Factory.Symbol.LookupSymbol(_symbol);
+			lSymbol = symbol.BinaryIdentifier;
+			if( Directory.Exists( storageFolder + "\\" + folderOrfile )) {
+				fileName = storageFolder + "\\" + folderOrfile + "\\" + _symbol.StripInvalidPathChars() + "_Tick" + ".tck";
+			} else if( File.Exists( folderOrfile)) {
+			    fileName = folderOrfile;
+			} else {
+				throw new ApplicationException("Requires either a file or folder to read data.");
 			}
-			Initialize( fileName);
 		}
 		
+		[Obsolete("Use Initialize( folderOrfile, symbol) instead.",true)]
 		public void Initialize(string fileName) {
 			this.fileName = fileName;
 			if(debug) log.Debug("File Name = " + fileName);

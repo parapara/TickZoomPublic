@@ -52,12 +52,17 @@ namespace TickZoom.TickUtil
 		MemoryStream memory = null;
 		bool isInitialized = false;
 		bool isPaused = false;
-
+		string storageFolder;
+		
 		public TickWriter(bool eraseFileToStart)
 		{
 			this.eraseFileToStart = eraseFileToStart;
 			writeQueue = Factory.TickUtil.TickQueue(typeof(TickWriter));
 			writeQueue.StartEnqueue = Start;
+       		storageFolder = Factory.Settings["AppDataFolder"];
+       		if( storageFolder == null) {
+       			throw new ApplicationException( "Must set AppDataFolder property in app.config");
+       		}
 		}
 		
 		public void Start() {
@@ -76,28 +81,16 @@ namespace TickZoom.TickUtil
 			get { return backgroundWorker !=null && backgroundWorker.CancellationPending; }
 		}
 		
-		public void Initialize(string _folder, SymbolInfo _symbol) {
-			symbol = _symbol;
-       		string storageFolder = Factory.Settings["AppDataFolder"];
-       		if( storageFolder == null) {
-       			throw new ApplicationException( "Must set AppDataFolder property in app.config");
-       		}
-       		
-       		string symbolStr = _symbol.Symbol.StripInvalidPathChars();
-       		
-       		string fileNameRoot = storageFolder + "\\" + _folder + "\\" + symbolStr + "_Tick";
-			fileName = fileNameRoot+".tck";
-			Initialize( fileName);
-		}
-		
-		public void Initialize(string filePath) {
-    		log.Notice("TickWriter fileName: " + fileName);
-    		this.fileName = filePath;
-			Directory.CreateDirectory( Path.GetDirectoryName(FileName));
-			string baseName = Path.GetFileNameWithoutExtension(filePath);
-			if( this.symbol == null) {
-				this.symbol = Factory.Symbol.LookupSymbol(baseName.Replace("_Tick",""));
+		public void Initialize(string folderOrfile, string _symbol) {
+			SymbolInfo symbolInfo = Factory.Symbol.LookupSymbol(_symbol);
+			symbol = Factory.Symbol.LookupSymbol(_symbol);
+			if( Directory.Exists(folderOrfile)) {
+				fileName = storageFolder + "\\" + folderOrfile + "\\" + symbol.Symbol.StripInvalidPathChars() + "_Tick.tck";
+			} else {
+       			fileName = folderOrfile;
 			}
+    		log.Notice("TickWriter fileName: " + fileName);
+			Directory.CreateDirectory( Path.GetDirectoryName(FileName));
 			if( eraseFileToStart) {
     			File.Delete( fileName);
     			log.Notice("TickWriter file was erased to begin writing.");
@@ -112,6 +105,16 @@ namespace TickZoom.TickUtil
 				StartAppendThread();
 			}
 			isInitialized = true;
+		}
+		
+		[Obsolete("Please pass string symbol instead of SymbolInfo.",true)]
+		public void Initialize(string _folder, SymbolInfo _symbol) {
+			isInitialized = false;
+		}
+		
+		[Obsolete("Please call Initialize( folderOrfile, symbo) instead.",true)]
+		public void Initialize(string filePath) {
+			isInitialized = false;
 		}
 
 		protected virtual void StartAppendThread() {

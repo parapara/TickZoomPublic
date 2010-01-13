@@ -28,6 +28,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using TickZoom.Api;
 
 namespace tzdata
@@ -36,13 +37,24 @@ namespace tzdata
 	{
 		public static void Main(string[] args)
 		{
-//			new Query(args);
-			new Filter(args);
+			if( args.Length == 0) {
+				Console.Write("tzdata Usage:");
+				Console.Write("tzdata migrate <symbol> <file>");
+				return;
+			}
+			List<string> taskArgs = new List<string>(args);
+			taskArgs.RemoveAt(0); // Remove the command string.
+
+			if( args[0] == "migrate") {
+				new Migrate(taskArgs.ToArray());
+			}
+			if( args[0] == "filter") {
+				new Filter(taskArgs.ToArray());
+			}
+			if( args[0] == "query") {
+				new Query(taskArgs.ToArray());
+			}
 			
-			// TODO: Implement Functionality Here
-			
-			Console.Write("Press any key to continue . . . ");
-			Console.ReadKey(true);
 		}
 	}
 }

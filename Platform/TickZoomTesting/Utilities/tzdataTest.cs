@@ -31,13 +31,14 @@
 using System;
 using System.Configuration;
 using NUnit.Framework;
+using System.IO;
 using TickZoom.Api;
 using tzdata;
 
 namespace TickZoom.Utilities
 {
 	[TestFixture]
-	public class tzdata
+	public class tzdataTest
 	{
 		[Test]
 		public void TestFilter()
@@ -51,6 +52,28 @@ namespace TickZoom.Utilities
 				storageFolder + @"\TestData\Daily4Sim_Tick.tck",
 			};
 			Filter filter = new Filter(args);
+		}
+		
+		[Test]
+		public void TestMigrate()
+		{
+	       	string storageFolder = Factory.Settings["AppDataFolder"];
+	       	if( storageFolder == null) {
+	       		throw new ApplicationException( "Must set AppDataFolder property in app.config");
+	       	}
+	       	string origFile = storageFolder + @"\TestData\Migrate_Tick.tck";
+	       	string tempFile = origFile + ".temp";
+	       	string backupFile = origFile + ".back";
+	       	File.Delete( backupFile);
+	       	File.Delete( origFile);
+	       	File.Copy(storageFolder + @"\TestData\USD_JPY_Tick.tck", origFile);
+	       	
+	       	string[] args = { "USD/JPY", storageFolder + @"\TestData\Migrate_Tick.tck" };
+	       	
+	       	Migrate migrate = new Migrate(args);
+			Assert.IsTrue( File.Exists( origFile));
+			Assert.IsTrue( File.Exists( backupFile));
+			Assert.IsFalse( File.Exists( tempFile));
 		}
 	}
 }

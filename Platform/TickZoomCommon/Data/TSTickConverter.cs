@@ -209,7 +209,7 @@ namespace TickZoom.Common
 	 			tickWriter = new TickWriter(true);
 	 			tickWriter.KeepFileOpen = true;
 				string folder = "DataCache";
-				tickWriter.Initialize(folder, symbol);
+				tickWriter.Initialize(folder, symbol.Symbol);
 			}
 			
 			tickWriter.Add(tickImpl);

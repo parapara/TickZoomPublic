@@ -113,7 +113,7 @@ namespace TickZoom.Common
 	    		tickReader.BulkFileLoad = singleLoad;
 	    		tickReader.QuietMode = quietMode;
 	    		try { 
-		    		tickReader.Initialize(DataFolder,symbols[i]);
+		    		tickReader.Initialize(DataFolder,symbols[i].Symbol);
 					senderList.Add(tickReader);
 	    		} catch( System.IO.FileNotFoundException ex) {
 	    			throw new ApplicationException("Error: " + ex.Message);
@@ -142,7 +142,7 @@ namespace TickZoom.Common
 			SymbolInfo[] symbols = ProjectProperties.Starter.SymbolProperties;
 			for(int i=0; i<symbols.Length; i++) {
 	    		TickWriter tickWriter = new TickWriter(false);
-	    		tickWriter.Initialize(DataFolder,symbols[i]);
+	    		tickWriter.Initialize(DataFolder,symbols[i].Symbol);
 				queueList.Add(tickWriter.WriteQueue);
 			}
 			return queueList.ToArray();

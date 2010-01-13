@@ -1,4 +1,4 @@
-#region Copyright
+﻿#region Copyright
 /*
  * Copyright 2008 M. Wayne Walter
  * Software: TickZoom Trading Platform
@@ -34,55 +34,57 @@ using TickZoom.TickUtil;
 
 namespace tzdata
 {
-	/// <summary>
-	/// Description of Query.
-	/// </summary>
-	public class Query
+	public class Migrate
 	{
-		public Query(string[] args)
+		public Migrate(string[] args)
 		{
 			if( args.Length != 2) {
-				Console.Write("Query Usage:");
-				Console.Write("tzdata query <symbol> <file>");
+				Console.Write("Migrate Usage:");
+				Console.Write("tzdata migrate <symbol> <file>");
 				return;
 			}
-			string symbol = args[0];
-			string file = args[1];
-			ReadFile(file,symbol);
+			MigrateFile(args[1],args[0]);
 		}
 		
-		public void ReadFile(string filePath, string symbol) {
+		private void MigrateFile(string file, string symbol) {
+			if( File.Exists(file + ".back")) {
+				Console.WriteLine("A backup file already exists. Please delete it first at: " + file + ".back");
+				return;
+			}
 			TickReader reader = new TickReader();
-			reader.Initialize(filePath,symbol);
-			TickQueue queue = reader.ReadQueue;
+//			reader.BulkFileLoad = true;
+			reader.Initialize( file, symbol);
+			
+			TickWriter writer = new TickWriter(true);
+			writer.KeepFileOpen = true;
+			writer.Initialize( file + ".temp", symbol);
+			
 			TickImpl firstTick = new TickImpl();
-			TickImpl lastTick = new TickImpl();
-			TickImpl prevTick = new TickImpl();
-			long count = 0;
-			long dups = 0;
 			TickIO tickIO = new TickImpl();
 			TickBinary tickBinary = new TickBinary();
-			queue.Dequeue(ref tickBinary);
-			tickIO.Inject(tickBinary);
-			count++;
-			firstTick.Copy( tickIO);
-			prevTick.Copy( tickIO);
+			int count = 0;
+			bool first = false;
 			try {
 				while(true) {
-					queue.Dequeue(ref tickBinary);
+					reader.ReadQueue.Dequeue(ref tickBinary);
 					tickIO.Inject(tickBinary);
-					count++;
-					if( tickIO.Bid == prevTick.Bid && tickIO.Ask == prevTick.Ask) {
-						dups++;
+					writer.Add(tickIO);
+					if( first) {
+						firstTick.Copy(tickIO);
+						first = false;
 					}
-					prevTick.Copy(tickIO);
+					count++;
 				}
-			} catch( CollectionTerminatedException) {
-				
+			} catch( QueueException ex) {
+				if( ex.EntryType != EntryType.EndHistorical) {
+					throw new ApplicationException("Unexpected QueueException: " + ex);
+				}
 			}
-			lastTick.Copy( tickIO);
-			Console.WriteLine(reader.Symbol + ": " + count + " ticks from " + firstTick.Time + " to " + lastTick.Time + " " + dups + " duplicates");
+			Console.WriteLine(reader.Symbol + ": Migrated " + count + " ticks from " + firstTick.Time + " to " + tickIO.Time );
 			TickReader.CloseAll();
+			writer.Close();
+			File.Move( file, file + ".back");
+			File.Move( file + ".temp", file);
 		}
 	}
 }

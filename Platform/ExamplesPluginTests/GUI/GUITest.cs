@@ -166,9 +166,9 @@ namespace MiscTest
 			string hash1 = auto.GetMD5HashFromFile(compareFile1);
 			string hash2 = auto.GetMD5HashFromFile(compareFile2);
 			TickReader reader1 = new TickReader();
-			reader1.Initialize(compareFile1);
+			reader1.Initialize(compareFile1,form.TxtSymbol.Text);
 			TickReader reader2 = new TickReader();
-			reader2.Initialize(compareFile2);
+			reader2.Initialize(compareFile2,form.TxtSymbol.Text);
 			TickBinary tick1 = new TickBinary();
 			TickBinary tick2 = new TickBinary();
 			try {
