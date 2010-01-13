@@ -78,7 +78,7 @@ namespace TickZoom.Common
 		public override void OnBeforeInitialize()
 		{
 			if( anyInput == null) {
-				input = Doubles(Bars.Typical);
+				input = Doubles(Bars.Close);
 			} else {
 				input = Doubles(anyInput);
 			}
