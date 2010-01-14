@@ -81,14 +81,16 @@ namespace TickZoom.Common
 	
 		public sealed override bool OnProcessTick(Tick tick)
 		{
-			if( IsTrace) Log.Trace("ProcessTick() Previous="+Strategy+" Previous.Signal="+Strategy.Position.Current);
-			
 			// Handle ActiveNow orders.
-			Strategy.OrderManager.ProcessOrders(tick);
+			if( Data.ActiveOrders.Count > 0) {
+				Strategy.OrderManager.ProcessOrders(tick);
+			}
 			
 			if( stopTradingToday || stopTradingThisWeek || stopTradingThisMonth ) {
 				return true;
 			}
+			
+//			if( Strategy.Position.ResetChangeFlag() ) {
 			if( (strategySignal>0) != Strategy.Position.IsLong || (strategySignal<0) != Strategy.Position.IsShort ) {
 				strategySignal = Strategy.Position.Current;
 				entryPrice = Strategy.Position.Price;

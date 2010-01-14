@@ -123,5 +123,13 @@ namespace TickZoom.Api
 		double Size {
 			get;
 		}
+		
+		/// <summary>
+		/// Used by ExitStrategy to see if the position has change.
+		/// WARNING: Avoid using this in other context as it will
+		/// both read and reset the direction change flag.
+		/// </summary>
+		/// <returns>boolean of the position direction change status.</returns>
+		bool ResetChangeFlag();
 	}
 }

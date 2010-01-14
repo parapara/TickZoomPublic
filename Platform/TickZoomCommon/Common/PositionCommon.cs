@@ -71,12 +71,28 @@ namespace TickZoom.Common
 			Change( position, price, model.Data.Ticks[0].Time);
 		}
 		
+		bool isChangeDirection = true;
 		public virtual void Change( double position, double price, TimeStamp time) {
 			if( current != position) {
+				if( (current>0) != (position>0) || (current<0) != (position<0) ) {
+					isChangeDirection = true;
+				}
 				this.time = time;
 				this.price = price;
 				this.current = position;
 			}
+		}
+		
+		/// <summary>
+		/// Used by ExitStrategy to see if the position has change.
+		/// WARNING: Avoid using this in other context as it will
+		/// both read and reset the direction change flag.
+		/// </summary>
+		/// <returns></returns>
+		public bool ResetChangeFlag() {
+			bool retVal = isChangeDirection;
+			isChangeDirection = false;
+			return retVal;
 		}
 		
 		public void Copy( PositionInterface _other) {

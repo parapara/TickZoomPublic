@@ -57,8 +57,8 @@ namespace TickZoom.Common
 		{
 			foreach( LogicalOrder order in orders) {
 				if( order.IsNextBar) {
-					order.IsNextBar = false;
 					order.IsActive = true;
+					order.IsNextBar = false;
 				}
 			}
 			return true;
@@ -66,8 +66,9 @@ namespace TickZoom.Common
 		
 		public sealed override bool OnProcessTick(Tick tick)
 		{
-			if( IsTrace) Log.Trace("OnProcessTick()");
-			ProcessOrders(tick);
+			if( Data.ActiveOrders.Count > 0) {
+				ProcessOrders(tick);
+			}
 			return true;
 		}
 		

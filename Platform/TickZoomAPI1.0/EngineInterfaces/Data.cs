@@ -47,6 +47,14 @@ namespace TickZoom.Api
 			get;
 		}
 		
+		List<LogicalOrder> ActiveOrders {
+			get;
+		}
+		
+		List<LogicalOrder> NextBarOrders {
+			get;
+		}
+		
 		[Obsolete("Please use the SymbolInfo property",true)]
 		double MinimumTick {
 			get;
