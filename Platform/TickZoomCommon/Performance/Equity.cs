@@ -56,7 +56,11 @@ namespace TickZoom.Common
 		ProfitLoss equityProfitLoss;
 		bool isMultiSymbolPortfolio;
 		PortfolioInterface portfolio;
-
+		bool enableYearlyStats = false;
+		bool enableMonthlyStats = false;
+		bool enableWeeklyStats = false;
+		bool enableDailyStats = false;
+		
 		public Equity(Strategy strategy) : base(strategy)
 		{
 			this.strategy = strategy;
@@ -82,10 +86,6 @@ namespace TickZoom.Common
 			yearlyBinary = new TransactionPairsBinary();
 			yearly  = new TransactionPairs(GetCurrentEquity,equityProfitLoss,yearlyBinary);
 			yearlyBinary.Name = "Yearly";
-			RequestUpdate(Intervals.Day1);
-			RequestUpdate(Intervals.Week1);
-			RequestUpdate(Intervals.Month1);
-			RequestUpdate(Intervals.Year1);
 			closedEquity = startingEquity;
 			
 			if( graphEquity) {
@@ -99,6 +99,18 @@ namespace TickZoom.Common
 				AddIndicator(equity);
 			}
 			
+			if( enableYearlyStats) {
+				RequestUpdate(Intervals.Year1);
+			}
+			if( enableMonthlyStats) {
+				RequestUpdate(Intervals.Month1);
+			}
+			if( enableWeeklyStats) {
+				RequestUpdate(Intervals.Week1);
+			}
+			if( enableDailyStats) {
+				RequestUpdate(Intervals.Day1);
+			}
 		}
 		
 		public sealed override bool OnProcessTick(Tick tick)
@@ -385,5 +397,24 @@ namespace TickZoom.Common
 			set { graphEquity = value; }
 		}
 		
+		public bool EnableYearlyStats {
+			get { return enableYearlyStats; }
+			set { enableYearlyStats = value; }
+		}
+		
+		public bool EnableMonthlyStats {
+			get { return enableMonthlyStats; }
+			set { enableMonthlyStats = value; }
+		}
+		
+		public bool EnableWeeklyStats {
+			get { return enableWeeklyStats; }
+			set { enableWeeklyStats = value; }
+		}
+		
+		public bool EnableDailyStats {
+			get { return enableDailyStats; }
+			set { enableDailyStats = value; }
+		}
 	}
 }

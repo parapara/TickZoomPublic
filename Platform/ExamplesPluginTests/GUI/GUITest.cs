@@ -152,11 +152,11 @@ namespace MiscTest
 			form.EndTime = DateTime.Now;
 			form.RealTimeButtonClick(null,null);
 //			form.HistoricalButtonClick(null,null);
-			WaitComplete(30, () => { return form.PortfolioDocs.Count == 1; } );
+			WaitComplete(20, () => { return form.PortfolioDocs.Count == 1; } );
 			Assert.AreEqual(1,form.PortfolioDocs.Count,"Charts");
-			WaitComplete(30, () => { return false; } );
+			WaitComplete(20, () => { return false; } );
 			form.btnStop_Click(null,null);
-			WaitComplete(30, () => { return !form.ProcessWorker.IsBusy; } );
+			WaitComplete(20, () => { return !form.ProcessWorker.IsBusy; } );
 			Assert.IsFalse(form.ProcessWorker.IsBusy,"ProcessWorker.Busy");
 			Assert.Greater(form.LogOutput.Lines.Length,2,"number of log lines");
 			string appData = Factory.Settings["AppDataFolder"];

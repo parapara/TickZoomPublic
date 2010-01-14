@@ -58,9 +58,9 @@ namespace TickZoom.Common
 		bool stopTradingThisMonth = false;
 		
 		public ExitStrategy(Strategy strategy) : base( strategy) {
-			RequestUpdate(Intervals.Day1);
-			RequestUpdate(Intervals.Week1);
-			RequestUpdate(Intervals.Month1);
+//			RequestUpdate(Intervals.Day1);
+//			RequestUpdate(Intervals.Week1);
+//			RequestUpdate(Intervals.Month1);
 		}
 		
 		public override void OnInitialize()

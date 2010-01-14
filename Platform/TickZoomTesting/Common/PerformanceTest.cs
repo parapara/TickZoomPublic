@@ -121,8 +121,9 @@ namespace TickZoom.Common
 			PerformanceInner performance = new PerformanceInner(random);
 			performance.Slippage = 0.0140;
 			performance.Commission = 0.010;
-
 			random.Performance = performance;
+			random.Performance.Equity.EnableMonthlyStats = true;
+			random.Performance.Equity.EnableWeeklyStats = true;
 
 			// Stops
 			random.ExitStrategy.StopLoss = stop;

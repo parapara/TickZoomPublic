@@ -59,6 +59,7 @@ namespace TickZoom.TickUtil
 		bool terminate = false;
 		string storageFolder;
 		MemoryStream memory;
+		byte[] buffer;
 		
 		public Reader()
 		{
@@ -69,6 +70,9 @@ namespace TickZoom.TickUtil
 			lock(locker) {
 				readerList.Add(this);
 			}
+			memory = new MemoryStream();
+			memory.SetLength(TickImpl.minTickSize);
+			buffer = memory.GetBuffer();
 		}
 		
 		bool CancelPending {
@@ -112,8 +116,6 @@ namespace TickZoom.TickUtil
 			Stream stream = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite); 
 			length = stream.Length;
 			dataIn = new BinaryReader(stream,Encoding.Unicode); 
-			memory = new MemoryStream();
-			memory.SetLength(TickImpl.minTickSize);
 			position = 0;
 			try { 
 		    	while( position < length && !CancelPending) {
@@ -186,8 +188,6 @@ namespace TickZoom.TickUtil
 		    		}
 		    			
 					dataIn = new BinaryReader(stream,Encoding.Unicode); 
-					memory = new MemoryStream();
-					memory.SetLength(TickImpl.minTickSize);
 		    		
 		     		progressDivisor = length/20;
 		     		if( !quietMode || debug) {
@@ -228,21 +228,20 @@ namespace TickZoom.TickUtil
 		}
 		
 		private void ReadTick() {
-			byte size = dataIn.ReadByte();
+			int size = dataIn.ReadByte();
 			position++;
 			// Check for old style prior to version 8 where
 			// single byte version # was first.
 			if( size < 8) {
-    			position += tickIO.FromReader(size,dataIn);
+				position += tickIO.FromReader((byte)size,dataIn);
 			} else {
 				size--; // Subtract the size byte.
-				memory.Position = 0;
-				while(memory.Position < size) {
-					memory.Position += dataIn.Read(memory.GetBuffer(), (int) memory.Position, (int) (size-memory.Position));
+				int count = 0;
+				while(count < size) {
+					count += dataIn.Read(buffer, count, size-count);
 				}
-				memory.SetLength(memory.Position);
 				memory.Position = 0;
-				position += memory.Length;
+				position += count;
 				tickIO.FromReader(memory);
 			}
    			tickIO.SetSymbol(lSymbol);

@@ -84,8 +84,8 @@ namespace TickZoom.TickUtil
 		public void Initialize(string folderOrfile, string _symbol) {
 			SymbolInfo symbolInfo = Factory.Symbol.LookupSymbol(_symbol);
 			symbol = Factory.Symbol.LookupSymbol(_symbol);
-			if( Directory.Exists(folderOrfile)) {
-				fileName = storageFolder + "\\" + folderOrfile + "\\" + symbol.Symbol.StripInvalidPathChars() + "_Tick.tck";
+			if( Directory.Exists(storageFolder + @"\" + folderOrfile)) {
+				fileName = storageFolder + @"\" + folderOrfile + @"\" + symbol.Symbol.StripInvalidPathChars() + "_Tick.tck";
 			} else {
        			fileName = folderOrfile;
 			}

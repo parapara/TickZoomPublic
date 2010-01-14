@@ -166,6 +166,10 @@ namespace TickZoom.StarterTest
 			{
 				ModelInterface model = CreateStrategy("ExampleSimpleStrategy");
 				Strategy strategy = model as Strategy;
+				strategy.Performance.Equity.EnableYearlyStats = true;
+				strategy.Performance.Equity.EnableMonthlyStats = true;
+				strategy.Performance.Equity.EnableWeeklyStats = true;
+				strategy.Performance.Equity.EnableDailyStats = true;
 		    	AddDependency( "PortfolioCommon", "ExampleSimpleStrategy");
 		    	TopModel = GetStrategy( "PortfolioCommon");
 			}
