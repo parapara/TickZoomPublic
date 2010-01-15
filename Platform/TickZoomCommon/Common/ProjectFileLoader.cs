@@ -74,7 +74,7 @@ namespace TickZoom.Common
 			if( !QuietMode) {
 				log.Debug( properties.ModelType + " " + properties.Name + ", type = " + properties.Type);
 			}
-			Strategy model = CreateStrategy( properties.Type, properties.Name);
+			ModelInterface model = CreateModel( properties.Type, properties.Name);
 			model.OnProperties(properties);
 			if( !QuietMode) {
 				log.Indent();
@@ -111,17 +111,23 @@ namespace TickZoom.Common
 			
 			if( "exitstrategy".Equals(properties.Name)) {
 				Strategy strategy = (Strategy) model;
-				model = strategy.ExitStrategy;
-			}
-			if( "performance".Equals(properties.Name)) {
+				strategy.ExitStrategy.OnProperties(properties);
+			} else if( "performance".Equals(properties.Name)) {
+				if( model is Portfolio) {
+					Portfolio portfolio = (Portfolio) model;
+					portfolio.Performance.OnProperties(properties);
+				} else if( model is Strategy) {
+					Strategy strategy = (Strategy) model;
+					strategy.Performance.OnProperties(properties);
+				} else {
+					throw new ApplicationException("'" + model.Name + "' is neither a strategy nor a portfolio.");
+				}
+			} else if( "positionsize".Equals(properties.Name)) {
 				Strategy strategy = (Strategy) model;
-				model = strategy.Performance;
+				strategy.PositionSize.OnProperties(properties);
+			} else {
+				model.OnProperties(properties);
 			}
-			if( "positionsize".Equals(properties.Name)) {
-				Strategy strategy = (Strategy) model;
-				model = strategy.PositionSize;
-			}
-			model.OnProperties(properties);
 			if( !QuietMode) {
 				log.Outdent();
 			}

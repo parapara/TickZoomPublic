@@ -62,7 +62,7 @@ namespace TickZoom
 	    	AddDependency( "ExampleMultiStrategy", "LongStrategy");
 	    	AddDependency( "ExampleMultiStrategy", "ShortStrategy");
 	    	
-			TopModel = GetStrategy("ExampleMultiStrategy");
+			TopModel = GetPortfolio("ExampleMultiStrategy");
 		}
 		
 	}

@@ -28,6 +28,7 @@ using System.Drawing;
 
 namespace TickZoom.Api
 {
+
 	[Obsolete("Please use DrawingInterface instead.",true)]
 	public interface Drawing : DrawingInterface {
 		

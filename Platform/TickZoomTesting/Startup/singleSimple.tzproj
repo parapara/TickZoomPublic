@@ -9,8 +9,6 @@
     <propertyset name="chart" />
     <propertyset name="engine" />
     <strategy name="PortfolioCommon" type="PortfolioCommon">
-        <propertyset name="exitstrategy" />
-        <propertyset name="positionsize" />
         <propertyset name="performance" />
         <strategy name="ExampleSimpleStrategy" type="ExampleSimpleStrategy">
             <propertyset name="exitstrategy" />

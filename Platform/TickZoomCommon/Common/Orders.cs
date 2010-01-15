@@ -34,12 +34,12 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of Orders.
 	/// </summary>
-	public class Orders
+	public class OrderHandlers
 	{
 		EnterTiming enter;
 		ExitTiming exit;
 		
-		public Orders(EnterCommon enterNow, EnterCommon enterNextBar, ExitCommon exitNow, ExitCommon exitNextBar)
+		public OrderHandlers(EnterCommon enterNow, EnterCommon enterNextBar, ExitCommon exitNow, ExitCommon exitNextBar)
 		{
 			this.enter = new EnterTiming(enterNow,enterNextBar);
 			this.exit = new ExitTiming(exitNow,exitNextBar);

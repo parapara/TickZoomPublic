@@ -47,11 +47,6 @@ namespace TickZoom
 		{
 		}
 		
-		public override bool OnProcessTick(Tick tick)
-		{
-			return false;
-		}
-		
 		public override bool OnIntervalClose()
 		{
 			// Example log message.

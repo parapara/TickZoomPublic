@@ -35,8 +35,9 @@ namespace TickZoom.Common
 		
 		public TradeStats( TransactionPairs trades) : base(trades)
 		{
-			
-			calculate();
+			if( trades != null && trades.Count > 0) {
+				calculate();
+			}
 		}
 		
 		private void calculate() {

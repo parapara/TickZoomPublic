@@ -40,7 +40,9 @@ namespace TickZoom
 		public override void OnInitialize()
 		{
 			Performance.GraphTrades = true;
-			PositionSize.Size = 10000;
+			foreach( Strategy strategy in Strategies) {
+				strategy.PositionSize.Size = 10000;
+			}
 			
 			equity = new IndicatorCommon();
 			equity.Drawing.IsVisible = true;

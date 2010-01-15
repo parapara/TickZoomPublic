@@ -60,7 +60,7 @@ namespace TickZoom
 		static Interval initialInterval;
 		int objectId = 0;
 		float _clusterWidth = 0;
-		StrategySupportInterface strategy;
+		StrategyInterface strategy;
 		bool isDynamicUpdate = false;
 		Color[] colors = { Color.Black, Color.Red, Color.FromArgb(194,171,213), Color.FromArgb (250,222,130) } ;
 		bool isAudioNotify = false;
@@ -897,7 +897,7 @@ namespace TickZoom
 		}
 		
 		[Browsable(false)]
-		public StrategySupportInterface StrategyForTrades {
+		public StrategyInterface StrategyForTrades {
 			get { return strategy; }
 			set { strategy = value; }
 		}

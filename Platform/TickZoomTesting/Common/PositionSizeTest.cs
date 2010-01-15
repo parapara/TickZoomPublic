@@ -35,7 +35,6 @@ namespace TickZoom.Common
 		private static readonly Log log = Factory.Log.GetLogger(typeof(PositionSizeTest));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly bool trace = log.IsTraceEnabled;
-
 		PositionSizeInner performance;
 		
     	[SetUp]
@@ -62,9 +61,9 @@ namespace TickZoom.Common
 			strategy.PositionSize = performance;
 			strategy.Performance = new Performance(strategy);
 			Assert.AreSame(strategy.PositionSize,performance);
-			log.Notice(performance.Chain.ToChainString());
-			Assert.AreSame(strategy.Performance.Equity,performance.Chain.Previous.Model);
-			Assert.AreSame(strategy.ExitStrategy,performance.Chain.Next.Model);
+			int x = 0;
+//			Assert.AreSame(strategy.Performance.Equity,performance.Chain.Previous.Model);
+//			Assert.AreSame(strategy.ExitStrategy,performance.Chain.Next.Model);
 		}
 
 		public class PositionSizeInner : PositionSize {
@@ -72,36 +71,23 @@ namespace TickZoom.Common
 			public List<Tick> signalChanges = new List<Tick>();
 			public List<double> signalDirection = new List<double>();
 			double prevSignal = 0;
-			public TradingSignalTest tradingSignalTest;
+			
 			public PositionSizeInner(Strategy strategy) : base(strategy) {
-				
-			}
-			public override void OnInitialize()
-			{
-				if( trace) log.Trace(FullName+" Initialize()");
-				Position = tradingSignalTest = new TradingSignalTest(this);
-				base.OnInitialize();
 				signalChanges = new List<Tick>();
-				List<int> signalDirection = new List<int>();
 			}
-			public class TradingSignalTest : PositionCommon {
-				new PositionSizeInner model;
-				public TradingSignalTest( PositionSizeInner formula ) : base(formula) {
-					this.model = formula;
-				}
-				public override double Current  {
-					get { return base.Current; }
-				}
-				public override void Change(double position, double price, TimeStamp time)
-				{
-					base.Change(position, price, time);
-					if( base.Current != model.prevSignal) {
-						model.signalChanges.Add(model.Ticks[0]);
-						model.signalDirection.Add(base.Current);
-						model.prevSignal = base.Current;
+
+			public override void Intercept(EventContext context, EventType eventType, object eventDetail)
+			{
+				base.Intercept(context, eventType, eventDetail);
+				if( eventType == EventType.Tick) {
+					if( context.Position.Current != prevSignal) {
+						signalChanges.Add(Strategy.Data.Ticks[0]);
+						signalDirection.Add(context.Position.Current);
+						prevSignal = context.Position.Current;
 					}
 				}
 			}
+			
 			public void TickConsoleWrite() {
 				for( int i = 0; i< signalChanges.Count; i++) {
 					Tick tick = signalChanges[i];
@@ -133,7 +119,6 @@ namespace TickZoom.Common
 			starter.Run(random);
 			
 			Assert.AreEqual(positionSize,random.PositionSize);
-			Assert.AreEqual(positionSize.tradingSignalTest,random.PositionSize.Position);
 			
 //			Signal Times BEFORE applying stops or target
 //			0: 1: time: 2004-07-22 08:02:08.757 bid: 109440 ask: 109440

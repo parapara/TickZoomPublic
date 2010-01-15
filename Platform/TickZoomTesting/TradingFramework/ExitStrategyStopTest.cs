@@ -28,34 +28,28 @@ using TickZoom.Common;
 
 //using mscoree;
 
-
-
-
-
-
-
 #if TESTING
 namespace TickZoom.TradingFramework
 {
 	[TestFixture]
-	public class ExitStrategyStopTest : MarshalByRefObject
+	public class WrongSideOrderTest : MarshalByRefObject
 	{
-		private static readonly Log log = Factory.Log.GetLogger(typeof(ExitStrategyTest));
+		private static readonly Log log = Factory.Log.GetLogger(typeof(WrongSideOrderTest));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly bool trace = log.IsTraceEnabled;
 		ExitStrategyMock exitStrategy;
 		
-	    	[TestFixtureSetUp]
-	    	public virtual void Init() {
-	    		TimeStamp.SetToUtcTimeZone();
+	    [TestFixtureSetUp]
+	    public virtual void Init() {
+	    	TimeStamp.SetToUtcTimeZone();
 			log.Notice("Setup ExitStrategyTest");
 			StopTestProcessing();
-	    	}
+	    }
 	    	
-	    	[TestFixtureTearDown]
-	    	public void Dispose() {
-	    		TimeStamp.ResetUtcOffset();
-	    	}
+	    [TestFixtureTearDown]
+	    public void Dispose() {
+	    	TimeStamp.ResetUtcOffset();
+	    }
 		
 		public void StopTestProcessing() {
 			RandomMock random = new RandomMock();
@@ -74,15 +68,15 @@ namespace TickZoom.TradingFramework
 
 	    [Test]
 		public void LongStopTest() {
-			TimeStamp expected = new TimeStamp("2005-02-10 09:57:54.325");
+			TimeStamp expected = new TimeStamp("2005-02-10 09:57:58.364");
+			Assert.AreEqual(0,exitStrategy.signalDirection[41],"Long stop exit");
 			Assert.AreEqual(expected,exitStrategy.signalChanges[41],"Long stop exit");
-			Assert.AreEqual(1,exitStrategy.signalDirection[41],"Long stop exit");
 		}
 	
 		[Test]
 		public void ShortStopTest() {
-			TimeStamp expected = new TimeStamp("2005-02-09 09:51:41.949");
-			Assert.AreEqual(-1,exitStrategy.signalDirection[13],"Short stop exit");
+			TimeStamp expected = new TimeStamp("2005-02-09 09:52:18.097");
+			Assert.AreEqual(0,exitStrategy.signalDirection[13],"Short stop exit");
 			Assert.AreEqual(expected,exitStrategy.signalChanges[13],"Short stop exit");
 		}
 		

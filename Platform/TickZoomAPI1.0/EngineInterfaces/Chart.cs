@@ -88,7 +88,7 @@ namespace TickZoom.Api
 			set ;
 		}
 		
-		StrategySupportInterface StrategyForTrades {
+		StrategyInterface StrategyForTrades {
 			get ;
 			set ;
 		}

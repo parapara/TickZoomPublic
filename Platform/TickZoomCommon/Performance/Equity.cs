@@ -37,7 +37,7 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of MoneyManagerSupport.
 	/// </summary>
-	public class Equity : StrategySupport
+	public class Equity : StrategyInterceptor
 	{
 		TransactionPairs daily;
 		TransactionPairs weekly;
@@ -48,8 +48,8 @@ namespace TickZoom.Common
 		TransactionPairsBinary monthlyBinary;
 		TransactionPairsBinary yearlyBinary;
 		double closedEquity = 0;
-		StrategySupportInterface next;
-		Strategy strategy;
+		Model model;
+		Performance performance;
 		double startingEquity = 10000;
 		bool graphEquity = false;
 		IndicatorCommon equity;
@@ -60,21 +60,41 @@ namespace TickZoom.Common
 		bool enableMonthlyStats = false;
 		bool enableWeeklyStats = false;
 		bool enableDailyStats = false;
+		bool isInitialized = false;
 		
-		public Equity(Strategy strategy) : base(strategy)
+		public Equity(Model model, Performance performance) 
 		{
-			this.strategy = strategy;
-			equityProfitLoss = new TradeProfitLoss(strategy);
+			this.model = model;
+			this.performance = performance;
+			equityProfitLoss = new TradeProfitLoss(model);
 			dailyBinary   = new TransactionPairsBinary();
 		}
 		
-		public override void OnInitialize()
+		public void Intercept(EventContext context, EventType eventType, object eventDetail)
 		{
-			portfolio = strategy as PortfolioInterface;
+			if( EventType.Initialize == eventType) {
+				OnInitialize();
+			}
+			context.Invoke();
+			if( EventType.Open == eventType) {
+				if( eventDetail != null) {
+					OnIntervalOpen((Interval)eventDetail);
+				}
+			} else if( EventType.Close == eventType) {
+				if( eventDetail == null) {
+					OnIntervalClose();
+				} else {
+					OnIntervalClose((Interval)eventDetail);
+				}
+			}
+		}
+
+		public void OnInitialize()
+		{
+			portfolio = model as PortfolioInterface;
 			if( portfolio != null) {
 				isMultiSymbolPortfolio = portfolio.PortfolioType == PortfolioType.MultiSymbol;
 			}
-			next = Chain.Next.Model as StrategySupportInterface;
 			daily  = new TransactionPairs(GetCurrentEquity,equityProfitLoss,dailyBinary);
 			dailyBinary.Name = "Daily";
 			weeklyBinary  = new TransactionPairsBinary();
@@ -96,55 +116,39 @@ namespace TickZoom.Common
 				equity.Drawing.Color = Color.Green;
 				equity.Drawing.GroupName = "SimpleEquity";
 				equity.Name = "SimpleEquity";
-				AddIndicator(equity);
+				model.AddIndicator(equity);
 			}
 			
 			if( enableYearlyStats) {
-				RequestUpdate(Intervals.Year1);
+				model.RequestUpdate(Intervals.Year1);
 			}
 			if( enableMonthlyStats) {
-				RequestUpdate(Intervals.Month1);
+				model.RequestUpdate(Intervals.Month1);
 			}
 			if( enableWeeklyStats) {
-				RequestUpdate(Intervals.Week1);
+				model.RequestUpdate(Intervals.Week1);
 			}
 			if( enableDailyStats) {
-				RequestUpdate(Intervals.Day1);
+				model.RequestUpdate(Intervals.Day1);
 			}
-		}
-		
-		public sealed override bool OnProcessTick(Tick tick)
-		{
-			Position.Copy(next.Position);
-			return true;
+			
+			model.AddInterceptor( EventType.Open, this);
+			model.AddInterceptor( EventType.Close, this);
+			isInitialized = true;
 		}
 		
 		public void OnChangeClosedEquity(double profitLoss) {
 			closedEquity += profitLoss;
 		}
 		
-		public override bool OnIntervalOpen(Interval interval)
+		public bool OnIntervalOpen(Interval interval)
 		{
-			if( IsTrace) Log.Trace("IntervalOpen("+interval+")");
-			if( Data == null) {
-				Log.Debug("Data is null");
-			}
-			
-			if( Ticks == null) {
-				Log.Debug("Ticks is null");
-			}
-			
-			if( Ticks[0] == null) {
-				Log.Debug("Ticks is null");
-			}
-			
 			TimeStamp dt;
 			try { 
-				dt = Ticks[0].Time;
+				dt = model.Ticks[0].Time;
 			} catch( NullReferenceException ex) {
-				Log.Debug("RETRYING: Found exception " + ex);
 				Thread.Sleep(100);
-				dt = Ticks[0].Time;
+				dt = model.Ticks[0].Time;
 			}
 			if( dailyBinary.Count == 0) CalcNew(dailyBinary);
 			if( weeklyBinary.Count == 0) CalcNew(weeklyBinary);
@@ -153,9 +157,8 @@ namespace TickZoom.Common
 			return true;
 		}
 
-		public override bool OnIntervalClose(Interval interval)
+		public bool OnIntervalClose(Interval interval)
 		{
-			if( IsTrace) Log.Trace("IntervalClose("+interval+")");
 			if( interval.Equals(Intervals.Day1)) {
 				CalcEnd(dailyBinary);
 				CalcNew(dailyBinary);
@@ -172,7 +175,7 @@ namespace TickZoom.Common
 			return true;
 		}
 		
-		public override bool OnIntervalClose()
+		public bool OnIntervalClose()
 		{
 			if( graphEquity) {
 				equity[0] = CurrentEquity;
@@ -188,7 +191,7 @@ namespace TickZoom.Common
 			TransactionPairBinary trade = TransactionPairBinary.Create();
 			trade.Direction = 1;
 			trade.EntryPrice = CurrentEquity;
-			trade.EntryTime = Ticks[0].Time;
+			trade.EntryTime = model.Ticks[0].Time;
 			periodTrades.Add(trade);
 		}
 
@@ -196,7 +199,7 @@ namespace TickZoom.Common
 			if( periodTrades.Count>0) {
 				TransactionPairBinary pair = periodTrades[periodTrades.Count - 1];
 				pair.ExitPrice = CurrentEquity;
-				pair.ExitTime = Ticks[0].Time;
+				pair.ExitTime = model.Ticks[0].Time;
 				pair.Completed = true;
 				periodTrades[periodTrades.Count - 1] = pair;
 			}
@@ -207,17 +210,6 @@ namespace TickZoom.Common
 			equityStats.StrategyStats = strategyStats;
 			equityStats.WriteReport(name,folder);
 			return true;
-		}
-
-		[Obsolete("This method is never used.",true)]
-		public override double Fitness {
-			get { TradeStats stats = new TradeStats( CompletedMonthly); 
-				return stats.Average; }
-		}
-		
-		[Obsolete("Override OnGetFitness() or OnStatistics() in a strategy instead.",true)]
-		public override string OnOptimizeResults() {
-			throw new NotImplementedException();
 		}
 
 		[Obsolete("Use Performance.ProfitLossCalculation.Slippage or create your own ProfitLossCalculation instead.",true)]
@@ -238,8 +230,8 @@ namespace TickZoom.Common
 
 		[Obsolete("Use Daily instead.",true)]
 		public TransactionPairs CompletedDaily {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,dailyBinary.GetCompletedList(Ticks[0].Time,CurrentEquity,Bars.BarCount));
+			get { if( model.Ticks.Count>0) {
+					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,dailyBinary.GetCompletedList(model.Ticks[0].Time,CurrentEquity,model.Bars.BarCount));
 				} else {
 					return new TransactionPairs(GetCurrentEquity,equityProfitLoss);
 				}
@@ -248,8 +240,8 @@ namespace TickZoom.Common
 
 		[Obsolete("Use Weekly instead.",true)]
 		public TransactionPairs CompletedWeekly {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,weeklyBinary.GetCompletedList(Ticks[0].Time,CurrentEquity,Bars.BarCount));
+			get { if( model.Ticks.Count>0) {
+					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,weeklyBinary.GetCompletedList(model.Ticks[0].Time,CurrentEquity,model.Bars.BarCount));
 				} else {
 					return new TransactionPairs(GetCurrentEquity,equityProfitLoss);
 				}
@@ -258,8 +250,8 @@ namespace TickZoom.Common
 
 		[Obsolete("Use Monthly instead.",true)]
 		public TransactionPairs CompletedMonthly {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,monthlyBinary.GetCompletedList(Ticks[0].Time,CurrentEquity,Bars.BarCount));
+			get { if( model.Ticks.Count>0) {
+					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,monthlyBinary.GetCompletedList(model.Ticks[0].Time,CurrentEquity,model.Bars.BarCount));
 				} else {
 					return new TransactionPairs(GetCurrentEquity,equityProfitLoss);
 				}
@@ -268,8 +260,8 @@ namespace TickZoom.Common
 	
 		[Obsolete("Use Yearly instead.",true)]
 		public TransactionPairs CompletedYearly {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,yearlyBinary.GetCompletedList(Ticks[0].Time,CurrentEquity,Bars.BarCount));
+			get { if( model.Ticks.Count>0) {
+					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,yearlyBinary.GetCompletedList(model.Ticks[0].Time,CurrentEquity,model.Bars.BarCount));
 				} else {
 					return new TransactionPairs(GetCurrentEquity,equityProfitLoss);
 				}
@@ -277,8 +269,8 @@ namespace TickZoom.Common
 		}
 		
 		public TransactionPairs Daily {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,dailyBinary.GetCompletedList(Ticks[0].Time,CurrentEquity,Bars.BarCount));
+			get { if( model.Ticks.Count>0) {
+					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,dailyBinary.GetCompletedList(model.Ticks[0].Time,CurrentEquity,model.Bars.BarCount));
 				} else {
 					return new TransactionPairs(GetCurrentEquity,equityProfitLoss);
 				}
@@ -286,8 +278,8 @@ namespace TickZoom.Common
 		}
 		
 		public TransactionPairs Weekly {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,weeklyBinary.GetCompletedList(Ticks[0].Time,CurrentEquity,Bars.BarCount));
+			get { if( model.Ticks.Count>0) {
+					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,weeklyBinary.GetCompletedList(model.Ticks[0].Time,CurrentEquity,model.Bars.BarCount));
 				} else {
 					return new TransactionPairs(GetCurrentEquity,equityProfitLoss);
 				}
@@ -296,8 +288,8 @@ namespace TickZoom.Common
 		
 		[Browsable(false)]
 		public TransactionPairs Monthly {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,monthlyBinary.GetCompletedList(Ticks[0].Time,CurrentEquity,Bars.BarCount));
+			get { if( model.Ticks.Count>0) {
+					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,monthlyBinary.GetCompletedList(model.Ticks[0].Time,CurrentEquity,model.Bars.BarCount));
 				} else {
 					return new TransactionPairs(GetCurrentEquity,equityProfitLoss);
 				}
@@ -306,8 +298,8 @@ namespace TickZoom.Common
 		
 		[Browsable(false)]
 		public TransactionPairs Yearly {
-			get { if( Ticks.Count>0) {
-					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,yearlyBinary.GetCompletedList(Ticks[0].Time,CurrentEquity,Bars.BarCount));
+			get { if( model.Ticks.Count>0) {
+					return new TransactionPairs(GetCurrentEquity,equityProfitLoss,yearlyBinary.GetCompletedList(model.Ticks[0].Time,CurrentEquity,model.Bars.BarCount));
 				} else {
 					return new TransactionPairs(GetCurrentEquity,equityProfitLoss);
 				}
@@ -383,7 +375,12 @@ namespace TickZoom.Common
 				if( isMultiSymbolPortfolio) {
 					return portfolio.GetOpenEquity();
 				} else {
-					return strategy.Performance.ComboTrades.OpenProfitLoss;
+					try { 
+						return performance.ComboTrades.OpenProfitLoss;
+					} catch( Exception) {
+						int x = 0;
+						return 0;
+					}
 				}
 			}
 		}
@@ -394,7 +391,12 @@ namespace TickZoom.Common
 		
 		public bool GraphEquity {
 			get { return graphEquity; }
-			set { graphEquity = value; }
+			set { if( isInitialized) {
+					throw new ApplicationException("You must set GraphEquity before initialize event occurs.");
+				} else {
+					graphEquity = value;
+				}
+			}
 		}
 		
 		public bool EnableYearlyStats {

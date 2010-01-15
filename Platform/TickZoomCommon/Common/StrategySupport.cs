@@ -37,9 +37,8 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of StrategySupport.
 	/// </summary>
-	public class StrategySupport : Model, StrategySupportInterface
+	public class StrategySupport : StrategyInterceptor
 	{
-		PositionInterface position;
 		Strategy strategy;
 		private readonly Log instanceLog;
 		private readonly bool instanceNotice;
@@ -54,8 +53,7 @@ namespace TickZoom.Common
 			instanceDebug = instanceLog.IsDebugEnabled;
 			instanceTrace = instanceLog.IsTraceEnabled;
 			this.strategy = strategy;
-			position = new PositionCommon(this);
-			fullName = strategy.Name + "." + Name;
+			fullName = strategy.Name;
 		}
 		
 		public string ToStatistics(Dictionary<string,string> optimizeValues)
@@ -63,14 +61,9 @@ namespace TickZoom.Common
 			throw new NotImplementedException("Operation not valid for this type of object");
 		}
 		
-		public override string SymbolDefault {
-			get { return strategy.SymbolDefault; }
-			set { /* ignore */ }
-		}
-		
-		public virtual PositionInterface Position {
-			get { return position; }
-			set { position = value; }
+		public virtual void Intercept(EventContext eventContext, EventType eventType, object eventDetail)
+		{
+			throw new NotImplementedException("\"" + eventType + "\" event intercepted without any implementation on '" + GetType() + "'.");
 		}
 		
 		public Strategy Strategy {
@@ -93,8 +86,11 @@ namespace TickZoom.Common
 			get { return instanceTrace; }
 		}
 		
-		public override string FullName {
-			get { return fullName; }
+		public EventType EventType {
+			get {
+				throw new NotImplementedException();
+			}
 		}
+		
 	}
 }

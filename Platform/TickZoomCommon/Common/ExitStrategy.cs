@@ -56,54 +56,68 @@ namespace TickZoom.Common
 		bool stopTradingToday = false;
 		bool stopTradingThisWeek = false;
 		bool stopTradingThisMonth = false;
+		PositionCommon position;
 		
 		public ExitStrategy(Strategy strategy) : base( strategy) {
 //			RequestUpdate(Intervals.Day1);
 //			RequestUpdate(Intervals.Week1);
 //			RequestUpdate(Intervals.Month1);
+			position = new PositionCommon(strategy);
 		}
 		
-		public override void OnInitialize()
+		EventContext context;
+		public override void Intercept(EventContext context, EventType eventType, object eventDetail)
 		{
-			marketOrder = Data.CreateOrder(this);
+			if( eventType == EventType.Initialize) {
+				Strategy.AddInterceptor( EventType.Tick, this);
+				OnInitialize();
+			}
+			context.Invoke();
+			this.context = context;
+			if( eventType == EventType.Tick) {
+				OnProcessPosition((Tick) eventDetail);
+			}
+		}
+				
+		public void OnInitialize()
+		{
+			marketOrder = Strategy.Data.CreateOrder();
 			marketOrder.TradeDirection = TradeDirection.Exit;
 			Strategy.OrderManager.Add(marketOrder);
-			breakEvenStopOrder = Data.CreateOrder(this);
+			breakEvenStopOrder = Strategy.Data.CreateOrder();
 			breakEvenStopOrder.TradeDirection = TradeDirection.Exit;
-			stopLossOrder = Data.CreateOrder(this);
+			stopLossOrder = Strategy.Data.CreateOrder();
 			Strategy.OrderManager.Add(stopLossOrder);
 			stopLossOrder.TradeDirection = TradeDirection.Exit;
+			stopLossOrder.Tag = "ExitStrategy" ;
 			Strategy.OrderManager.Add(breakEvenStopOrder);
 //			log.WriteFile( LogName + " chain = " + Chain.ToChainString());
-			if( IsTrace) Log.Trace(FullName+".Initialize()");
-			Drawing.Color = Color.Black;
+			if( IsTrace) Log.Trace(Strategy.FullName+".Initialize()");
+			Strategy.Drawing.Color = Color.Black;
 		}
-	
-		public sealed override bool OnProcessTick(Tick tick)
-		{
+		
+		public void OnProcessPosition(Tick tick) {
 			// Handle ActiveNow orders.
-			if( Data.ActiveOrders.Count > 0) {
+			if( Strategy.Data.ActiveOrders.Count > 0) {
 				Strategy.OrderManager.ProcessOrders(tick);
 			}
 			
 			if( stopTradingToday || stopTradingThisWeek || stopTradingThisMonth ) {
-				return true;
+				return;
 			}
 			
-//			if( Strategy.Position.ResetChangeFlag() ) {
-			if( (strategySignal>0) != Strategy.Position.IsLong || (strategySignal<0) != Strategy.Position.IsShort ) {
-				strategySignal = Strategy.Position.Current;
-				entryPrice = Strategy.Position.Price;
+			if( (strategySignal>0) != context.Position.IsLong || (strategySignal<0) != context.Position.IsShort ) {
+				strategySignal = context.Position.Current;
+				entryPrice = context.Position.Price;
 				maxPnl = 0;
-				Position.Copy(Strategy.Position);
+				position.Copy(context.Position);
 				trailStop = 0;
 				breakEvenStop = 0;
 				CancelOrders();
 			} 
 			
-			if( Position.HasPosition ) {
+			if( position.HasPosition ) {
 				// copy signal in case of increased position size
-				Position.Copy(Strategy.Position);
 				double exitPrice;
 				if( strategySignal > 0) {
 					exitPrice = tick.Bid;
@@ -125,7 +139,7 @@ namespace TickZoom.Common
 				if( monthlyMaxLoss > 0) processMonthlyMaxLoss(tick);
 			}
 			
-			return true;
+			context.Position.Copy(position);
 		}
 	
 		private void processDailyMaxProfit(Tick tick) {
@@ -137,7 +151,7 @@ namespace TickZoom.Common
 		}
 		
 		private void processDailyMaxLoss(Tick tick) {
-			if( - Strategy.Performance.Equity.ProfitToday >= dailyMaxLoss) {
+			if( Strategy.Performance.Equity.ProfitToday >= dailyMaxLoss) {
 				stopTradingToday = true;
 				LogExit("DailyMaxLoss Exit at " + dailyMaxLoss);
 				flattenSignal(tick,"Daily Stop Loss");
@@ -191,17 +205,17 @@ namespace TickZoom.Common
             if (Strategy.Performance.GraphTrades)
             {
 				double fillPrice = 0;
-				if( Position.IsLong) {
-					order.Positions = Strategy.Position.Size;
+				if( position.IsLong) {
+					order.Positions = context.Position.Size;
 					fillPrice = tick.Bid;
 				}
-				if( Position.IsShort) {
-					order.Positions = Strategy.Position.Size;
+				if( position.IsShort) {
+					order.Positions = context.Position.Size;
 					fillPrice = tick.Ask;
 				}
                 Strategy.Chart.DrawTrade(order, fillPrice, 0);
             }
-            Position.Change(0);
+            position.Change(0);
 			CancelOrders();
 			if( controlStrategy) {
 				Strategy.Orders.Exit.ActiveNow.GoFlat();
@@ -219,17 +233,17 @@ namespace TickZoom.Common
 		private void processStopLoss(Tick tick) {
 			if( !stopLossOrder.IsActive) {
 				stopLossOrder.IsActive = true;
-				if( Position.IsLong) {
+				if( position.IsLong) {
 					stopLossOrder.Type = OrderType.SellStop;
 					stopLossOrder.Price = entryPrice - stopLoss;
 				}
-				if( Position.IsShort) {
+				if( position.IsShort) {
 					stopLossOrder.Type = OrderType.BuyStop;
 					stopLossOrder.Price = entryPrice + stopLoss;
 				}
 			}
 			if( pnl <= -stopLoss) {
-				LogExit("StopLoss Exit at " + stopLoss);
+				LogExit("StopLoss " + stopLoss + " Exit at " + tick);
 				flattenSignal(stopLossOrder,tick);
 			}
 		}
@@ -241,7 +255,7 @@ namespace TickZoom.Common
 			}
 		}
 		
-		public override bool OnIntervalOpen(Interval interval) {
+		public bool OnIntervalOpen(Interval interval) {
 			if( interval.Equals(Intervals.Day1)) {
 				stopTradingToday = false;
 			}
@@ -259,11 +273,12 @@ namespace TickZoom.Common
 				breakEvenStopOrder.Tag = "Break Even";
 				if( !breakEvenStopOrder.IsActive) {
 					breakEvenStopOrder.IsActive = true;
-					if( Position.IsLong ) {
+					if( position.IsLong ) {
 						breakEvenStopOrder.Type = OrderType.SellStop;
 						breakEvenStopOrder.Price = entryPrice + breakEvenStop;
 					}
-					if( Position.IsShort ) {
+					
+					if( position.IsShort ) {
 						breakEvenStopOrder.Type = OrderType.BuyStop;
 						breakEvenStopOrder.Price = entryPrice - breakEvenStop;
 					}
@@ -276,10 +291,10 @@ namespace TickZoom.Common
 		}
 		
 		private void LogExit(string description) {
-			if( Chart.IsDynamicUpdate) {
-				Log.Notice(Ticks[0].Time + ", Bar="+Chart.DisplayBars.CurrentBar+", " + description);
-			} else if( !IsOptimizeMode) {
-				if( IsTrace) Log.Trace(Ticks[0].Time + ", Bar="+Chart.DisplayBars.CurrentBar+", " + description);
+			if( Strategy.Chart.IsDynamicUpdate) {
+				Log.Notice(Strategy.Ticks[0].Time + ", Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
+			} else if( !Strategy.IsOptimizeMode) {
+				if( IsDebug) Log.Debug(Strategy.Ticks[0].Time + ", Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
 			}
 		}
 
@@ -358,11 +373,15 @@ namespace TickZoom.Common
 		}
 		#endregion
 	
-		public override string ToString()
-		{
-			return FullName;
-		}
+//		public override string ToString()
+//		{
+//			return Strategy.FullName;
+//		}
 		
+		public PositionCommon Position {
+			get { return position; }
+			set { position = value; }
+		}
 	}
 
 	[Obsolete("Please use ExitStrategy instead.",true)]

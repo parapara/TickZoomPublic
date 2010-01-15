@@ -62,7 +62,7 @@ namespace TickZoom
 		bool showPriceGraph = true;
 		int objectId = 0;
 		float _clusterWidth = 0;
-		StrategySupportInterface strategyForTrades;
+		StrategyInterface strategyForTrades;
 		bool isDynamicUpdate = false;
 		Color[] colors = { Color.Black, Color.Red, Color.FromArgb(194,171,213), Color.FromArgb (250,222,130) } ;
 		bool isAudioNotify = false;
@@ -1179,7 +1179,7 @@ namespace TickZoom
 			set { showPriceGraph = value; }
 		}
 		
-		public StrategySupportInterface StrategyForTrades {
+		public StrategyInterface StrategyForTrades {
 			get { return strategyForTrades; }
 			set { strategyForTrades = value; }
 		}

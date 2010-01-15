@@ -48,13 +48,12 @@ namespace TickZoom.Indicators
 			Assert.IsNotNull(tema, "constructor");
 			tema.IntervalDefault = Intervals.Day1;
 			for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
-				ModelInterface formula = tema.Chain.Dependencies[j].Model;
+				Model formula = (Model) tema.Chain.Dependencies[j].Model;
 				formula.Bars = bars;
-				formula.OnBeforeInitialize();
 				formula.OnInitialize();
 			}
 			tema.Bars = bars;
-			tema.OnBeforeInitialize();
+			tema.OnConfigure();
 			tema.OnInitialize();
 		}
 		
@@ -65,8 +64,9 @@ namespace TickZoom.Indicators
 				// open, high, low, close all the same.
 				bars.AddBar( data[i], data[i], data[i], data[i], 0);
 				for(int j=0; j<tema.Chain.Dependencies.Count; j++) {
-					ModelInterface formula = tema.Chain.Dependencies[j].Model;
+					Model formula = (Model) tema.Chain.Dependencies[j].Model;
 					formula.OnBeforeIntervalOpen();
+					formula.OnIntervalOpen();
 					formula.OnIntervalClose();
 				}
 				tema.OnBeforeIntervalOpen();

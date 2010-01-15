@@ -30,6 +30,7 @@ namespace TickZoom.Api
 {
 	public interface ModelInterface
 	{
+		
 		Context Context {
 			get;
 			set;
@@ -69,39 +70,10 @@ namespace TickZoom.Api
 			get;
 		}
 		
-		[Category("Strategy Settings")]
 		Interval IntervalDefault {
 			get;
 			set;
 		}
-		
-		void OnProperties(ModelProperties properties);
-		
-		void OnBeforeInitialize();
-		
-		void OnInitialize();
-		
-		void OnStartHistorical();
-			
-		bool OnBeforeIntervalOpen();
-		
-		bool OnBeforeIntervalOpen(Interval interval);
-		
-		bool OnIntervalOpen();
-		
-		bool OnIntervalOpen(Interval interval);
-		
-		bool OnProcessTick(Tick tick);
-		
-		bool OnBeforeIntervalClose();
-		
-		bool OnBeforeIntervalClose(Interval interval);
-		
-		bool OnIntervalClose();
-		
-		bool OnIntervalClose(Interval interval);
-	
-		void OnEndHistorical();
 		
 		string Name {
 			get;
@@ -122,5 +94,24 @@ namespace TickZoom.Api
 			set;
 		}
 		
+		List<StrategyInterceptor> StrategyInterceptors {
+			get;
+		}
+		
+		Dictionary<EventType,List<EventInterceptor>> EventInterceptors {
+			get;
+		}
+		
+		List<EventType> Events {
+			get;
+		}
+		
+		void OnProperties(ModelProperties properties);
+		
+		void OnConfigure();
+		void OnInitialize();
+		
+		void OnEvent( EventContext context, EventType eventType, object eventDetail);
+
 	}
 }

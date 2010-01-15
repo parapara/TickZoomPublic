@@ -36,9 +36,9 @@ namespace TickZoom.Api
 			get;
 		}
 		
-		[Obsolete("Use CreateOrder() with an argument instead.",true)]
 		LogicalOrder CreateOrder();
 		
+		[Obsolete("Use CreateOrder() without argument instead.",true)]
 		LogicalOrder CreateOrder(ModelInterface strategy);
 		
 		Bars Get(Interval interval);

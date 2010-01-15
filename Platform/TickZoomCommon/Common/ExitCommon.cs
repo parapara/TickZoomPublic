@@ -52,24 +52,25 @@ namespace TickZoom.Common
 		public ExitCommon(Strategy strategy) : base(strategy) {
 		}
 		
-		public override void OnInitialize()
+		public void OnInitialize()
 		{
-			if( IsTrace) Log.Trace(FullName+".Initialize()");
-			Drawing.Color = Color.Black;
-			orders.buyMarket = Data.CreateOrder(this);
+			if( IsTrace) Log.Trace(Strategy.FullName+".Initialize()");
+			Strategy.Drawing.Color = Color.Black;
+			orders.buyMarket = Strategy.Data.CreateOrder();
 			orders.buyMarket.Type = OrderType.BuyMarket;
-			orders.sellMarket = Data.CreateOrder(this);
+			orders.sellMarket = Strategy.Data.CreateOrder();
 			orders.sellMarket.Type = OrderType.SellMarket;
-			orders.buyStop = Data.CreateOrder(this);
+			orders.buyStop = Strategy.Data.CreateOrder();
 			orders.buyStop.Type = OrderType.BuyStop;
 			orders.buyStop.TradeDirection = TradeDirection.Exit;
-			orders.sellStop = Data.CreateOrder(this);
+			orders.sellStop = Strategy.Data.CreateOrder();
 			orders.sellStop.Type = OrderType.SellStop;
 			orders.sellStop.TradeDirection = TradeDirection.Exit;
-			orders.buyLimit = Data.CreateOrder(this);
+			orders.sellStop.Tag = "ExitCommon";
+			orders.buyLimit = Strategy.Data.CreateOrder();
 			orders.buyLimit.Type = OrderType.BuyLimit;
 			orders.buyLimit.TradeDirection = TradeDirection.Exit;
-			orders.sellLimit = Data.CreateOrder(this);
+			orders.sellLimit = Strategy.Data.CreateOrder();
 			orders.sellLimit.Type = OrderType.SellLimit;
 			orders.sellLimit.TradeDirection = TradeDirection.Exit;
 			Strategy.OrderManager.Add( orders.buyMarket);
@@ -100,7 +101,7 @@ namespace TickZoom.Common
 		}
 		
 		private void FlattenSignal(double price) {
-			Strategy.Position.Change(0,price,Ticks[0].Time);
+			Strategy.Position.Change(0,price,Strategy.Ticks[0].Time);
 			CancelOrders();
 		}
 	
@@ -188,10 +189,10 @@ namespace TickZoom.Common
 		}
 		
 		private void LogExit(string description) {
-			if( Chart.IsDynamicUpdate) {
-				Log.Notice("Bar="+Chart.DisplayBars.CurrentBar+", " + description);
+			if( Strategy.Chart.IsDynamicUpdate) {
+				Log.Notice("Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
 			} else {
-        		if( IsDebug) Log.Debug("Bar="+Chart.DisplayBars.CurrentBar+", " + description);
+        		if( IsDebug) Log.Debug("Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
 			}
 		}
 
@@ -211,9 +212,9 @@ namespace TickZoom.Common
 		        	orders.sellMarket.IsActive = true;
 	        	}
 				if( Strategy.Performance.GraphTrades) {
-	        		Strategy.Chart.DrawTrade(orders.sellMarket,Ticks[0].Bid,Strategy.Position.Current);
+	        		Strategy.Chart.DrawTrade(orders.sellMarket,Strategy.Ticks[0].Bid,Strategy.Position.Current);
 				}
-	        	FlattenSignal(Ticks[0].Bid);
+	        	FlattenSignal(Strategy.Ticks[0].Bid);
         	}
         	if( Strategy.Position.IsShort) {
 	        	orders.buyMarket.Price = 0;
@@ -224,9 +225,9 @@ namespace TickZoom.Common
 		        	orders.buyMarket.IsActive = true;
 	        	}
 				if( Strategy.Performance.GraphTrades) {
-	        		Strategy.Chart.DrawTrade(orders.buyMarket,Ticks[0].Ask,Strategy.Position.Current);
+	        		Strategy.Chart.DrawTrade(orders.buyMarket,Strategy.Ticks[0].Ask,Strategy.Position.Current);
 				}
-	        	FlattenSignal(Ticks[0].Ask);
+	        	FlattenSignal(Strategy.Ticks[0].Ask);
         	}
 		}
 	
@@ -299,14 +300,7 @@ namespace TickZoom.Common
 		
 		public override string ToString()
 		{
-			return FullName;
-		}
-		
-		// This just makes sure nothing uses PositionChange
-		// here because only Strategy.PositionChange must be used.
-		public new int Position {
-			get { return 0; }
-			set { /* ignore */ }
+			return Strategy.FullName;
 		}
 		
 		public bool EnableWrongSideOrders {

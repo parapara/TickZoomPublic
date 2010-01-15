@@ -75,7 +75,7 @@ namespace Loaders
  			// Get the stategy
     		multiSymbolPortfolio = loader.TopModel as Portfolio;
     		fullTickData = multiSymbolPortfolio.Strategies[0] as ExampleOrderStrategy;
-    		singleSymbolPortfolio = multiSymbolPortfolio.Strategies[1] as Portfolio;
+    		singleSymbolPortfolio = multiSymbolPortfolio.Portfolios[0] as Portfolio;
     		fourTicksPerBar = singleSymbolPortfolio.Strategies[0] as ExampleOrderStrategy;
     		exampleSimple = singleSymbolPortfolio.Strategies[1] as ExampleSimpleStrategy;
 		}
@@ -89,10 +89,16 @@ namespace Loaders
 		[Test] 
 		public void TestSingleSymbolPortfolio() {
 			double expectedEquity = 0;
-			expectedEquity += fourTicksPerBar.Performance.Equity.CurrentEquity;
-			expectedEquity -= fourTicksPerBar.Performance.Equity.StartingEquity;
-			expectedEquity += exampleSimple.Performance.Equity.CurrentEquity;
-			expectedEquity -= exampleSimple.Performance.Equity.StartingEquity;
+			double fourTicksEquity = 0;
+			fourTicksEquity += fourTicksPerBar.Performance.Equity.CurrentEquity;
+			fourTicksEquity -= fourTicksPerBar.Performance.Equity.StartingEquity;
+			Assert.AreEqual(-74800,fourTicksEquity,"four ticks");
+			double exampleEquity = 0;
+			exampleEquity += exampleSimple.Performance.Equity.CurrentEquity;
+			exampleEquity -= exampleSimple.Performance.Equity.StartingEquity;
+			Assert.AreEqual(-223000D,exampleEquity,"example simple");
+			
+			expectedEquity = fourTicksEquity + exampleEquity;
 			
 			double portfolioEquity = singleSymbolPortfolio.Performance.Equity.CurrentEquity;
 			portfolioEquity -= singleSymbolPortfolio.Performance.Equity.StartingEquity;

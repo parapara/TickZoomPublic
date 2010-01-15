@@ -39,7 +39,7 @@ namespace TickZoom.Common
 	public abstract class ModelLoaderCommon : ModelLoaderInterface
 	{
 		Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-		IList<Strategy> models = new List<Strategy>();
+		IList<Model> models = new List<Model>();
 		List<ModelProperty> variables = new List<ModelProperty>();
 		List<OptimizeRange> rules = new List<OptimizeRange>();
 		bool isVisibleInGUI = true;
@@ -66,53 +66,81 @@ namespace TickZoom.Common
 			models.Clear();
 		}
 		
-		[Obsolete("Please use CreateStrategy() instead.",true)]
 		public ModelInterface CreateModel( string type, string name) {
-			return CreateStrategy(type,name);
+			Model model = CreateModel(type);
+			model.Name = name;
+			return model;
 		}
 		 
 		public Strategy CreateStrategy( string type, string name) {
-			ModelInterface model;
-			for( int i = 0; i< models.Count; i++) {
-				if( models[i].Name == name) {
-					if( models[i].GetType().Name != type) {
-						throw new ApplicationException("Model already exists with name " + name + " with different type");
-					}
-					return models[i] as Strategy;
-				}
-			}
-			model = CreateStrategy(type);
+			Model model = CreateStrategy(type);
 			model.Name = name;
 			return model as Strategy;
 		}
 		
-		[Obsolete("Please use CreateStrategy() instead.",true)]
-		public ModelInterface CreateModel( string type) {
-			return CreateStrategy( type);
+		public Strategy CreateStrategy( string type) {
+			Model model = CreateModel( type);
+			if( model is Strategy) {
+				models.Add( model as Strategy);
+				return model as Strategy;
+			} else {
+				throw new ApplicationException("Name passed to CreateStrategy() was of type " + model.GetType().Name + " instead of a strategy. Perhaps, try CreatePortfolio() instead.");
+			}
+		}
+
+		public Portfolio CreatePortfolio( string type, string name) {
+			Model model = CreateStrategy(type);
+			model.Name = name;
+			return model as Portfolio;
 		}
 		
-		public Strategy CreateStrategy( string type) {
-			ModelInterface model;
+		public Portfolio CreatePortfolio( string type) {
+			Model model = CreateModel( type);
+			if( model is Portfolio) {
+				models.Add( model as Portfolio);
+				return model as Portfolio;
+			} else {
+				throw new ApplicationException("Name passed to CreatePortfolio() was " + model.GetType().Name + " instead of a portfolio. Perhaps, try CreateStrategy() instead.");
+			}
+		}
+		
+		public Model CreateModel( string type) {
+			Model model = null;
 			for( int i = 0; i< models.Count; i++) {
 				if( models[i].Name == type) {
 					if( models[i].GetType().Name != type) {
 						throw new ApplicationException("Model already exists with name " + name + " with different type");
 					}
-					return models[i];
+					model = models[i];
 				}
 			}
-			try { 
-				model = Plugins.Instance.GetModel(type);
-			} catch( Exception ex) {
-				log.Error( "Please make sure " + type + " exists and has a default constructor. ", ex);
-				return null;
+			if( model == null) {
+				try { 
+					model = Plugins.Instance.GetModel(type) as Model;
+					models.Add(model);
+				} catch( Exception ex) {
+					log.Error( "Please make sure " + type + " exists and has a default constructor. ", ex);
+				}
 			}
-			models.Add( model as Strategy);
-			return model as Strategy;
+			return model;
 		}
-
+		
 		public Strategy GetStrategy( string name) {
-			return (Strategy) GetModelInternal( name);
+			ModelInterface model = GetModelInternal( name);
+			if( model is Strategy) {
+				return (Strategy) model;
+			} else {
+				throw new InvalidCastException( "'" + name + "' is not a strategy. Perhaps, try GetPortfolio() method instead.");
+			}
+		}
+		
+		public Portfolio GetPortfolio( string name) {
+			ModelInterface model = GetModelInternal( name);
+			if( model is Portfolio) {
+				return (Portfolio) model;
+			} else {
+				throw new InvalidCastException( "'" + name + "' is not a portfolio. Perhaps, try GetStrategy() method instead.");
+			}
 		}
 		
 		[Obsolete("Please use GetStrategy() instead",true)]
@@ -127,7 +155,7 @@ namespace TickZoom.Common
 					return models[i];
 				}
 			}
-			model = CreateStrategy( name);
+			model = CreateModel( name);
 			if( model != null) {
 				return model;
 			}
@@ -142,7 +170,7 @@ namespace TickZoom.Common
 		}
 		
 		public void AddDependency( string current, string previous) {
-			Strategy previousStrategy = null;
+			Model previousStrategy = null;
 			for( int i = 0; i< models.Count; i++) {
 				if( models[i].Name == previous) {
 					previousStrategy = models[i];
@@ -157,15 +185,16 @@ namespace TickZoom.Common
 			AddDependency( current, previousStrategy);
 		}
 		
-		public void AddDependency( string current, Strategy previousStrategy) {
-			Strategy currentStrategy = null;
+		public void AddDependency( string current, Model previousStrategy) {
+			Model currentStrategy = null;
 			for( int i = 0; i< models.Count; i++) {
-				if( models[i].Name == current) {
+				string name = models[i].Name;
+				if( name == current) {
 					currentStrategy = models[i];
 				}
 			}
 			if( currentStrategy == null) {
-				currentStrategy = CreateStrategy( current);
+				currentStrategy = CreateModel( current);
 			}
 			if( currentStrategy == null) {
 				throw new ApplicationException( "Child Strategy '" + current + "' was not found for AddDependency()");
@@ -173,7 +202,7 @@ namespace TickZoom.Common
 			AddDependency(currentStrategy,previousStrategy);
 		}
 		
-		public void AddDependency( Strategy currentStrategy, Strategy previousStrategy) {
+		public void AddDependency( ModelInterface currentStrategy, ModelInterface previousStrategy) {
 			currentStrategy.Chain.Dependencies.Add(previousStrategy.Chain.Root);
 		}
 		                          

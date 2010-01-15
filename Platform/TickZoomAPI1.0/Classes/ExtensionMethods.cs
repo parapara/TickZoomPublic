@@ -22,10 +22,11 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
@@ -139,5 +140,22 @@ namespace TickZoom.Api
        		}
        		return symbolStr;
 		}
+		
+		public static void OnProperties(this object obj, ModelProperties properties)
+		{
+			string[] propertyKeys = properties.GetPropertyKeys();
+			for( int i=0; i<propertyKeys.Length; i++) {
+				obj.HandleProperty(propertyKeys[i],properties.GetProperty(propertyKeys[i]).Value);
+			}
+		}
+		
+		private static void HandleProperty(this object obj, string name, string str) {
+			PropertyInfo property = obj.GetType().GetProperty(name);
+			Type propertyType = property.PropertyType;
+			object value = Converters.Convert(propertyType,str);
+			property.SetValue(obj,value,null);
+	//			log.WriteFile("Property " + property.Name + " = " + value);
+		}		
+		
 	}
 }

@@ -32,7 +32,81 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public partial class Model : ModelInterface
+	public class ModelEvents {
+		private static readonly Log log = Factory.Log.GetLogger(typeof(ModelEvents));
+		private static readonly bool debug = log.IsDebugEnabled;
+		private static readonly bool trace = log.IsTraceEnabled;
+		protected ModelProperties properties;
+		public void OnProperties(ModelProperties properties)
+		{
+			this.properties = properties;
+	   			if( trace) log.Trace(GetType().Name+".OnProperties() - NotImplemented");
+			string[] propertyKeys = properties.GetPropertyKeys();
+			for( int i=0; i<propertyKeys.Length; i++) {
+				HandleProperty(propertyKeys[i],properties.GetProperty(propertyKeys[i]).Value);
+			}
+		}
+		
+		private void HandleProperty( string name, string str) {
+			PropertyInfo property = this.GetType().GetProperty(name);
+			Type propertyType = property.PropertyType;
+			object value = Converters.Convert(propertyType,str);
+			property.SetValue(this,value,null);
+	//			log.WriteFile("Property " + property.Name + " = " + value);
+		}		
+		
+		public virtual void OnConfigure() {
+			
+		}
+		
+		public virtual void OnInitialize() {
+		}
+		
+		public virtual bool OnBeforeIntervalOpen() {
+   			return false;
+		}
+	
+		public virtual bool OnBeforeIntervalOpen(Interval interval) {
+	   			return false;
+		}
+	
+		public virtual bool OnIntervalOpen() {
+			return false;
+		}
+	
+		public virtual bool OnIntervalOpen(Interval interval) {
+			return false;
+		}
+		
+		public virtual void OnGetPosition(EventContext context) {
+			
+		}
+		
+		public virtual bool OnProcessTick(Tick tick) {
+			return true;
+		}
+		
+		public virtual bool OnBeforeIntervalClose() {
+			return false;
+		}
+		
+		public virtual bool OnBeforeIntervalClose(Interval interval) {
+			return false;
+		}
+		
+		public virtual bool OnIntervalClose() {
+			return false;
+		}
+		
+		public virtual bool OnIntervalClose(Interval interval) {
+			return false;
+		}
+	
+		public virtual void OnEndHistorical() {
+		}
+	}
+	
+	public partial class Model : ModelEvents, ModelInterface
 	{
 		string name;
 		Chain chain;
@@ -49,8 +123,11 @@ namespace TickZoom.Common
 		Formula formula;
 		private static readonly Log log = Factory.Log.GetLogger(typeof(Model));
 		private static readonly bool debug = log.IsDebugEnabled;
-		private static readonly bool trace = log.IsTraceEnabled;		ModelProperties properties;
+		private static readonly bool trace = log.IsTraceEnabled;
 		bool isOptimizeMode = false;
+		List<StrategyInterceptor> strategyInterceptors = new List<StrategyInterceptor>();
+		Dictionary<EventType,List<EventInterceptor>> eventInterceptors = new Dictionary<EventType,List<EventInterceptor>>();
+		List<EventType> events = new List<EventType>();
 		
 		public Model()
 		{
@@ -62,6 +139,45 @@ namespace TickZoom.Common
 			
 			if( trace) log.Trace(GetType().Name+".new");
 			chain = Factory.Engine.Chain(this);
+
+			RequestEvent( EventType.Open);
+			RequestEvent( EventType.Close);
+			RequestEvent( EventType.Tick);
+			RequestEvent( EventType.Position);
+			RequestEvent( EventType.EndHistorical);
+		}
+
+		public void AddInterceptor(StrategyInterceptor interceptor) {
+			strategyInterceptors.Add(interceptor);
+		}
+		
+		public void InsertInterceptor(StrategyInterceptor interceptor) {
+			strategyInterceptors.Insert(0,interceptor);
+		}
+		
+		public void AddInterceptor(EventType eventType, EventInterceptor interceptor) {
+			List<EventInterceptor> list = GetInterceptorList(eventType);
+			list.Add(interceptor);
+		}
+		
+		public void InsertInterceptor(EventType eventType, EventInterceptor interceptor) {
+			List<EventInterceptor> list = GetInterceptorList(eventType);
+			list.Insert(0,interceptor);
+		}
+		
+		private List<EventInterceptor> GetInterceptorList(EventType eventType) {
+			List<EventInterceptor> list;
+			if( eventInterceptors.TryGetValue( eventType, out list)) {
+				return list;
+			} else {
+				list = new List<EventInterceptor>();
+				eventInterceptors.Add(eventType,list);
+				return list;
+			}
+		}
+
+		public void RequestEvent( EventType eventType) {
+			events.Add(eventType);
 		}
 		
 		public void RequestUpdate( Interval interval) {
@@ -77,6 +193,10 @@ namespace TickZoom.Common
 			return false;
 		}
 	
+		public virtual double OnCalculateProfitLoss(double position, double entry, double exit) {
+			throw new NotImplementedException("The performance object ignores this method unless you override and provide your own implementation.");
+		}
+
 		[Browsable(false)]
 		public virtual Interval IntervalDefault {
 			get { return intervalDefault; }
@@ -87,19 +207,19 @@ namespace TickZoom.Common
 			if( chain.Dependencies.Contains(indicator.Chain)) {
 				throw new ApplicationException( "Indicator " + indicator.Name + " already added.");
 			}
-			if( this is StrategySupport) {
-				StrategySupport support = this as StrategySupport;
-				indicator.Performance = support.Strategy.Performance;
-			} else if( this is Strategy) {
+			if( this is Strategy) {
 				Strategy strategy = this as Strategy;
 				indicator.Performance = strategy.Performance;
 			} else if( this is IndicatorCommon) {
 				IndicatorCommon thisIndicator = this as IndicatorCommon;
 				indicator.Performance = thisIndicator.Performance;
+			} else if( this is Portfolio) {
+				Portfolio thisPortfolio = this as Portfolio;
+				indicator.Performance = thisPortfolio.Performance;
 			} else {
 				throw new ApplicationException("Sorry, indicators can only be added to objects derived from " +
 				                               typeof(Strategy).Name + ", " +
-				                               typeof(StrategySupport).Name + ", or " +
+				                               typeof(Portfolio).Name + ", or " +
 				                               typeof(IndicatorCommon).Name + ".");
 			}
 			// Apply Properties from project.xml, if any.
@@ -229,97 +349,43 @@ namespace TickZoom.Common
 			set { context = value; }
 		}
 		
-		public void OnProperties(ModelProperties properties)
-		{
-			this.properties = properties;
-	   			if( trace) log.Trace(GetType().Name+".OnProperties() - NotImplemented");
-			string[] propertyKeys = properties.GetPropertyKeys();
-			for( int i=0; i<propertyKeys.Length; i++) {
-				HandleProperty(propertyKeys[i],properties.GetProperty(propertyKeys[i]).Value);
-			}
-		}
-		
-		private void HandleProperty( string name, string str) {
-			PropertyInfo property = this.GetType().GetProperty(name);
-			Type propertyType = property.PropertyType;
-			object value = Converters.Convert(propertyType,str);
-			property.SetValue(this,value,null);
-	//			log.WriteFile("Property " + property.Name + " = " + value);
-		}		
-		
-		public virtual void OnBeforeInitialize() {
-	   			if( trace) log.Trace("OnBeforeInitialize() - NotImplemented");
-		}
-		
-		public virtual void OnInitialize() {
-	   			if( trace) log.Trace("OnInitialize() - NotImplemented");
-		}
-		
-		public virtual void OnStartHistorical() {
-	   			if( trace) log.Trace("OnStartHistorical() - NotImplemented");
-		}
-			
-		public virtual bool OnBeforeIntervalOpen() {
-	   			if( trace) log.Trace("OnBeforeIntervalOpen() - NotImplemented");
-	   			// Return false means never call this method again for performance.
-	   			return false;
-		}
-	
-		public virtual bool OnBeforeIntervalOpen(Interval interval) {
-	   			if( trace) log.Trace("OnBeforeIntervalOpen("+interval+") - NotImplemented");
-	   			// Return false means never call this method again for performance.
-	   			return false;
-		}
-	
-		public virtual bool OnIntervalOpen() {
-	   			if( trace) log.Trace("OnIntervalOpen() - NotImplemented");
-	   			// return false means the engine will never call this method again.
-			return false;
-		}
-	
-		public virtual bool OnIntervalOpen(Interval interval) {
-	   			if( trace) log.Trace("OnIntervalOpen("+interval+") - NotImplemented");
-	   			// return false means the engine will never call this method again.
-			return false;
-		}
-		
-		public virtual bool OnProcessTick(Tick tick) {
-	   			if( trace) log.Trace("OnProcessTick() - NotImplemented");
-	   			// return false means the engine will never call this method again.
-			return false;
-		}
-		
-		public virtual bool OnBeforeIntervalClose() {
-	   			if( trace) log.Trace("OnBeforeIntervalClose() - NotImplemented");
-	   			// return false means the engine will never call this method again.
-			return false;
-		}
-		
-		public virtual bool OnBeforeIntervalClose(Interval interval) {
-	   			if( trace) log.Trace("OnBeforeIntervalClose("+interval+") - NotImplemented");
-	   			// return false means the engine will never call this method again.
-			return false;
-		}
-		
-		public virtual bool OnIntervalClose() {
-	   			if( trace) log.Trace("OnIntervalClose() - NotImplemented");
-	   			// return false means the engine will never call this method again.
-			return false;
-		}
-		
-		public virtual bool OnIntervalClose(Interval interval) {
-	   			if( trace) log.Trace("OnIntervalClose("+interval+") - NotImplemented");
-	   			// return false means the engine will never call this method again.
-			return false;
-		}
-	
-		public virtual void OnEndHistorical() {
-	   			if( trace) log.Trace("OnEndHistorical() - NotImplemented");
-	   			// return false means the engine will never call this method again.
-		}
-		
 		public virtual void Save( string fileName) {
 			
+		}
+		
+		public virtual void OnEvent(EventContext context, EventType eventType, object eventDetail) {
+			switch( eventType) {
+				case EventType.Initialize:
+					OnInitialize();
+					break;
+				case EventType.Open:
+					if( eventDetail == null) {
+						OnBeforeIntervalOpen();
+						OnIntervalOpen();
+					} else {
+						OnBeforeIntervalOpen((Interval)eventDetail);
+						OnIntervalOpen((Interval)eventDetail);
+					}
+					break;
+				case EventType.Close:
+					if( eventDetail == null) {
+						OnBeforeIntervalClose();
+						OnIntervalClose();
+					} else {
+						OnBeforeIntervalClose((Interval)eventDetail);
+						OnIntervalClose((Interval)eventDetail);
+					}
+					break;
+				case EventType.Tick:
+					OnProcessTick((Tick)eventDetail);
+					break;
+				case EventType.EndHistorical:
+					OnEndHistorical();
+					break;
+				case EventType.Position:
+					OnGetPosition(context);
+					break;
+			}
 		}
 		
 		public void AddDependency( ModelInterface formula) {
@@ -422,6 +488,18 @@ namespace TickZoom.Common
 		public virtual string SymbolDefault {
 			get { return symbolDefault; }
 			set { symbolDefault = value; }
+		}
+		
+		public Dictionary<EventType,List<EventInterceptor>> EventInterceptors {
+			get { return eventInterceptors; }
+		}
+		
+		public List<EventType> Events {
+			get { return events; }
+		}
+		
+		public List<StrategyInterceptor> StrategyInterceptors {
+			get { return strategyInterceptors; }
 		}
 	}
 

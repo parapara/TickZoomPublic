@@ -37,30 +37,25 @@ namespace TickZoom.Common
 	public class Strategy : Model, StrategyInterface 
 	{
 		PositionInterface position;
-
-		[Browsable(false)]
-		public PositionInterface Position {
-			get { return position; }
-			set { position = value; }
-		}
-		
 		private static readonly Log log = Factory.Log.GetLogger(typeof(Strategy));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly bool trace = log.IsTraceEnabled;
 		private readonly Log instanceLog;
 		private readonly bool instanceDebug;
 		private readonly bool instanceTrace;
+		private Result result;
+		List<LogicalOrder> logicalOrders = new List<LogicalOrder>();
 		
 		OrderManager orderManager;
-		Orders orders;
-		ExitCommon exitNow;
-		EnterCommon enterNow;
+		OrderHandlers orderHandlers;
+		ExitCommon exitActiveNow;
+		EnterCommon enterActiveNow;
 		ExitCommon exitNextBar;
 		EnterCommon enterNextBar;
-		Chain exitStrategyChain;
-		Chain positionSizeChain;
-		Chain performanceChain;
-
+		Performance performance;
+		PositionSize positionSize;
+		ExitStrategy exitStrategy;
+		
 		public Strategy()
 		{
 			instanceLog = Factory.Log.GetLogger(this.GetType()+"."+Name);
@@ -68,72 +63,55 @@ namespace TickZoom.Common
 			instanceTrace = instanceLog.IsTraceEnabled;
 			position = new PositionCommon(this);
 			if( trace) log.Trace("Constructor");
-			log.Indent();
 			Chain.Dependencies.Clear();
 			isStrategy = true;
-			orderManager = new OrderManager(this);
-			Chain.InsertAfter(orderManager.Chain);
-			exitNow = new ExitCommon(this);
-			Chain.Dependencies.Add(exitNow.Chain);
-			enterNow = new EnterCommon(this);
-			Chain.Dependencies.Add(enterNow.Chain);
+			result = new Result(this);
+			/// <summary>
+			/// 
+			/// </summary>
+			
+			exitActiveNow = new ExitCommon(this);
+			enterActiveNow = new EnterCommon(this);
 			exitNextBar = new ExitCommon(this);
-			exitNextBar.Orders = exitNow.Orders;
+			exitNextBar.Orders = exitActiveNow.Orders;
 			exitNextBar.IsNextBar = true;
-			Chain.Dependencies.Add(exitNextBar.Chain);
 			enterNextBar = new EnterCommon(this);
-			enterNextBar.Orders = enterNow.Orders;
+			enterNextBar.Orders = enterActiveNow.Orders;
 			enterNextBar.IsNextBar = true;
-			Chain.Dependencies.Add(enterNextBar.Chain);
-			orders = new Orders(enterNow,enterNextBar,exitNow,exitNextBar);
-			Model exitStrategy = new ExitStrategy(this);
-			exitStrategyChain = Chain.InsertBefore(exitStrategy.Chain);
-			Model positionSizeStrategy = new PositionSize(this);
-			positionSizeChain = exitStrategy.Chain.InsertBefore(positionSizeStrategy.Chain);
-			Model performance = new Performance(this);
-			performanceChain = performance.Chain;
-			positionSizeStrategy.Chain.InsertBefore(performance.Chain);
-			log.Outdent();
+			orderHandlers = new OrderHandlers(enterActiveNow,enterNextBar,exitActiveNow,exitNextBar);
+			
+			// Interceptors.
+			orderManager = new OrderManager(this);
+			performance = new Performance(this);
+		    positionSize = new PositionSize(this);
+		    exitStrategy = new ExitStrategy(this);
 		}
 		
-		
-		public void propogateName() {
-			if( exitStrategyChain!=null) {
-				exitStrategyChain.Model.Name = Name;
-			}
-			if( performanceChain != null) {
-				performanceChain.Model.Name = Name;
-			}
-			if( positionSizeChain != null) {
-				positionSizeChain.Model.Name = Name;
-			}
-			if( exitNow != null) {
-				exitNow.Chain.Model.Name = Name;
-			}
-			if( enterNow != null) {
-				enterNow.Chain.Model.Name = Name;
-			}
-		}
-		
-		public override void OnBeforeInitialize()
+		public override void OnConfigure()
 		{
-			base.OnBeforeInitialize();
+			exitActiveNow.OnInitialize();
+			enterActiveNow.OnInitialize();
+			exitNextBar.OnInitialize();
+			enterNextBar.OnInitialize();
+			exitNextBar.OnInitialize();
+			base.OnConfigure();
+			
+			AddInterceptor(orderManager);
+			AddInterceptor(performance.Equity);
+			AddInterceptor(performance);
+			AddInterceptor(positionSize);
+			AddInterceptor(exitStrategy);
 		}
 		
-		public sealed override bool OnBeforeIntervalOpen() {
-			return base.OnBeforeIntervalOpen();
-		}
-		
-		public sealed override bool OnBeforeIntervalOpen(Interval interval) {
-			return base.OnBeforeIntervalOpen(interval);
-		}
-		
-		public sealed override bool OnBeforeIntervalClose() {
-			return base.OnBeforeIntervalClose();
-		}
-		
-		public sealed override bool OnBeforeIntervalClose(Interval interval) {
-			return base.OnBeforeIntervalClose(interval);
+		public override void OnEvent(EventContext context, EventType eventType, object eventDetail)
+		{
+			base.OnEvent(context, eventType, eventDetail);
+			if( eventType == EventType.Tick) {
+				if( context.Position == null) {
+					context.Position = new PositionCommon(this);
+				}
+				context.Position.Copy(Position);
+			}
 		}
 		
 		[Obsolete("Please, use OnGetOptimizeResult() instead.",true)]
@@ -157,12 +135,7 @@ namespace TickZoom.Common
 		
 		public override bool OnWriteReport(string folder)
 		{
-			Performance performance = (Performance) performanceChain.Model;
 			return performance.WriteReport(Name,folder);
-		}
-
-		public virtual double OnCalculateProfitLoss(double position, double entry, double exit) {
-			throw new NotImplementedException("The performance object ignores this method unless you override and provide your own implementation.");
 		}
 
 		[Browsable(true)]
@@ -188,50 +161,38 @@ namespace TickZoom.Common
 			set { base.Name = value; }
 		}
 
-		public Orders Orders {
-			get { return orders; }
+		public OrderHandlers Orders {
+			get { return orderHandlers; }
 		}
 		
 		[Obsolete("Please user Orders.Exit instead.",true)]
-		public ExitCommon ExitNow {
-			get { return exitNow; }
+		public ExitCommon ExitActiveNow {
+			get { return exitActiveNow; }
 		}
 		
 		[Obsolete("Please user Orders.Enter instead.",true)]
-		public EnterCommon EnterNow {
-			get { return enterNow; }
+		public EnterCommon EnterActiveNow {
+			get { return enterActiveNow; }
 		}
 		
 		[Category("Strategy Settings")]
 		public ExitStrategy ExitStrategy {
-			get { return (ExitStrategy) exitStrategyChain.Model; }
-			set { if( trace) log.Trace( FullName+" Exits - Replacing " + exitStrategyChain.Model.FullName + " with " + value.FullName);
-				  exitStrategyChain = exitStrategyChain.Replace(value.Chain);
-			}
+			get { return exitStrategy; }
+			set { exitStrategy = value; }
 		}
 		
 		[Category("Strategy Settings")]
 		public PositionSize PositionSize {
-			get { return (PositionSize) positionSizeChain.Model; }
-			set { if( trace) log.Trace( FullName+" PositionSize - Replacing " + positionSizeChain.Model.FullName + " with " + value.FullName);
-				  positionSizeChain = positionSizeChain.Replace(value.Chain);
-			}
+			get { return positionSize; }
+			set { positionSize = value; }
 		}
 
 		[Category("Strategy Settings")]
 		public Performance Performance {
-			get { return (Performance) performanceChain.Model; }
-			set { if( trace) log.Trace( FullName+" Performance - Replacing " + performanceChain.Model.FullName + " with " + value.FullName);
-				  Performance.RemoveChildren();
-				  performanceChain = performanceChain.Replace(value.Chain);
-			}
+			get { return performance; }
+			set { performance = value;}
 		}
 
-		[Obsolete("Use OnGetFitness() in a strategy instead.",true)]
-		public override double Fitness {
-			get { return Performance.Fitness; }
-		}
-		
 		public virtual double OnGetFitness() {
 			EquityStats stats = Performance.Equity.CalculateStatistics();
 			return stats.Daily.SortinoRatio;
@@ -261,6 +222,18 @@ namespace TickZoom.Common
 			
 		}
 		
+		public PositionInterface Position {
+			get { return position; }
+			set { position = value; }
+		}
+		
+	 	public IList<LogicalOrder> LogicalOrders {
+        	get { return (IList<LogicalOrder>) logicalOrders; }
+		}
+		
+		public ResultInterface Result {
+			get { return result; }
+		}
 	}
 	
 	[Obsolete("Please user Strategy instead.",true)]

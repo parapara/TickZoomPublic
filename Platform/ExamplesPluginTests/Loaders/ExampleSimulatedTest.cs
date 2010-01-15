@@ -51,7 +51,7 @@ namespace Loaders
 				
 				// Set run properties as in the GUI.
 				starter.ProjectProperties.Starter.StartTime = new TimeStamp(1800,1,1);
-	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp(1990,5,28);
+	    		starter.ProjectProperties.Starter.EndTime = new TimeStamp(1990,1,1);
 	    		starter.DataFolder = "TestData";
 	    		starter.ProjectProperties.Starter.Symbols = "Daily4Sim";
 				starter.ProjectProperties.Starter.IntervalDefault = Intervals.Day1;
@@ -71,6 +71,23 @@ namespace Loaders
 			}
 		}
 		
+		[Test]
+		public void VerifyCurrentEquity() {
+			Assert.AreEqual( -64800,strategy.Performance.Equity.CurrentEquity,"current equity");
+		}
+		[Test]
+		public void VerifyOpenEquity() {
+			Assert.AreEqual( -200,strategy.Performance.Equity.OpenEquity,"open equity");
+		}
+		[Test]
+		public void VerifyClosedEquity() {
+			Assert.AreEqual( -64600,strategy.Performance.Equity.ClosedEquity,"closed equity");
+		}
+		[Test]
+		public void VerifyStartingEquity() {
+			Assert.AreEqual( 10000,strategy.Performance.Equity.StartingEquity,"starting equity");
+		}
+
 		[TestFixtureTearDown]
 		public void FixtureTearDown() {
 			TimeStamp.ResetUtcOffset();
@@ -79,7 +96,7 @@ namespace Loaders
 		
 		[Test]
 		public void CompareTradeCount() {
-			Assert.AreEqual(502,strategy.Performance.ComboTrades.Count, "trade count");
+			Assert.AreEqual(472,strategy.Performance.ComboTrades.Count, "trade count");
 		}
 		
 		[Test]
@@ -96,25 +113,25 @@ namespace Loaders
 		
 		[Test]
 		public void BuyStopStopLossTest() {
-			VerifyPair( strategy, 2, "1983-04-08 09:00:00.000", 30.650,
+			VerifyPair( strategy, 2, "1983-04-08 09:00:00.000", 30.650D,
 			                 "1983-04-11 09:00:00.001",30.280D);
 		}
 		
 		[Test]
 		public void TradeAfterStopLossTest() {
-			VerifyPair( strategy, 3, "1983-04-12 09:00:00.002", 30.550,
-			                 "1983-04-12 09:00:00.002",31.000);
+			VerifyPair( strategy, 3, "1983-04-12 09:00:00.002", 30.550D,
+			                 "1983-04-12 09:00:00.002",31.000D);
 		}
 		
 		[Test]
 		public void SellStopStopLossTest() {
-			VerifyPair( strategy, 4, "1983-04-18 09:00:00.000", 30.560,
+			VerifyPair( strategy, 4, "1983-04-18 09:00:00.000", 30.560D,
 			                 "1983-04-18 09:00:00.002",30.710);
 		}
 		
 		[Test]
 		public void BuyStopBreakEvenTest() {
-			VerifyPair( strategy, 44, "1983-12-16 09:00:00.000", 28.68d,
+			VerifyPair( strategy, 44, "1983-12-16 09:00:00.000", 28.68D,
 			                 "1983-12-20 09:00:00.002",28.68d);
 		}
 		

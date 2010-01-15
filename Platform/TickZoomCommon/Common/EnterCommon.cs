@@ -51,21 +51,22 @@ namespace TickZoom.Common
 		
 		public EnterCommon(Strategy strategy) : base(strategy) {
 		}
-		public override void OnInitialize()
+		
+		public void OnInitialize()
 		{
 			if( IsDebug) Log.Debug("OnInitialize()");
-			Drawing.Color = Color.Black;
-			orders.buyMarket = Data.CreateOrder(this);
+			Strategy.Drawing.Color = Color.Black;
+			orders.buyMarket = Strategy.Data.CreateOrder();
 			orders.buyMarket.Type = OrderType.BuyMarket;
-			orders.sellMarket = Data.CreateOrder(this);
+			orders.sellMarket = Strategy.Data.CreateOrder();
 			orders.sellMarket.Type = OrderType.SellMarket;
-			orders.buyStop = Data.CreateOrder(this);
+			orders.buyStop = Strategy.Data.CreateOrder();
 			orders.buyStop.Type = OrderType.BuyStop;
-			orders.sellStop = Data.CreateOrder(this);
+			orders.sellStop = Strategy.Data.CreateOrder();
 			orders.sellStop.Type = OrderType.SellStop;
-			orders.buyLimit = Data.CreateOrder(this);
+			orders.buyLimit = Strategy.Data.CreateOrder();
 			orders.buyLimit.Type = OrderType.BuyLimit;
-			orders.sellLimit = Data.CreateOrder(this);
+			orders.sellLimit = Strategy.Data.CreateOrder();
 			orders.sellLimit.Type = OrderType.SellLimit;
 			Strategy.OrderManager.Add( orders.buyMarket);
 			Strategy.OrderManager.Add( orders.sellMarket);
@@ -216,10 +217,10 @@ namespace TickZoom.Common
 		}
 		
 		private void LogEntry(string description) {
-			if( Chart.IsDynamicUpdate) {
-        		if( IsNotice) Log.Notice("Bar="+Chart.DisplayBars.CurrentBar+", " + description);
+			if( Strategy.Chart.IsDynamicUpdate) {
+        		if( IsNotice) Log.Notice("Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
 			} else {
-        		if( IsDebug) Log.Debug("Bar="+Chart.DisplayBars.CurrentBar+", " + description);
+        		if( IsDebug) Log.Debug("Bar="+Strategy.Chart.DisplayBars.CurrentBar+", " + description);
 			}
 		}
 		
@@ -391,14 +392,7 @@ namespace TickZoom.Common
 	
 		public override string ToString()
 		{
-			return FullName;
-		}
-		
-		// This just makes sure nothing uses PositionChange
-		// here because only Strategy.PositionChange must be used.
-		public new int Position {
-			get { return 0; }
-			set { /* ignore */ }
+			return Strategy.FullName;
 		}
 		
 		public bool EnableWrongSideOrders {

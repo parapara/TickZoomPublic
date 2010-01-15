@@ -31,22 +31,22 @@ namespace TickZoom.Common
 		double slippage = 0.0D;
 		double commission = 0.0D;
 		double fullPointValue = 1.0D;
-		Strategy strategy;
+		Model model;
 		bool firstTime = true;
 		bool userImplemented = false;
 		
 		public TradeProfitLoss() {
 		}
 		
-		public TradeProfitLoss(Strategy strategy) {
-			this.strategy = strategy;
+		public TradeProfitLoss(Model model) {
+			this.model = model;
 		}
 		
 		public double CalculateProfit( double position, double entry, double exit) {
 			if( firstTime ){
 				try {
-					if( strategy != null) {
-						strategy.OnCalculateProfitLoss(position, entry, exit);
+					if( model != null) {
+						model.OnCalculateProfitLoss(position, entry, exit);
 						userImplemented = true;
 					} else {
 						userImplemented = false;
@@ -58,7 +58,7 @@ namespace TickZoom.Common
 			}
 			
 			if( userImplemented) {
-				return strategy.OnCalculateProfitLoss(position, entry, exit);
+				return model.OnCalculateProfitLoss(position, entry, exit);
 			} else {
 				double transactionCosts = (slippage + commission)*fullPointValue*Math.Abs(position);
 				double pnl = ((exit - entry) * position * fullPointValue) - transactionCosts;

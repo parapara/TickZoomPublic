@@ -79,7 +79,7 @@ namespace Loaders
 		public void CompareEquity() {
 			double expectedTotal = strategy.Strategies[0].Performance.Equity.NetProfit;
 			expectedTotal += strategy.Strategies[1].Performance.Equity.NetProfit;
-			double actualTotal = strategy.Performance.Equity.NetProfit / 10000;
+			double actualTotal = strategy.Performance.Equity.NetProfit;
 			Assert.AreEqual(expectedTotal.Round(),actualTotal.Round(),"net profit totals");
 		}
 		

@@ -44,6 +44,7 @@ namespace TickZoom.Unit.Indicators
  			DataImpl data = new DataImpl(properties,10000,1000);
 			sma = new SMA(data.Get(IntervalsInternal.Day1).Close,14);
 			sma.IntervalDefault = IntervalsInternal.Day1;
+			sms.OnConfigure();
 			sma.OnInitialize();
 			Assert.IsNotNull(sma, "sma constructor");
 			ticks = new TickSeries(10000);

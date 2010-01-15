@@ -52,7 +52,7 @@ namespace MiscTest
             AddDependency("PortfolioCommon", "MQ_BadFakeTick_1");
             AddDependency("PortfolioCommon", "MQ_BadFakeTick_2");
 
-            TopModel = GetStrategy("PortfolioCommon");
+            TopModel = GetPortfolio("PortfolioCommon");
         }
 	}
 }

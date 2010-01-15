@@ -56,20 +56,20 @@ namespace TickZoom
 			Strategy strategy = CreateStrategy("ExampleOrderStrategy","ExampleOrder-"+symbol) as Strategy;
 			strategy.SymbolDefault = symbol;
 			strategy.Performance.Equity.GraphEquity = false;
-	    	AddDependency( "PortfolioCommon", "ExampleOrder-"+symbol);
+	    	AddDependency( "Portfolio", "ExampleOrder-"+symbol);
 
 			symbol = properties.Starter.SymbolInfo[1].Symbol;
 			strategy = CreateStrategy("ExampleOrderStrategy","ExampleOrder-"+symbol) as Strategy;
 			strategy.SymbolDefault = symbol;
 			strategy.Performance.Equity.GraphEquity = false;
-	    	AddDependency( "PortfolioCommon", "ExampleOrder-"+symbol);
+	    	AddDependency( "Portfolio", "ExampleOrder-"+symbol);
 			
 			strategy = CreateStrategy("ExampleSimpleStrategy","ExampleSimple-"+symbol) as Strategy;
 			strategy.SymbolDefault = symbol;
 			strategy.Performance.Equity.GraphEquity = false;
-	    	AddDependency( "PortfolioCommon", "ExampleSimple-"+symbol);
+	    	AddDependency( "Portfolio", "ExampleSimple-"+symbol);
 			
-			TopModel = GetStrategy("PortfolioCommon");
+			TopModel = GetPortfolio("Portfolio");
 		}
 	}
 

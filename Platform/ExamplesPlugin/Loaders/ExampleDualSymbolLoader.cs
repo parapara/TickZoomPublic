@@ -52,11 +52,11 @@ namespace TickZoom
 			fullTicks.SymbolDefault = properties.Starter.SymbolInfo[0].Symbol;
 			ModelInterface fourTicks = CreateStrategy("ExampleOrderStrategy","FourTicksData");
 			fourTicks.SymbolDefault = properties.Starter.SymbolInfo[1].Symbol;
-			AddDependency("PortfolioCommon","FullTicksData");
-			AddDependency("PortfolioCommon","FourTicksData");
-			Strategy strategy = GetStrategy("PortfolioCommon");
-			strategy.Performance.GraphTrades = false;
-			TopModel = strategy;
+			AddDependency("Portfolio","FullTicksData");
+			AddDependency("Portfolio","FourTicksData");
+			Portfolio portfolio = GetPortfolio("Portfolio");
+			portfolio.Performance.GraphTrades = false;
+			TopModel = portfolio;
 		}
 	}
 }

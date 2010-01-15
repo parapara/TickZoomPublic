@@ -53,7 +53,7 @@ namespace TickZoom
 				market.SymbolDefault = symbol;
 				AddDependency("ExampleScannerStrategy",symbol+"Strategy");
 			}
-			TopModel = GetStrategy("ExampleScannerStrategy");
+			TopModel = GetPortfolio("ExampleScannerStrategy");
 			TopModel.SymbolDefault = properties.Starter.SymbolInfo[0].Symbol;
 		}
 		

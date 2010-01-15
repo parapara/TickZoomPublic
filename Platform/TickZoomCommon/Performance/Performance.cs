@@ -33,43 +33,58 @@ using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public class Performance : StrategySupport
+	public class Performance : StrategyInterceptor
 	{
 		TransactionPairs comboTrades;
 		TransactionPairsBinary comboTradesBinary;
-		Strategy strategy;
 		bool graphTrades = true;
 		bool graphAveragePrice = false;
 		IndicatorCommon avgPrice;
-		Chain equityChain;
-		StrategySupport next;
+		Equity equity;
 		TradeProfitLoss profitLoss;
 		List<double> positionChanges = new List<double>();
+		PositionCommon position;
+		Model model;
 		
-		public Performance(Strategy strategy) : base(strategy)
+		public Performance(Model model)
 		{
-			this.strategy = strategy;
-			profitLoss = new TradeProfitLoss(strategy);
-			Model equity = new Equity(strategy);
-			equityChain = Chain.InsertAfter(equity.Chain);
+			this.model = model;
+			profitLoss = new TradeProfitLoss(model);
+			equity = new Equity(model,this);
 			comboTradesBinary  = new TransactionPairsBinary();
 			comboTradesBinary.Name = "ComboTrades";
+			position = new PositionCommon(model);
 		}
 		
 		public double GetCurrentPrice( double direction) {
 			System.Diagnostics.Debug.Assert(direction!=0);
 			if( direction > 0) {
-				return Ticks[0].Bid;
+				return model.Ticks[0].Bid;
 			} else {
-				return Ticks[0].Ask;
+				return model.Ticks[0].Ask;
 			}
 		}
 		
-		public override void OnInitialize()
+		EventContext context;
+		
+		public void Intercept(EventContext context, EventType eventType, object eventDetail)
 		{
-			next = Chain.Next.Model as StrategySupport;
+			this.context = context;
+			if( EventType.Initialize == eventType) {
+				model.AddInterceptor( EventType.Close, this);
+				model.AddInterceptor( EventType.Tick, this);
+				OnInitialize();
+			}
+			context.Invoke();
+			if( EventType.Tick == eventType) {
+				OnProcessTick((Tick)eventDetail);
+			}
+		}
+		
+		public void OnInitialize()
+		{
 			comboTrades  = new TransactionPairs(GetCurrentPrice,profitLoss,comboTradesBinary);
-			profitLoss.FullPointValue = Data.SymbolInfo.FullPointValue;
+			profitLoss.FullPointValue = model.Data.SymbolInfo.FullPointValue;
 
 			if( graphAveragePrice) {
 				avgPrice = new IndicatorCommon();
@@ -78,21 +93,19 @@ namespace TickZoom.Common
 				avgPrice.Drawing.Color = Color.Green;
 				avgPrice.Drawing.GroupName = "Avg Price";
 				avgPrice.Name = "Avg Price";
-				AddIndicator(avgPrice);
+				model.AddIndicator(avgPrice);
 			}
 		}
 		
-		public override bool OnProcessTick(Tick tick)
+		public bool OnProcessTick(Tick tick)
 		{
-			if( IsTrace) Log.Trace("ProcessTick() Previous="+next+" Signal="+next.Position.Current);
-			if( next.Position.Current != Position.Current) {
-				positionChanges.Add(next.Position.Current);
-				if( IsTrace) Log.Trace("ProcessTick() Signal Changed.");
-				if( Position.IsFlat) {
+			if( context.Position.Current != position.Current) {
+				positionChanges.Add(context.Position.Current);
+				if( position.IsFlat) {
 					EnterComboTradeInternal();
-				} else if( next.Position.IsFlat) {
+				} else if( context.Position.IsFlat) {
 					ExitComboTradeInternal();
-				} else if( (next.Position.IsLong && Position.IsShort) || (next.Position.IsShort && Position.IsLong)) {
+				} else if( (context.Position.IsLong && position.IsShort) || (context.Position.IsShort && position.IsLong)) {
 					// The signal must be opposite. Either -1 / 1 or 1 / -1
 					ExitComboTradeInternal();
 					EnterComboTradeInternal();
@@ -101,57 +114,71 @@ namespace TickZoom.Common
 					ChangeComboSizeInternal();
 				}
 			} 
-			Position.Copy(next.Position);
-//			if( Position.HasPosition) {
-//				comboTradesBinary.Current.TryUpdate(tick);
-//				double pnl = comboTrades.ProfitInPosition(comboTrades.Current,tick);
-//				if( pnl != 0) {
-//					Equity.OnSetOpenEquity( pnl);
-//				}
-//			}
+			position.Copy(context.Position);
+			if( model is Strategy) {
+				Strategy strategy = (Strategy) model;
+				strategy.Result.Position.Copy(context.Position);
+			}
+
+			if( model is Portfolio) {
+				Portfolio portfolio = (Portfolio) model;
+				double tempNetClosedEquity = 0;
+				foreach( Strategy tempStrategy in portfolio.Strategies) {
+					tempNetClosedEquity += tempStrategy.Performance.Equity.ClosedEquity;
+					tempNetClosedEquity -= tempStrategy.Performance.Equity.StartingEquity;
+				}
+				double tempNetPortfolioEquity = 0;
+				tempNetPortfolioEquity += portfolio.Performance.Equity.ClosedEquity;
+				tempNetPortfolioEquity -= portfolio.Performance.Equity.StartingEquity;
+				if( tempNetClosedEquity != tempNetPortfolioEquity) {
+					int x = 0;
+				}
+			}
 			return true;
 		}
 		
 		private void EnterComboTradeInternal() {
-			EnterComboTrade(next.Position.Price);
+			EnterComboTrade(context.Position.Price);
 		}
 
 		public void EnterComboTrade(double fillPrice) {
-			if( IsTrace) Log.Trace("EnterComboTradeInternal()");
 			TransactionPairBinary pair = TransactionPairBinary.Create();
-			pair.Direction = next.Position.Current;
+			pair.Direction = context.Position.Current;
 			pair.EntryPrice = fillPrice;
-			Tick tick = Ticks[0];
+			Tick tick = model.Ticks[0];
 			pair.EntryTime = tick.Time;
-			pair.EntryBar = Chart.ChartBars.BarCount;
+			pair.EntryBar = model.Chart.ChartBars.BarCount;
 			comboTradesBinary.Add(pair);
-			Strategy.OnEnterTrade();
+			if( model is Strategy) {
+				Strategy strategy = (Strategy) model;
+				strategy.OnEnterTrade();
+			}
 		}
 		
 		private void ChangeComboSizeInternal() {
-			if( IsTrace) Log.Trace("ChangeComboSizeInternal()");
 			TransactionPairBinary combo = comboTradesBinary.Current;
-			combo.ChangeSize(next.Position.Current,next.Position.Price);
+			combo.ChangeSize(context.Position.Current,context.Position.Price);
 			comboTradesBinary.Current = combo;
 		}
 		
 		private void ExitComboTradeInternal() {
-			ExitComboTrade(next.Position.Price);
+			ExitComboTrade(context.Position.Price);
 		}
 					
 		public void ExitComboTrade(double fillPrice) {
-			if( IsTrace) Log.Trace("ExitComboTradeInternal()");
 			TransactionPairBinary comboTrade = comboTradesBinary.Current;
-			Tick tick = Ticks[0];
+			Tick tick = model.Ticks[0];
 			comboTrade.ExitPrice = fillPrice;
 			comboTrade.ExitTime = tick.Time;
-			comboTrade.ExitBar = Chart.ChartBars.BarCount;
+			comboTrade.ExitBar = model.Chart.ChartBars.BarCount;
 			comboTrade.Completed = true;
 			comboTradesBinary.Current = comboTrade;
 			double pnl = profitLoss.CalculateProfit(comboTrade.Direction,comboTrade.EntryPrice,comboTrade.ExitPrice);
 			Equity.OnChangeClosedEquity( pnl);
-			
-			Strategy.OnExitTrade();
+			if( model is Strategy) {
+				Strategy strategy = (Strategy) model;
+				strategy.OnExitTrade();
+			}
 		}
 		
 		protected virtual void EnterTrade() {
@@ -162,7 +189,7 @@ namespace TickZoom.Common
 			
 		}
 		
-		public override bool OnIntervalClose()
+		public bool OnIntervalClose()
 		{
 			if( graphAveragePrice) {
 				if( comboTradesBinary.Count > 0) {
@@ -177,13 +204,9 @@ namespace TickZoom.Common
 			return true;
 		}
 		
-		public void RemoveChildren() {
-			Equity.Chain.Remove();
-		}
-		
 		public Equity Equity {
-			get { return (Equity) equityChain.Model; }
-			set { equityChain = equityChain.Replace(value.Chain); }
+			get { return equity; }
+			set { equity = value; }
 		}
 		
 		public bool WriteReport(string name, string folder) {
@@ -212,20 +235,15 @@ namespace TickZoom.Common
 			set { profitLoss.Commission = value; }
 		}
 		
+		public PositionCommon Position {
+			get { return position; }
+			set { position = value; }
+		}
+		
 #region Obsolete Methods		
 		
 		[Obsolete("Use WriteReport(name,folder) instead.",true)]
 		public void WriteReport(string name,StreamWriter writer) {
-			throw new NotImplementedException();
-		}
-
-		[Obsolete("Please use the same property at Performance.Equity.* instead.",true)]
-		public override double Fitness {
-			get { return Equity.Fitness; }
-		}
-		
-		[Obsolete("Please use the same property at Performance.Equity.* instead.",true)]
-		public override string OnOptimizeResults() {
 			throw new NotImplementedException();
 		}
 
@@ -247,7 +265,7 @@ namespace TickZoom.Common
 		public TransactionPairs ComboTrades {
 			get { 
 				if( comboTradesBinary.Count > 0) {
-					comboTradesBinary.Current.TryUpdate(Ticks[0]);
+					comboTradesBinary.Current.TryUpdate(model.Ticks[0]);
 				}
 				return comboTrades;
 			}

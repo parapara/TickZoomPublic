@@ -56,7 +56,7 @@ namespace TickZoom.Common
 		public void TestPluginsForStrategy()
 		{
 			Plugins manager = Plugins.Instance;
-			Assert.IsTrue(typeof(StrategySupportInterface).IsAssignableFrom(manager.GetModel("ExampleSimpleStrategy").GetType()));
+			Assert.IsTrue(typeof(StrategyInterface).IsAssignableFrom(manager.GetModel("ExampleSimpleStrategy").GetType()));
 			Assert.IsTrue(typeof(ModelInterface).IsAssignableFrom(manager.Models[0]));
 			Assert.AreEqual(0,manager.ErrorCount, "Check the log for detailed errors.");
 		}

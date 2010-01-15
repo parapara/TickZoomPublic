@@ -264,7 +264,7 @@ namespace TickZoom.Common
 		}
 		
 		public void WriteTrades(TransactionPairs transactionPairs, TradeStats stats, bool combo) {
-			if( transactionPairs.Count > 0) {
+			if( transactionPairs != null && transactionPairs.Count > 0) {
 				int year = 0;
 				double currentBalance = stats.BeginningBalance;
 				double yearBalance = stats.BeginningBalance;

@@ -201,7 +201,6 @@ namespace TickZoom.Test
        		} catch ( QueueException) {
        			// Queue was already ended.
        		}
-//			Diagram.StateChange(this,receiverState);
 		}
 	}
 }

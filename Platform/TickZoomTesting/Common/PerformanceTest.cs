@@ -58,50 +58,35 @@ namespace TickZoom.Common
 			Assert.IsNotNull(performance,"MoneyManagerSupport constructor");
 		}
 		
-		[Test]
-		public void InitializeTick() 
-		{
-			Constructor();
-			RandomCommon strategy = new RandomCommon();
-			strategy.ExitStrategy = new ExitStrategy(strategy);
-			strategy.PositionSize = new PositionSize(strategy);
-			strategy.Performance = performance;
-			Assert.AreSame(strategy.Performance,performance);
-			Assert.AreSame(strategy.PositionSize,performance.Chain.Next.Next.Model);
-			Assert.AreSame(strategy.ExitStrategy,performance.Chain.Next.Next.Next.Model);
-		}
-
 		public class PerformanceInner : Performance {
 			Log log = Factory.Log.GetLogger(typeof(PerformanceInner));
 			public List<Tick> signalChanges = new List<Tick>();
 			public List<double> signalDirection = new List<double>();
 			double prevSignal = 0;
 			public TradingSignalTest tradingSignalTest;
-			public PerformanceInner( Strategy strategy) : base(strategy) {
-				
+			public PerformanceInner( Model model) : base(model) {
+				Position = tradingSignalTest = new TradingSignalTest(this,model);
 			}
-			public override void OnInitialize()
+			public new void OnInitialize()
 			{
-				if( trace) log.Trace(FullName+" Initialize()");
-				Position = tradingSignalTest = new TradingSignalTest(this);
 				base.OnInitialize();
 				signalChanges = new List<Tick>();
 				List<int> signalDirection = new List<int>();
 			}
 			public class TradingSignalTest : PositionCommon {
-				new PerformanceInner model;
-				public TradingSignalTest( PerformanceInner formula ) : base(formula) {
-					this.model = formula;
+				PerformanceInner test;
+				public TradingSignalTest( PerformanceInner test, ModelInterface formula ) : base(formula) {
+				 	this.test = test;
 				}
 				public override double Current  {
 					get { return base.Current; }
 				}
 				public override void Change( double position, double price, TimeStamp time) {
 					base.Change( position,price,time);
-					if( base.Current != model.prevSignal) {
-							model.signalChanges.Add(model.Ticks[0]);
-							model.signalDirection.Add(base.Current);
-							model.prevSignal = base.Current;
+					if( base.Current != test.prevSignal) {
+							test.signalChanges.Add(model.Data.Ticks[0]);
+							test.signalDirection.Add(base.Current);
+							test.prevSignal = base.Current;
 					}
 				}
 			}

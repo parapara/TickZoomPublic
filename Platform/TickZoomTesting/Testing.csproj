@@ -98,12 +98,11 @@
     <Compile Include="TradingFramework\ExitStrategyMiscTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyMock.cs" />
     <Compile Include="TradingFramework\ExitStrategyStopTest.cs" />
-    <Compile Include="TradingFramework\ExitStrategyTest.cs" />
+    <Compile Include="TradingFramework\ExitStrategyStopLossTest.cs" />
     <Compile Include="TradingFramework\ChainTest.cs" />
     <Compile Include="TradingFramework\ExitStrategyTickTest.cs" />
     <Compile Include="TradingFramework\MoneyManagerRandomStrategy.cs" />
     <Compile Include="TradingFramework\OptimizeVarTest.cs" />
-    <Compile Include="TradingFramework\PortfolioSupportTest.cs" />
     <Compile Include="TradingFramework\RandomMock.cs" />
     <Compile Include="TradingFramework\RandomStrategyTest.cs" />
     <Compile Include="TradingFramework\StrategyStatsTest.cs" />

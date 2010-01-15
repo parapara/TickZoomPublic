@@ -32,17 +32,24 @@ using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-	public interface StrategyInterface : StrategySupportInterface
+	public interface StrategyInterface : ModelInterface
 	{
 		string OnOptimizeResults();
 		[Obsolete("Please, implement OnGetFitness() method instead.")]
 		double Fitness {
 			get;
 		}
+		PositionInterface Position {
+			get;
+		}
+		ResultInterface Result {
+			get;
+		}
 		double OnGetFitness();
 		bool OnWriteReport(string folder);
 		string OnGetOptimizeResult(Dictionary<string,object> optimizeValues);
-		[Obsolete("Please, use OnStatistics() instead.")]
-		string ToStatistics();
+	 	IList<LogicalOrder> LogicalOrders {
+        	get;
+		}
 	}
 }

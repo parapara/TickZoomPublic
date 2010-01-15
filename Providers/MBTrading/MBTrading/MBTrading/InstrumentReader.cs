@@ -115,6 +115,7 @@ namespace TickZoom.MBTrading
         	TimeStamp timeStamp = TimeStamp.UtcNow;
 			tick.Initialize();
 			tick.SetTime(timeStamp);
+			tick.SetSymbol(symbol.BinaryIdentifier);
         }
         
         private void SendTick() {

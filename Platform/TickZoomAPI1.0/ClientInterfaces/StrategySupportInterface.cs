@@ -32,11 +32,7 @@ using System.Collections.Generic;
 
 namespace TickZoom.Api
 {
-	public interface StrategySupportInterface : ModelInterface
+	public interface StrategyInterceptor : EventInterceptor
 	{
-		PositionInterface Position {
-			get;
-			set;
-		}
 	}
 }

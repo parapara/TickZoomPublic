@@ -67,7 +67,7 @@ namespace TickZoom.StarterTest
 			Assert.IsNotNull( props.Engine);
 			Assert.IsNotNull( props.Model);
 			Assert.AreEqual( 0, props.Model.GetPropertyKeys().Length);
-			Assert.AreEqual( 4, props.Model.GetModelKeys().Length);
+			Assert.AreEqual( 2, props.Model.GetModelKeys().Length);
 		}
 	}
 }

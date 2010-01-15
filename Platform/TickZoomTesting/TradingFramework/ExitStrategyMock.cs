@@ -43,42 +43,25 @@ namespace TickZoom.TradingFramework
 		public List<TimeStamp> signalChanges = new List<TimeStamp>();
 		public List<double> signalDirection = new List<double>();
 		double prevSignal = 0;
-		public TradeSignalTest tradeSignalTest;
 		
 		public ExitStrategyMock(Strategy strategy) : base(strategy) {
-		}
-		
-		public override void OnInitialize()
-		{
-			base.OnInitialize();
-			if( trace) log.Trace(FullName+" Initialize()");
-			Position = tradeSignalTest = new TradeSignalTest(this);
 			signalChanges = new List<TimeStamp>();
-			List<int> signalDirection = new List<int>();
 		}
-		
-		public class TradeSignalTest : PositionCommon {
-			Log log = Factory.Log.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-			new ExitStrategyMock model;
-			public TradeSignalTest( ExitStrategyMock formula ) : base(formula) {
-				this.model = formula;
-			}
-			public override double Current  {
-				get { return base.Current; }
-			}
-			public override void Change(double position, double price, TimeStamp time)
-			{
-				base.Change(position, price, time);
-				if( base.Current != model.prevSignal) {
-					Tick tick = model.Ticks[0];
-					log.Debug( model.signalChanges.Count + " " + tick);
-					model.signalChanges.Add(tick.Time);
-					model.signalDirection.Add(base.Current);
-					model.prevSignal = base.Current;
+
+		public override void Intercept(EventContext context, EventType eventType, object eventDetail)
+		{
+			base.Intercept(context, eventType, eventDetail);
+			if( eventType == EventType.Tick) {
+				if( context.Position.Current != prevSignal) {
+					Tick tick = Strategy.Data.Ticks[0];
+					signalChanges.Add(tick.Time);
+					signalDirection.Add(context.Position.Current);
+					log.Warn( signalChanges.Count + " " + context.Position.Current + " " + tick);
+					prevSignal = context.Position.Current;
 				}
 			}
-	
 		}
+
 		public void TickConsoleWrite() {
 			for( int i = 0; i< signalChanges.Count; i++) {
 				TimeStamp time = signalChanges[i];

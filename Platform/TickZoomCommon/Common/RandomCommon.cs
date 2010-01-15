@@ -60,7 +60,7 @@ namespace TickZoom.Common
 				{
 					int sig = randomEntries[randomIndex].Second % 3 - 1;
 					if( sig != Position.Current) {
-						Position.Change(sig);
+						 Position.Change(sig);
 					}
 					randomIndex ++;
 				}

@@ -24,69 +24,76 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text;
 
 using TickZoom.Api;
 
 namespace TickZoom.Common
 {
-	public class Portfolio : Strategy, PortfolioInterface
+	public class Portfolio : Model, PortfolioInterface
 	{
 		List<Strategy> strategies = new List<Strategy>();
+		List<Portfolio> portfolios = new List<Portfolio>();
 		List<StrategyWatcher> watchers = new List<StrategyWatcher>();
 		PortfolioType portfolioType = PortfolioType.None;
 		double closedEquity = 0;
-		double openEquity;
+		Result result;
+		PositionCommon position;
+		Performance performance;
 		
 		public Portfolio()
 		{
-		    Performance.GraphTrades = false;
+		    result = new Result(this);
+		    position = new PositionCommon(this);
+			performance = new Performance(this);
+			FullName = this.GetType().Name;
+			Performance.GraphTrades = false;
 		}
 	
-		public sealed override void OnBeforeInitialize() {
+		public sealed override void OnConfigure() {
+			base.OnConfigure();
+			AddInterceptor(performance.Equity);
+			AddInterceptor(performance);
 			do {
 				// Count all the unique symbols used by dependencies and
 				// get a list of all the strategies.
 				strategies = new List<Strategy>();
-				Dictionary<string,List<Strategy>> symbolMap = new Dictionary<string,List<Strategy>>();
+				portfolios = new List<Portfolio>();
+				Dictionary<string,List<Model>> symbolMap = new Dictionary<string,List<Model>>();
 				for( int i=0; i<Chain.Dependencies.Count; i++) {
 					Chain chain = Chain.Dependencies[i];
-					Strategy strategy = null;
-					for( Chain link = chain.Tail; link.Model != null; link = link.Previous) {
-						strategy = link.Model as Strategy;
-						if( strategy != null) {
-							break;
-						}
-						chain = chain.Next;
-					}
-					if( strategy != null) {
-						List<Strategy> tempStrategies;
-						if( symbolMap.TryGetValue(strategy.SymbolDefault, out tempStrategies)) {
-							tempStrategies.Add(strategy);
+					if( chain.Model is Strategy || chain.Model is Portfolio) {
+						Model model = (Model) chain.Model;
+						List<Model> tempModels;
+						if( symbolMap.TryGetValue(model.SymbolDefault, out tempModels)) {
+							tempModels.Add(model);
 						} else {
-							tempStrategies = new List<Strategy>();
-							tempStrategies.Add(strategy);
-							symbolMap[strategy.SymbolDefault] = tempStrategies;
+							tempModels = new List<Model>();
+							tempModels.Add(model);
+							symbolMap[model.SymbolDefault] = tempModels;
 						}
-						strategies.Add(strategy);
+						if( model is Strategy) {
+							strategies.Add((Strategy)model);
+						} else if( model is Portfolio) {
+							portfolios.Add((Portfolio)model);
+						}
 					}
 				}
 				if(symbolMap.Count == 1) {
 					portfolioType = PortfolioType.SingleSymbol;
-				} else if( symbolMap.Count == strategies.Count) {
+				} else if( symbolMap.Count == (strategies.Count+portfolios.Count)) {
 					portfolioType = PortfolioType.MultiSymbol;
 				} else {
 					// Remove all dependencies which have more than one obect.
 					for( int i=Chain.Dependencies.Count-1; i>=0; i--) {
 						Chain chain = Chain.Dependencies[i];
-						if( chain.Root != chain.Tail) {
-							Chain.Dependencies.RemoveAt(i);
-						}
+						Chain.Dependencies.RemoveAt(i);
 					}
 					// There is a mixture of multi symbols and multi strategies per symbol.
 					// Insert additional Portfolios for each symbol.
 					foreach( var kvp in symbolMap) {
 						string symbol = kvp.Key;
-						List<Strategy> tempStrategies = kvp.Value;
+						List<Model> tempStrategies = kvp.Value;
 						if( tempStrategies.Count > 1) {
 							Portfolio portfolio = new Portfolio();
 							portfolio.Name = "Portfolio-"+symbol;
@@ -96,8 +103,8 @@ namespace TickZoom.Common
 							}
 							Chain.Dependencies.Add( portfolio.Chain);
 						} else {
-							Strategy strategy = tempStrategies[0];
-							Chain.Dependencies.Add( strategy.Chain);
+							Model model = tempStrategies[0];
+							Chain.Dependencies.Add( model.Chain);
 						}
 					}
 				}
@@ -107,14 +114,17 @@ namespace TickZoom.Common
 			foreach( var strategy in strategies) {
 				watchers.Add( new StrategyWatcher(strategy));
 			}
-		}	
+			foreach( var portfolio in portfolios) {
+				watchers.Add( new StrategyWatcher(portfolio));
+			}
+		}
 		
 		private class StrategyWatcher {
 			private double previousPosition = 0;
 			private PositionInterface position;
 			
-			public StrategyWatcher(Strategy strategy) {
-				this.position = strategy.Performance.Position;	
+			public StrategyWatcher(StrategyInterface strategy) {
+				this.position = strategy.Result.Position;
 			}
 			
 			public bool PositionChanged {
@@ -130,6 +140,17 @@ namespace TickZoom.Common
 			}
 		}
 	
+		public override void OnEvent(EventContext context, EventType eventType, object eventDetail)
+		{
+			base.OnEvent(context, eventType, eventDetail);
+			if( eventType == EventType.Tick) {
+				if( context.Position == null) {
+					context.Position = new PositionCommon(this);
+				}
+				context.Position.Copy(Position);
+			}
+		}
+		
 		public override bool OnProcessTick(Tick tick)
 		{
 			if( portfolioType == PortfolioType.SingleSymbol) {
@@ -157,13 +178,15 @@ namespace TickZoom.Common
 					tempClosedEquity += strategy.Performance.Equity.ClosedEquity;
 					tempClosedEquity -= strategy.Performance.Equity.StartingEquity;
 				}
+				foreach( var portfolio in portfolios) {
+					tempOpenEquity += portfolio.Performance.Equity.OpenEquity;
+					tempClosedEquity += portfolio.Performance.Equity.ClosedEquity;
+					tempClosedEquity -= portfolio.Performance.Equity.StartingEquity;
+				}
 				if( tempClosedEquity != closedEquity) {
 					double change = tempClosedEquity - closedEquity;
 					Performance.Equity.OnChangeClosedEquity(change);
 					closedEquity = tempClosedEquity;
-				}
-				if( tempOpenEquity != openEquity) {
-					openEquity = tempOpenEquity;
 				}
 				return true;
 			} else {
@@ -176,6 +199,9 @@ namespace TickZoom.Common
 			foreach( var strategy in strategies) {
 				tempOpenEquity += strategy.Performance.Equity.OpenEquity;
 			}
+			foreach( var portfolio in portfolios) {
+				tempOpenEquity += portfolio.Performance.Equity.OpenEquity;
+			}
 			return tempOpenEquity;
 		}
 		
@@ -186,6 +212,11 @@ namespace TickZoom.Common
 			get { return strategies; }
 		}
 		
+		public List<Portfolio> Portfolios {
+			get { return portfolios; }
+		}
+
+		[Obsolete("Please use Strategies instead.",true)]
 		public List<Strategy> Markets {
 			get { return strategies; }
 		}
@@ -193,6 +224,45 @@ namespace TickZoom.Common
 		public PortfolioType PortfolioType {
 			get { return portfolioType; }
 			set { portfolioType = value; }
+		}
+		
+		public ResultInterface Result {
+			get { return result; }
+		}
+		
+		public PositionInterface Position {
+			get { return position; }
+		}
+		
+		public virtual double OnGetFitness()
+		{
+			EquityStats stats = Performance.Equity.CalculateStatistics();
+			return stats.Daily.SortinoRatio;
+		}
+		
+		public virtual string OnGetOptimizeResult(Dictionary<string,object> optimizeValues)
+		{
+			StringBuilder sb = new StringBuilder();
+			sb.Append("Fitness,");
+			sb.Append(OnGetFitness());
+			foreach( KeyValuePair<string,object> kvp in optimizeValues) {
+				sb.Append(",");
+				sb.Append(kvp.Key);
+				sb.Append(",");
+				sb.Append(kvp.Value);
+			}
+			return sb.ToString();
+		}
+		
+		public Performance Performance {
+			get { return performance; }
+		}
+
+		List<LogicalOrder> logicalOrders = new List<LogicalOrder>();
+		public IList<LogicalOrder> LogicalOrders {
+			get {
+				return logicalOrders;
+			}
 		}
 	}
 

@@ -246,7 +246,7 @@ namespace TickZoom.Common
 		    			continue;
 					}
 				} else if( namePairs.Length == 3) {
-					StrategySupportInterface strategySupport = property.GetValue(strategy) as StrategySupportInterface;
+					StrategyInterceptor strategySupport = property.GetValue(strategy) as StrategyInterceptor;
 					if( strategySupport == null) {
 		    			log.Error("Sorry, the optimizer variable '" + kvp.Key + "' was not found.");
 		    			retVal = false;

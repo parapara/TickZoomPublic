@@ -34,16 +34,16 @@ namespace TickZoom
 	{
 		
 		public ExampleScannerStrategy() {
+			Performance.GraphTrades = true;
+			Performance.Equity.GraphEquity = true;
 		}
 		
 		public override void OnInitialize()
 		{
-			Performance.GraphTrades = true;
-			Performance.Equity.GraphEquity = true;
-			PositionSize.Size = 10000;
-			for( int i=0; i<Markets.Count; i++) {
-				Markets[i].Performance.GraphTrades = true;
-				Markets[i].Performance.Equity.GraphEquity = true;
+			foreach( Strategy strategy in Strategies) {
+				strategy.PositionSize.Size = 10000;
+				strategy.Performance.GraphTrades = true;
+				strategy.Performance.Equity.GraphEquity = true;
 			}
 		}
 		

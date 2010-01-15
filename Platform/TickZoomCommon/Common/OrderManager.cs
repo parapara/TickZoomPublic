@@ -36,13 +36,30 @@ namespace TickZoom.Common
 	/// <summary>
 	/// Description of OrderManager.
 	/// </summary>
-	public class OrderManager : StrategySupport, OrderManagerInterface
+	public class OrderManager : StrategySupport
 	{
-		List<LogicalOrder> orders = new List<LogicalOrder>();
-		
+		IList<LogicalOrder> orders;
 		public OrderManager(Strategy strategy) : base(strategy) {
+			orders = strategy.LogicalOrders;
 		}
-
+		
+		public override void Intercept(EventContext context, EventType eventType, object eventDetail)
+		{
+			if( eventType == EventType.Tick) {
+				OnProcessTick((Tick)eventDetail);
+			} else if( eventType == EventType.Open && eventDetail == null) {
+				OnIntervalOpen();
+			} else if( eventType == EventType.Initialize) {
+				OnInitialize();
+			}
+			context.Invoke();
+		}
+		
+		public void OnInitialize() {
+			Strategy.AddInterceptor(EventType.Open, this);
+			Strategy.AddInterceptor(EventType.Tick, this);
+		}
+		
 		public void Add(LogicalOrder order)
 		{
 			orders.Add(order);
@@ -53,7 +70,7 @@ namespace TickZoom.Common
 			orders.Remove(order);
 		}
 		
-		public override bool OnIntervalOpen()
+		public bool OnIntervalOpen()
 		{
 			foreach( LogicalOrder order in orders) {
 				if( order.IsNextBar) {
@@ -64,9 +81,9 @@ namespace TickZoom.Common
 			return true;
 		}
 		
-		public sealed override bool OnProcessTick(Tick tick)
+		public bool OnProcessTick(Tick tick)
 		{
-			if( Data.ActiveOrders.Count > 0) {
+			if( Strategy.Data.ActiveOrders.Count > 0) {
 				ProcessOrders(tick);
 			}
 			return true;
@@ -77,10 +94,6 @@ namespace TickZoom.Common
 			Strategy.Orders.Exit.ActiveNow.OnProcessOrders(tick);
 		}
 		
-	 	public IList<LogicalOrder> Orders {
-        	get { return (IList<LogicalOrder>) orders; }
-		}
-		
 		public bool AreExitsActive {
 			get { return Strategy.Position.HasPosition; }
 		}
@@ -89,7 +102,7 @@ namespace TickZoom.Common
 			get { return true; }
 		}
 		
-		public override PositionInterface Position {
+		public PositionInterface Position {
 			get { return Strategy.Position; }
 		}
 	}

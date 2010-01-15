@@ -31,7 +31,7 @@ using System;
 
 namespace TickZoom.Api
 {
-	public interface PortfolioInterface : ModelInterface
+	public interface PortfolioInterface : StrategyInterface
 	{
 		PortfolioType PortfolioType {
 			get;

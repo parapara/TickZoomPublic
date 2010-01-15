@@ -42,28 +42,27 @@ namespace TickZoom.Common
 	{
 		double size = 1;
 		double previousSignal = 0;
-		StrategySupportInterface strategy;
+		PositionCommon position;
 		
 		public PositionSize(Strategy strategy) : base(strategy) {
+			position = new PositionCommon(strategy);
 		}
 		
-		public override void OnInitialize()
+		public override void Intercept(EventContext context, EventType eventType, object eventDetail)
 		{
-			if( IsTrace) Log.Trace(FullName+".Initialize()");
-			strategy = Chain.Next.Model as StrategySupportInterface;
-		}
-	
-		public sealed override bool OnProcessTick(Tick tick)
-		{
-			if( IsTrace) Log.Trace("ProcessTick() Previous="+strategy+" Previous.Signal="+strategy.Position.Current);
-
-			// Is this a new position?
-			if( previousSignal != strategy.Position.Current ) {
-				// Pass 
-				previousSignal = strategy.Position.Current;
-				Position.Change(previousSignal * size, strategy.Position.Price, strategy.Position.Time);
+			if( eventType == EventType.Initialize) {
+				Strategy.AddInterceptor(EventType.Tick,this);
 			}
-			return true;
+			context.Invoke();
+			if( eventType == EventType.Tick) {
+				if( previousSignal != context.Position.Current ) {
+					// Pass 
+					previousSignal = context.Position.Current;
+					position.Change(previousSignal * size, context.Position.Price, context.Position.Time);
+				}
+				context.Position.Copy(position);
+			}
+			
 		}
 
 		/// <summary>
@@ -75,9 +74,5 @@ namespace TickZoom.Common
 			set { size = value; }
 		}
 		
-		public override string ToString()
-		{
-			return FullName;
-		}
 	}
 }

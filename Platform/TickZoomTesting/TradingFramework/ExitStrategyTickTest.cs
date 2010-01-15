@@ -42,7 +42,7 @@ namespace TickZoom.TradingFramework
 	[TestFixture]
 	public class ExitStrategyTickTest : MarshalByRefObject
 	{
-		private static readonly Log log = Factory.Log.GetLogger(typeof(ExitStrategyTest));
+		private static readonly Log log = Factory.Log.GetLogger(typeof(ExitStrategyTickTest));
 		private static readonly bool debug = log.IsDebugEnabled;
 		private static readonly bool trace = log.IsTraceEnabled;
 		ExitStrategyMock exitStrategy;
@@ -62,10 +62,8 @@ namespace TickZoom.TradingFramework
 		public void TickProcessing() {
 			Strategy random = new RandomCommon();
 			exitStrategy = new ExitStrategyMock(random);
-			exitStrategy.IntervalDefault = Intervals.Day1;
 			random.IntervalDefault = Intervals.Day1;
 			random.ExitStrategy = exitStrategy;
-			random.Performance.IntervalDefault = Intervals.Day1;
 			Starter starter = new HistoricalStarter();
 			starter.EndCount = 2047;
 			starter.ProjectProperties.Starter.Symbols = "USD_JPY_YEARS";
@@ -73,7 +71,6 @@ namespace TickZoom.TradingFramework
 			starter.Run(random);
 			
 			Assert.AreEqual(exitStrategy,random.ExitStrategy);
-			Assert.AreEqual(exitStrategy.tradeSignalTest,random.ExitStrategy.Position);
 		}
 	
 		[Test]

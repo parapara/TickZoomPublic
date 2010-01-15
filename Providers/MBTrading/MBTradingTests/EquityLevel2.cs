@@ -43,9 +43,11 @@ namespace TickZoom.Test
 	{
 		private static readonly Log log = Factory.Log.GetLogger(typeof(EquityLevel2));
 		private static readonly bool debug = log.IsDebugEnabled;		
-		Provider provider;
+		private Provider provider;
 		protected SymbolInfo symbol;
-		
+		protected VerifyFeed verify;
+		private bool localFlag = true;
+			
 		[TestFixtureSetUp]
 		public virtual void Init()
 		{
@@ -60,18 +62,34 @@ namespace TickZoom.Test
 		{
 		}
 		
+		public void CreateProvider() {
+			if( localFlag) {
+				provider = new MbtInterface();
+			} else {
+				provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
+			}
+			verify = new VerifyFeed();
+			provider.Start(verify);
+		}
+		
+		[SetUp]
+		public void Setup() {
+			CreateProvider();
+		}
+		
+		[TearDown]
+		public void TearDown() {
+  			provider.Stop(verify);	
+		}
+		
 		[Test]
 		public void DemoConnectionTest() {
 			if(debug) log.Debug("===DemoConnectionTest===");
-  			provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
 			if(debug) log.Debug("===StartSymbol===");
-			VerifyFeed verify = new VerifyFeed();
-			provider.Start(verify);
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			provider.Stop(verify);	
 		}
 		
 		[Test]		
@@ -82,14 +100,10 @@ namespace TickZoom.Test
 		
 		[Test]
 		public void TestSeperateProcess() {
-			provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
-			VerifyFeed verify = new VerifyFeed();
-			provider.Start(verify);
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			provider.Stop(verify);
   			Process[] processes = null;
   			for(int i=0;i<20;i++) {
   				processes = Process.GetProcessesByName("MBTradingService");
@@ -102,10 +116,7 @@ namespace TickZoom.Test
 		[Test]		
 		public void DemoStopSymbolTest() {
 			if(debug) log.Debug("===DemoConnectionTest===");
- 			provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
 			if(debug) log.Debug("===StartSymbol===");
-			VerifyFeed verify = new VerifyFeed();
-			provider.Start(verify);
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
 			if(debug) log.Debug("===VerifyFeed===");
   			long count = verify.Verify(AssertTick,symbol,25);
@@ -114,28 +125,21 @@ namespace TickZoom.Test
   			provider.StopSymbol(verify,symbol);
   			count = verify.Verify(AssertTick,symbol,25);
   			Assert.AreEqual(count,0,"tick count");
-  			provider.Stop(verify);
 		}
 
 		[Test]
 		public void DemoReConnectionTest() {
-  			provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
-			VerifyFeed verify = new VerifyFeed();
-			provider.Start(verify);
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
   			long count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
   			provider.Stop(verify);
-  			provider = Factory.Provider.ProviderProcess("127.0.0.1",6492,"MBTradingService.exe");
-			verify = new VerifyFeed();
-			provider.Start(verify);
+  			CreateProvider();
   			provider.StartSymbol(verify,symbol,TimeStamp.MinValue);
   			count = verify.Verify(AssertTick,symbol,25);
   			Assert.GreaterOrEqual(count,2,"tick count");
-  			provider.Stop(verify);
 		}
 
-		public void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
+		public virtual void AssertTick( TickIO tick, TickIO lastTick, ulong symbol) {
         	Assert.Greater(tick.Bid,0);
         	Assert.Greater(tick.Ask,0);
     		Assert.IsTrue(tick.Time>=lastTick.Time,"tick.Time > lastTick.Time");

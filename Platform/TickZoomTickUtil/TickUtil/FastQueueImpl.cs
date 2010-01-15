@@ -172,7 +172,9 @@ namespace TickZoom.TickUtil
 	    }
 	    
 	    public void Terminate() {
-	    	if( debug) log.Debug("Terminate was called.");
+	    	if( debug) {
+	    		log.Debug("Terminate was called: " + Environment.StackTrace);
+	    	}
 	   		SpinUnLock();
 	    	terminate = true;
 	        if( queue!=null) {

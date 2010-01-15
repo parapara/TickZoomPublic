@@ -91,6 +91,22 @@ namespace Loaders
 		#endregion
 		
 		[Test]
+		public void VerifyCurrentEquity() {
+			Assert.AreEqual( -213000,strategy.Performance.Equity.CurrentEquity,"current equity");
+		}
+		[Test]
+		public void VerifyOpenEquity() {
+			Assert.AreEqual( -1500,strategy.Performance.Equity.OpenEquity,"open equity");
+		}
+		[Test]
+		public void VerifyClosedEquity() {
+			Assert.AreEqual( -211500,strategy.Performance.Equity.ClosedEquity,"open equity");
+		}
+		[Test]
+		public void VerifyStartingEquity() {
+			Assert.AreEqual( 10000,strategy.Performance.Equity.StartingEquity,"starting equity");
+		}
+		[Test]
 		public void CompareTradeCount() {
 			Assert.AreEqual( 378,strategy.Performance.ComboTrades.Count, "trade count");
 		}
